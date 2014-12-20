@@ -1,0 +1,9 @@
+zh-TW:
+  active_admin:
+    devise:
+      email:
+        title: "信箱"
+      username:
+        title: "帳號"
+      password:
+        title: "密碼"
