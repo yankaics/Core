@@ -22,5 +22,12 @@ module Core
     # config.i18n.default_locale = :de
 
     config.action_mailer.delivery_method = (ENV['MAILER_DELIVERY_METHOD'].presence || :letter_opener).to_sym
+
+    # Send logs to a remote server
+    config.to_prepare do
+      if !ENV['REMOTE_LOGGER_HOST'].blank? && !ENV['REMOTE_LOGGER_PORT'].blank?
+        config.logger = RemoteSyslogLogger.new(ENV['REMOTE_LOGGER_HOST'], ENV['REMOTE_LOGGER_PORT'], local_hostname: (ENV['APP_NAME'].presence || Rails.application.class.parent_name), program: 'rails-' + Rails.application.class.parent_name.underscore)
+      end
+    end
   end
 end
