@@ -4,12 +4,14 @@ ruby '2.1.5'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.1.8'
-# Use sqlite3 as the database for Active Record
+# Use sqlite3 or pg as the database for Active Record
 gem 'sqlite3'
+gem 'pg'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 4.0.3'
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
+gem 'compass-rails', '~> 2.0.0'
 # Use CoffeeScript for .js.coffee assets and views
 gem 'coffee-rails', '~> 4.0.0'
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes
@@ -43,6 +45,36 @@ gem 'rack-timeout'
 # Loads environment variables from `.env`
 gem 'dotenv-rails', :groups => [:development, :test]
 
+# Handle settings by rails-settings-cached
+gem 'rails-settings-cached', '0.4.1'
+
+# Add Slim support
+gem 'slim-rails'
+
+gem 'devise', '~> 3.2.4'
+gem 'cancancan', '~> 1.9.2'
+gem 'omniauth-facebook', '~> 2.0.0'
+gem 'doorkeeper', '~> 1.4.0'
+gem 'httparty', '~> 0.13.1'
+
+gem 'simple_form', '~> 3.0.2'
+
+gem 'mailgunner', '~> 2.0.0'
+gem 'nexmo'
+
+# Make SEO-friendly meta tags and titles using meta-tags
+gem 'meta-tags', '~> 2.0.0'
+
+# Use activerecord-import to support bulk inserting data using ActiveRecord
+gem 'activerecord-import', '~> 0.5.0'
+
+# Use ActiveAdmin as the administration framework
+gem 'activeadmin', github: 'activeadmin'
+
+# Integrate swagger docs
+gem 'swagger-docs', '~> 0.1.8'
+gem 'swagger-ui_rails', '~> 0.1.7'
+
 # Development tools
 group :development do
   gem 'better_errors', '~> 2.0.0'
@@ -69,6 +101,16 @@ group :development, :test do
   gem 'timecop'
 end
 
+# Follow the rules of 12Factor
+gem 'rails_12factor', group: :production
+
 # Logger and Monitoring Tools
 gem 'remote_syslog_logger'
 gem 'newrelic_rpm'
+
+# Assets related Gems
+gem 'normalize-rails', '>= 3.0.1'
+gem 'modernizr-rails'
+# gem 'react-rails', '~> 1.0.0.pre', github: 'reactjs/react-rails'
+gem 'nprogress-rails', '~> 0.1.3.1'
+gem 'select2-rails', '~> 3.5.9'
