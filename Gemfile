@@ -52,3 +52,19 @@ group :development do
   # gem 'guard-livereload', require: false
   # gem 'growl_notify', require: false
 end
+
+# RSpec
+group :development, :test do
+  gem 'rspec-rails', '~> 3.0'
+  gem 'factory_girl_rails', '~> 4.5.0'
+  gem 'shoulda-matchers', require: false
+  gem 'rspec-its', require: false
+  gem 'simplecov', '~> 0.9.1', require: false
+  gem 'coveralls', require: false
+  gem 'capybara-webkit', '>= 1.2.0'
+  gem 'database_cleaner'
+  gem 'formulaic'
+  gem 'launchy'
+  gem 'webmock'
+  gem 'timecop'
+end
