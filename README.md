@@ -1,6 +1,11 @@
 Core
 ======
 
+[![Build Status](https://img.shields.io/travis/colorgy/Core/master.svg?style=flat)](https://travis-ci.org/colorgy/Core)
+[![Coverage Status](https://img.shields.io/coveralls/colorgy/Core/master.svg?style=flat)](https://coveralls.io/r/colorgy/Core?branch=master)
+[![Code Climate](https://img.shields.io/codeclimate/github/colorgy/Core.svg?style=flat)](https://codeclimate.com/github/colorgy/Core)
+[![Dependency Status](https://img.shields.io/gemnasium/colorgy/Core.svg?style=flat)](https://gemnasium.com/colorgy/Core)
+
 The core user authentication & management system.
 
 ## Development Setup
