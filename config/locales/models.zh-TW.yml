@@ -1,0 +1,4 @@
+zh-TW:
+  activerecord:
+    models:
+      setting: "系統設定"
