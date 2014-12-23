@@ -108,6 +108,14 @@ gem 'rails_12factor', group: :production
 gem 'remote_syslog_logger'
 gem 'newrelic_rpm'
 
+# Use Pry as the Rails console
+gem 'rb-readline'
+gem 'pry-rails'
+gem 'pry-byebug'
+gem 'awesome_print', :require => false
+gem 'hirb', :require => false
+gem 'hirb-unicode', :require => false
+
 # Assets related Gems
 gem 'normalize-rails', '>= 3.0.1'
 gem 'modernizr-rails'
