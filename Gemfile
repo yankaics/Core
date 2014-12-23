@@ -9,11 +9,11 @@ gem 'sqlite3'
 gem 'pg'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 4.0.3'
+gem 'compass-rails', '~> 2.0.0'
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
-gem 'compass-rails', '~> 2.0.0'
 # Use CoffeeScript for .js.coffee assets and views
-gem 'coffee-rails', '~> 4.0.0'
+gem 'coffee-rails', '~> 4.1.0'
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes
 # gem 'therubyracer',  platforms: :ruby
 
@@ -54,10 +54,10 @@ gem 'slim-rails'
 gem 'devise', '~> 3.2.4'
 gem 'cancancan', '~> 1.9.2'
 gem 'omniauth-facebook', '~> 2.0.0'
-gem 'doorkeeper', '~> 1.4.0'
+gem 'doorkeeper', '~> 2.0.1'
 gem 'httparty', '~> 0.13.1'
 
-gem 'simple_form', '~> 3.0.2'
+gem 'simple_form', '~> 3.1.0'
 
 gem 'mailgunner', '~> 2.0.0'
 gem 'nexmo'
@@ -66,7 +66,7 @@ gem 'nexmo'
 gem 'meta-tags', '~> 2.0.0'
 
 # Use activerecord-import to support bulk inserting data using ActiveRecord
-gem 'activerecord-import', '~> 0.5.0'
+gem 'activerecord-import', '~> 0.7.0'
 
 # Use ActiveAdmin as the administration framework
 gem 'activeadmin', github: 'activeadmin'
@@ -77,7 +77,7 @@ gem 'swagger-ui_rails', '~> 0.1.7'
 
 # Development tools
 group :development do
-  gem 'better_errors', '~> 2.0.0'
+  gem 'better_errors', '~> 2.1.0'
   gem 'binding_of_caller', '~> 0.7.2'
   gem 'meta_request'
   gem 'letter_opener'
@@ -112,5 +112,5 @@ gem 'newrelic_rpm'
 gem 'normalize-rails', '>= 3.0.1'
 gem 'modernizr-rails'
 # gem 'react-rails', '~> 1.0.0.pre', github: 'reactjs/react-rails'
-gem 'nprogress-rails', '~> 0.1.3.1'
+gem 'nprogress-rails', '~> 0.1.6.4'
 gem 'select2-rails', '~> 3.5.9'

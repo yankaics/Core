@@ -18,13 +18,13 @@ feature "Control Panel Setting", :type => :feature do
     end
     within("#main_content") do
       all('input[type=text]').each_with_index do |input, i|
-        input.value.should eq "input_val#{i}"
+        expect(input.value).to eq "input_val#{i}"
       end
       all('textarea').each_with_index do |input, i|
-        input.value.should eq "textarea_val#{i}"
+        expect(input.value).to eq "textarea_val#{i}"
       end
       all('input[type=checkbox]').each_with_index do |input, i|
-        input.value.should be_truthy
+        expect(input.value).to be_truthy
       end
     end
   end
