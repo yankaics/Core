@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141221114203) do
+ActiveRecord::Schema.define(version: 20141230031154) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -48,6 +48,41 @@ ActiveRecord::Schema.define(version: 20141221114203) do
   add_index "admins", ["email"], name: "index_admins_on_email", unique: true
   add_index "admins", ["unlock_token"], name: "index_admins_on_unlock_token", unique: true
   add_index "admins", ["username"], name: "index_admins_on_username", unique: true
+
+  create_table "departments", force: true do |t|
+    t.string   "organization_code", null: false
+    t.string   "code",              null: false
+    t.string   "name",              null: false
+    t.string   "short_name",        null: false
+    t.string   "parent_code"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "departments", ["organization_code"], name: "index_departments_on_organization_code"
+
+  create_table "friendly_id_slugs", force: true do |t|
+    t.string   "slug",                      null: false
+    t.integer  "sluggable_id",              null: false
+    t.string   "sluggable_type", limit: 50
+    t.string   "scope"
+    t.datetime "created_at"
+  end
+
+  add_index "friendly_id_slugs", ["slug", "sluggable_type", "scope"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope", unique: true
+  add_index "friendly_id_slugs", ["slug", "sluggable_type"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type"
+  add_index "friendly_id_slugs", ["sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_id"
+  add_index "friendly_id_slugs", ["sluggable_type"], name: "index_friendly_id_slugs_on_sluggable_type"
+
+  create_table "organizations", force: true do |t|
+    t.string   "code"
+    t.string   "name"
+    t.string   "short_name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "organizations", ["code"], name: "index_organizations_on_code", unique: true
 
   create_table "settings", force: true do |t|
     t.string   "var",                   null: false

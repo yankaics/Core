@@ -52,6 +52,7 @@ GEM
       activesupport (>= 3.0.0)
     arel (5.0.1.20140414130214)
     awesome_print (1.2.0)
+    babosa (0.3.11)
     bcrypt (3.1.9)
     better_errors (2.1.0)
       coderay (>= 1.0.0)
@@ -138,6 +139,8 @@ GEM
       activesupport
       capybara
       i18n
+    friendly_id (5.0.4)
+      activerecord (>= 4.0.0)
     fssm (0.2.10)
     has_scope (0.6.0.rc)
       actionpack (>= 3.2, < 5)
@@ -271,7 +274,6 @@ GEM
       activesupport (>= 3.0)
       i18n
       polyamorous (~> 1.1)
-    rb-readline (0.5.1)
     rdoc (4.2.0)
       json (~> 1.4)
     ref (1.0.5)
@@ -282,6 +284,7 @@ GEM
     rest-client (1.7.2)
       mime-types (>= 1.16, < 3.0)
       netrc (~> 0.7)
+    rmmseg-cpp (0.2.9)
     rspec-core (3.1.7)
       rspec-support (~> 3.1.0)
     rspec-expectations (3.1.2)
@@ -302,6 +305,8 @@ GEM
       rspec-support (~> 3.1.0)
     rspec-support (3.1.2)
     ruby-graphviz (1.0.9)
+    ruby-pinyin (0.4.5)
+      rmmseg-cpp (~> 0.2)
     safe_yaml (1.0.4)
     sass (3.2.19)
     sass-rails (4.0.5)
@@ -388,8 +393,10 @@ DEPENDENCIES
   activeadmin!
   activerecord-import (~> 0.7.0)
   awesome_print
+  babosa
   better_errors (~> 2.1.0)
   binding_of_caller (~> 0.7.2)
+  byebug
   cancancan (~> 1.9.2)
   capybara-webkit (>= 1.2.0)
   coffee-rails (~> 4.1.0)
@@ -402,6 +409,7 @@ DEPENDENCIES
   factory_girl_rails (~> 4.5.0)
   faker
   formulaic
+  friendly_id (~> 5.0.4)
   hirb
   hirb-unicode
   httparty (~> 0.13.1)
@@ -427,10 +435,10 @@ DEPENDENCIES
   rails-erd
   rails-settings-cached (= 0.4.1)
   rails_12factor
-  rb-readline
   remote_syslog_logger
   rspec-its
   rspec-rails (~> 3.0)
+  ruby-pinyin
   sass-rails (~> 4.0.3)
   sdoc (~> 0.4.0)
   select2-rails (~> 3.5.9)
