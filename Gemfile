@@ -15,7 +15,7 @@ gem 'uglifier', '>= 1.3.0'
 # Use CoffeeScript for .js.coffee assets and views
 gem 'coffee-rails', '~> 4.1.0'
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes
-# gem 'therubyracer',  platforms: :ruby
+gem 'therubyracer',  platforms: :ruby
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
@@ -51,7 +51,7 @@ gem 'rails-settings-cached', '0.4.1'
 # Add Slim support
 gem 'slim-rails'
 
-gem 'devise', '~> 3.2.4'
+gem 'devise', '~> 3.4.0'
 gem 'cancancan', '~> 1.9.2'
 gem 'omniauth-facebook', '~> 2.0.0'
 gem 'doorkeeper', '~> 2.0.1'
@@ -77,6 +77,8 @@ gem 'swagger-ui_rails', '~> 0.1.7'
 
 # Development tools
 group :development do
+  gem 'rails-erd'
+  gem 'railroady'
   gem 'better_errors', '~> 2.1.0'
   gem 'binding_of_caller', '~> 0.7.2'
   gem 'meta_request'
@@ -99,6 +101,7 @@ group :development, :test do
   gem 'launchy'
   gem 'webmock'
   gem 'timecop'
+  gem 'faker'
 end
 
 # Follow the rules of 12Factor
