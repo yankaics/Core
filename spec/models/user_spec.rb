@@ -8,6 +8,21 @@ RSpec.describe User, :type => :model do
 
   it { should validate_presence_of(:name) }
 
+  context "with emails" do
+    subject { create(:user) }
+    before do
+      @conf_email_1 = subject.emails.create!(email: Faker::Internet.email)
+      @conf_email_2 = subject.emails.create!(email: Faker::Internet.email)
+      @unconf_email_1 = subject.emails.create!(email: Faker::Internet.email)
+      @unconf_email_2 = subject.emails.create!(email: Faker::Internet.email)
+      @conf_email_1.confirm!
+      @conf_email_2.confirm
+      subject.clear_association_cache
+    end
+    its(:emails) { is_expected.to contain_exactly(@conf_email_1, @conf_email_2) }
+    its(:unconfirmed_emails) { is_expected.to contain_exactly(@unconf_email_1, @unconf_email_2) }
+  end
+
   describe "instantiation" do
     subject(:user) { create(:user) }
 
