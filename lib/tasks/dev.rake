@@ -7,7 +7,7 @@ namespace :dev do
     if Rails.env.development?
       include FactoryGirl::Syntax::Methods
 
-      # create(:user, email: "user@example.com", password: "password")
+      create(:organization_ntust)
     end
   end
 end

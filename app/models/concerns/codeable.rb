@@ -4,6 +4,8 @@ module Codeable
   included do
     default_scope { order('code ASC') }
     validates :code, format: { with: /\A[a-zA-Z0-9]+\z/ }
+    extend FriendlyId
+    friendly_id :code
   end
 
   module ClassMethods
