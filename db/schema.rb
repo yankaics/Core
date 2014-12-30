@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141230065420) do
+ActiveRecord::Schema.define(version: 20141230171421) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -60,6 +60,19 @@ ActiveRecord::Schema.define(version: 20141230065420) do
   end
 
   add_index "departments", ["organization_code"], name: "index_departments_on_organization_code"
+
+  create_table "email_patterns", force: true do |t|
+    t.integer  "priority",                   limit: 1, default: 100, null: false
+    t.string   "organization_code",                                  null: false
+    t.integer  "corresponded_identity",      limit: 1,               null: false
+    t.string   "email_regexp",                                       null: false
+    t.string   "uid_postparser"
+    t.string   "department_code_postparser"
+    t.string   "started_at_postparser"
+    t.string   "identity_detail_postparser"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "friendly_id_slugs", force: true do |t|
     t.string   "slug",                      null: false
@@ -112,6 +125,20 @@ ActiveRecord::Schema.define(version: 20141230065420) do
     t.integer  "user_id",      null: false
     t.string   "email",        null: false
     t.datetime "confirmed_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "user_identities", force: true do |t|
+    t.boolean  "email_pattern_id"
+    t.integer  "user_id"
+    t.string   "email",                          null: false
+    t.string   "organization_code",              null: false
+    t.integer  "identity",          default: 0,  null: false
+    t.string   "uid",                            null: false
+    t.string   "department_code"
+    t.string   "identity_detail",   default: "", null: false
+    t.date     "started_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

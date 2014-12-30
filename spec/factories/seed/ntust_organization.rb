@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :organization_ntust, parent: :organization do
+  factory :ntust_organization, parent: :organization do
     code 'NTUST'
     name '國立臺灣科技大學'
     short_name '台科大'
@@ -85,6 +85,30 @@ FactoryGirl.define do
 
         ], :validate => false
       )
+
+      if EmailPattern.where(organization: ntust).count < 1
+        create(:ntust_student_email_pattern)
+        create(:ntust_staff_email_pattern)
+      end
     end
+  end
+
+  factory :ntust_student_email_pattern, parent: :email_pattern do
+    priority 10
+    organization { Organization.find_by(code: 'NTUST') || create(:ntust_organization) }
+    corresponded_identity UserIdentity::IDENTITES[:student]
+    email_regexp '^(?<uid>(?<identity_detail>[aAbmdBMD])(?<started_at>\\d*)(?<department_code>\\d{2})\\d{3})@mail\\.ntust\\.edu\\.tw$'
+    uid_postparser "n.toLowerCase()"
+    department_code_postparser "'D' + n"
+    identity_detail_postparser "switch (n.toLowerCase()) { case 'a': 'a'; break; case 'b': 'bachelor'; break; case 'm': 'master'; break; case 'd': 'doctor'; break; }"
+    started_at_postparser "new Date((parseInt(n)+1911) + '-9')"
+  end
+
+  factory :ntust_staff_email_pattern, parent: :email_pattern do
+    priority 20
+    organization { Organization.find_by(code: 'NTUST') || create(:ntust_organization) }
+    corresponded_identity UserIdentity::IDENTITES[:staff]
+    email_regexp '^(?<uid>.+)@mail\\.ntust\\.edu\\.tw$'
+    uid_postparser "n.toLowerCase()"
   end
 end
