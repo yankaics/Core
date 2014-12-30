@@ -51,6 +51,10 @@ gem 'rails-settings-cached', '0.4.1'
 # Add Slim support
 gem 'slim-rails'
 
+gem 'friendly_id', '~> 5.0.4'
+gem 'babosa'
+gem 'ruby-pinyin'
+
 gem 'devise', '~> 3.4.0'
 gem 'cancancan', '~> 1.9.2'
 gem 'omniauth-facebook', '~> 2.0.0'
@@ -79,6 +83,7 @@ gem 'swagger-ui_rails', '~> 0.1.7'
 group :development do
   gem 'rails-erd'
   gem 'railroady'
+  gem 'byebug'
   gem 'better_errors', '~> 2.1.0'
   gem 'binding_of_caller', '~> 0.7.2'
   gem 'meta_request'
@@ -112,7 +117,6 @@ gem 'remote_syslog_logger'
 gem 'newrelic_rpm'
 
 # Use Pry as the Rails console
-gem 'rb-readline'
 gem 'pry-rails'
 gem 'pry-byebug'
 gem 'awesome_print', :require => false
