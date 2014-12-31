@@ -1,7 +1,7 @@
 class CreateUserIdentities < ActiveRecord::Migration
   def change
     create_table :user_identities do |t|
-      t.boolean :email_pattern_id, index: true, null: true
+      t.integer :email_pattern_id, index: true, null: true
       t.integer :user_id, index: true, unique: false, null: true
       t.string :email, index: true, unique: true, null: false
       t.string :organization_code, index: true, unique: false, null: false

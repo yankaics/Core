@@ -24,5 +24,15 @@ FactoryGirl.define do
     trait :'18_years_old' do
       birth_date { 18.years.ago }
     end
+
+    trait :with_identity do
+      transient do
+        user_identity { create(:user_identity) }
+      end
+      after(:create) do |user, evaluator|
+        user.emails.create(email: evaluator.user_identity.email)
+        user.unconfirmed_emails.last.confirm!
+      end
+    end
   end
 end

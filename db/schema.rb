@@ -132,7 +132,7 @@ ActiveRecord::Schema.define(version: 20141230171421) do
   end
 
   create_table "user_identities", force: true do |t|
-    t.boolean  "email_pattern_id"
+    t.integer  "email_pattern_id"
     t.integer  "user_id"
     t.string   "email",                                               null: false
     t.string   "organization_code",                                   null: false
@@ -166,7 +166,7 @@ ActiveRecord::Schema.define(version: 20141230171421) do
     t.integer  "failed_attempts",        default: 0,  null: false
     t.string   "unlock_token"
     t.datetime "locked_at"
-    t.string   "primary_identity_id"
+    t.integer  "primary_identity_id"
     t.string   "name",                   default: "", null: false
     t.string   "avatar_url",             default: "", null: false
     t.string   "cover_photo_url",        default: "", null: false

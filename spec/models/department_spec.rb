@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Department, :type => :model do
   it_should_behave_like "a codeable model"
 
-  xit { should have_many(:users) }
+  it { should have_many(:users) }
   it { should have_many(:departments) }
   it { should belong_to(:parent) }
 
