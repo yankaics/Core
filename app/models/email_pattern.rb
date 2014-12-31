@@ -52,7 +52,6 @@ class EmailPattern < ActiveRecord::Base
     { uid:              :uid_postparser,
       identity_detail:  :identity_detail_postparser,
       department_code:  :department_code_postparser,
-      unit_code:        :unit_code_postparser,
       started_at:       :started_at_postparser
     }.each do |data_name, postparser_name|
       unless pattern[postparser_name].blank?

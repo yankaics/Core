@@ -8,5 +8,7 @@ FactoryGirl.define do
     department_code_postparser nil
     identity_detail_postparser nil
     started_at_postparser nil
+
+    permit_changing_department_in_group false
   end
 end

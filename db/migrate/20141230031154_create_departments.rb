@@ -7,6 +7,8 @@ class CreateDepartments < ActiveRecord::Migration
       t.string :short_name, null: false
       t.string :parent_code, null: true, index: true, unique: false
 
+      t.string :group, limit: 4
+
       t.timestamps
     end
 

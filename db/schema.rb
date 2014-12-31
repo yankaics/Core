@@ -50,11 +50,12 @@ ActiveRecord::Schema.define(version: 20141230171421) do
   add_index "admins", ["username"], name: "index_admins_on_username", unique: true
 
   create_table "departments", force: true do |t|
-    t.string   "organization_code", null: false
-    t.string   "code",              null: false
-    t.string   "name",              null: false
-    t.string   "short_name",        null: false
+    t.string   "organization_code",           null: false
+    t.string   "code",                        null: false
+    t.string   "name",                        null: false
+    t.string   "short_name",                  null: false
     t.string   "parent_code"
+    t.string   "group",             limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -62,14 +63,15 @@ ActiveRecord::Schema.define(version: 20141230171421) do
   add_index "departments", ["organization_code"], name: "index_departments_on_organization_code"
 
   create_table "email_patterns", force: true do |t|
-    t.integer  "priority",                   limit: 1, default: 100, null: false
-    t.string   "organization_code",                                  null: false
-    t.integer  "corresponded_identity",      limit: 1,               null: false
-    t.string   "email_regexp",                                       null: false
-    t.string   "uid_postparser"
-    t.string   "department_code_postparser"
-    t.string   "started_at_postparser"
-    t.string   "identity_detail_postparser"
+    t.integer  "priority",                            limit: 3, default: 100, null: false
+    t.string   "organization_code",                                           null: false
+    t.integer  "corresponded_identity",               limit: 1,               null: false
+    t.string   "email_regexp",                                                null: false
+    t.text     "uid_postparser"
+    t.text     "department_code_postparser"
+    t.text     "started_at_postparser"
+    t.text     "identity_detail_postparser"
+    t.string   "permit_changing_department_in_group",           default: "f", null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -132,13 +134,16 @@ ActiveRecord::Schema.define(version: 20141230171421) do
   create_table "user_identities", force: true do |t|
     t.boolean  "email_pattern_id"
     t.integer  "user_id"
-    t.string   "email",                          null: false
-    t.string   "organization_code",              null: false
-    t.integer  "identity",          default: 0,  null: false
-    t.string   "uid",                            null: false
+    t.string   "email",                                               null: false
+    t.string   "organization_code",                                   null: false
+    t.integer  "identity",                            default: 0,     null: false
+    t.string   "uid",                                                 null: false
+    t.string   "original_department_code"
     t.string   "department_code"
-    t.string   "identity_detail",   default: "", null: false
+    t.string   "identity_detail",                     default: "",    null: false
     t.date     "started_at"
+    t.boolean  "permit_changing_department_in_group", default: false, null: false
+    t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

@@ -7,9 +7,14 @@ class CreateUserIdentities < ActiveRecord::Migration
       t.string :organization_code, index: true, unique: false, null: false
       t.integer :identity, null: false, default: 0
       t.string :uid, index: true, unique: false, null: false
+      t.string :original_department_code
       t.string :department_code
       t.string :identity_detail, null: false, default: ''
       t.date :started_at
+
+      t.boolean :permit_changing_department_in_group, null: false, default: false
+
+      t.string :name
 
       t.timestamps
     end
