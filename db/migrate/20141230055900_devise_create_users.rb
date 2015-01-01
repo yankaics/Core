@@ -33,11 +33,12 @@ class DeviseCreateUsers < ActiveRecord::Migration
       t.integer   :primary_identity_id, null: true
 
       t.string   :name, default: "", null: false
-      t.string   :avatar_url, default: "", null: false
-      t.string   :cover_photo_url, default: "", null: false
+      t.string   :username
+      t.string   :avatar_url
+      t.string   :cover_photo_url
 
-      t.string   :fbid, default: "", null: false
-
+      t.string   :fbid
+      t.string   :fbtoken
 
       t.timestamps
     end

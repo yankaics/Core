@@ -114,14 +114,20 @@ ActiveRecord::Schema.define(version: 20141230171421) do
   add_index "settings", ["thing_type", "thing_id", "var"], name: "index_settings_on_thing_type_and_thing_id_and_var", unique: true, using: :btree
 
   create_table "user_data", force: true do |t|
-    t.integer  "user_id",                            null: false
-    t.integer  "gender",      limit: 2, default: 0,  null: false
+    t.integer  "user_id",                                            null: false
+    t.integer  "gender",                      limit: 2, default: 0,  null: false
     t.integer  "birth_year"
-    t.integer  "birth_month", limit: 2
-    t.integer  "birth_day",   limit: 2
-    t.string   "url",                   default: "", null: false
-    t.text     "brief",                 default: "", null: false
-    t.text     "motto",                 default: "", null: false
+    t.integer  "birth_month",                 limit: 2
+    t.integer  "birth_day",                   limit: 2
+    t.string   "url",                                   default: "", null: false
+    t.text     "brief",                                 default: "", null: false
+    t.text     "motto",                                 default: "", null: false
+    t.string   "mobile"
+    t.string   "unconfirmed_mobile"
+    t.string   "mobile_confirmation_token"
+    t.datetime "mobile_confirmation_sent_at"
+    t.integer  "mobile_confirm_tries",                  default: 0,  null: false
+    t.text     "devices"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -172,9 +178,11 @@ ActiveRecord::Schema.define(version: 20141230171421) do
     t.datetime "locked_at"
     t.integer  "primary_identity_id"
     t.string   "name",                   default: "", null: false
-    t.string   "avatar_url",             default: "", null: false
-    t.string   "cover_photo_url",        default: "", null: false
-    t.string   "fbid",                   default: "", null: false
+    t.string   "username"
+    t.string   "avatar_url"
+    t.string   "cover_photo_url"
+    t.string   "fbid"
+    t.string   "fbtoken"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

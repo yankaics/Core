@@ -10,6 +10,14 @@ class CreateUserData < ActiveRecord::Migration
       t.text :brief, null: false, default: ""
       t.text :motto, null: false, default: ""
 
+      t.string :mobile
+      t.string :unconfirmed_mobile
+      t.string :mobile_confirmation_token
+      t.datetime :mobile_confirmation_sent_at
+      t.integer :mobile_confirm_tries, default: 0, null: false
+
+      t.text :devices
+
       t.timestamps
     end
   end
