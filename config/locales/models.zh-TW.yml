@@ -2,3 +2,34 @@ zh-TW:
   activerecord:
     models:
       setting: "系統設定"
+      organization: "組織資料"
+      department: "部門資料"
+      email_pattern: "電子郵件地址規則"
+
+    attributes:
+      organization:
+        code: "代碼"
+        code_cont: "代碼"
+        name: "全名"
+        short_name: "簡稱"
+      department:
+        organization: "所屬組織"
+        organization_code: "所屬組織代碼"
+        code: "代碼"
+        code_cont: "代碼"
+        name: "全名"
+        short_name: "簡稱"
+        group: "類型代號"
+        parent: "父部門"
+        parent_code: "父部門代碼"
+      email_pattern:
+        priority: "優先級"
+        corresponded_identity: "對應身份"
+        email_regexp: "Email 正規表示式"
+        uid_postparser: "學號運算式"
+        identity_detail_postparser: "詳細身份運算式"
+        department_code_postparser: "系所代碼運算式"
+        unit_code_postparser: "單位代碼運算式"
+        started_at_postparser: "開始日期運算式"
+        permit_changing_department_in_group: "允許切換到同類型的部門"
+        permit_changing_department_in_organization: "允許切換到同組織的部門"

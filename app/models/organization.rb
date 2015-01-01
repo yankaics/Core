@@ -1,5 +1,7 @@
 class Organization < ActiveRecord::Base
   include Codeable
+  extend FriendlyId
+  friendly_id :code
 
   has_many :departments, primary_key: :code, foreign_key: :organization_code, dependent: :delete_all
   has_many :email_patterns, primary_key: :code, foreign_key: :organization_code, dependent: :delete_all

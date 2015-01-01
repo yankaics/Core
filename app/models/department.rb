@@ -9,7 +9,6 @@ class Department < ActiveRecord::Base
   has_many :user_identities, primary_key: :code, foreign_key: :department_code
   has_many :users, through: :user_identities
 
-  friendly_id :code
   delegate :name, :short_name, to: :parent, prefix: true, allow_nil: true
 
   validates :code, uniqueness: { scope: :organization_code }

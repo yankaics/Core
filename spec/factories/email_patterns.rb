@@ -10,5 +10,6 @@ FactoryGirl.define do
     started_at_postparser nil
 
     permit_changing_department_in_group false
+    permit_changing_department_in_organization false
   end
 end
