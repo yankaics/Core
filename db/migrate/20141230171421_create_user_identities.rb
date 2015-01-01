@@ -13,6 +13,7 @@ class CreateUserIdentities < ActiveRecord::Migration
       t.date :started_at
 
       t.boolean :permit_changing_department_in_group, null: false, default: false
+      t.boolean :permit_changing_department_in_organization, null: false, default: false
 
       t.string :name
 

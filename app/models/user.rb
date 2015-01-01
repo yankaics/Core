@@ -12,8 +12,8 @@ class User < ActiveRecord::Base
   has_many :organizations, through: :identities, primary_key: :code, foreign_key: :organization_code
   has_many :departments, through: :identities, primary_key: :code, foreign_key: :department_code
   belongs_to :primary_identity, class_name: :UserIdentity
-  delegate :organization, :organization_code, :department, :department_code, to: :primary_identity, prefix: false, allow_nil: true
 
+  delegate :organization, :organization_code, :department, :department_code, to: :primary_identity, prefix: false, allow_nil: true
   accepts_nested_attributes_for :data, allow_destroy: false
   delegate :gender,  :birth_year,  :birth_month,  :birth_day,  :birth_date,  :url,  :brief,  :motto,
            :gender=, :birth_year=, :birth_month=, :birth_day=, :birth_date=, :url=, :brief=, :motto=,

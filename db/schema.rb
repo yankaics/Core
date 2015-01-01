@@ -137,15 +137,16 @@ ActiveRecord::Schema.define(version: 20141230171421) do
   create_table "user_identities", force: true do |t|
     t.integer  "email_pattern_id"
     t.integer  "user_id"
-    t.string   "email",                                               null: false
-    t.string   "organization_code",                                   null: false
-    t.integer  "identity",                            default: 0,     null: false
-    t.string   "uid",                                                 null: false
+    t.string   "email",                                                      null: false
+    t.string   "organization_code",                                          null: false
+    t.integer  "identity",                                   default: 0,     null: false
+    t.string   "uid",                                                        null: false
     t.string   "original_department_code"
     t.string   "department_code"
-    t.string   "identity_detail",                     default: "",    null: false
+    t.string   "identity_detail",                            default: "",    null: false
     t.date     "started_at"
-    t.boolean  "permit_changing_department_in_group", default: false, null: false
+    t.boolean  "permit_changing_department_in_group",        default: false, null: false
+    t.boolean  "permit_changing_department_in_organization", default: false, null: false
     t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"

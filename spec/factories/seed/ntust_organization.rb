@@ -102,6 +102,7 @@ FactoryGirl.define do
     department_code_postparser "'D' + n"
     identity_detail_postparser "switch (n.toLowerCase()) { case 'a': 'a'; break; case 'b': 'bachelor'; break; case 'm': 'master'; break; case 'd': 'doctor'; break; }"
     started_at_postparser "new Date((parseInt(n)+1911) + '-9')"
+    permit_changing_department_in_group true
   end
 
   factory :ntust_staff_email_pattern, parent: :email_pattern do

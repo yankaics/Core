@@ -8,6 +8,9 @@ FactoryGirl.define do
     sequence(:uid) { |n| "#{Faker::Number.number(10)}#{n}" }
     department nil
 
+    permit_changing_department_in_group false
+    permit_changing_department_in_organization false
+
     trait :with_department do
       after(:build) do |ui|
         ui.department = create(:department, organization: ui.organization) unless ui.department

@@ -1,3 +1,18 @@
+class UserIdentityValidator < ActiveModel::Validator
+  def validate(record)
+    if record.department.presence
+      record.errors[:base] << "Illegal department." if record.organization_code != record.department.organization_code
+      return if record.permit_changing_department_in_organization
+      return unless record.original_department_code.presence
+      if record.permit_changing_department_in_group
+        record.errors[:base] << "Changing the department to a different group from the original one is not permitted for this identity." if record.department.group != record.original_department.group
+      elsif record.department_code != record.original_department_code
+        record.errors[:base] << "Changing the department against the original one is not permitted for this identity."
+      end
+    end
+  end
+end
+
 class UserIdentity < ActiveRecord::Base
   IDENTITES = {
     guest: 0,
@@ -13,7 +28,6 @@ class UserIdentity < ActiveRecord::Base
   belongs_to :user, touch: true
   belongs_to :associated_user_email, class_name: UserEmail, primary_key: :email, foreign_key: :email
   has_one :primary_user, class_name: :User, foreign_key: :primary_identity_id
-  # has_one :user_email
   belongs_to :email_pattern
   belongs_to :organization, primary_key: :code, foreign_key: :organization_code
   belongs_to :department, ->(o) { where(organization_code: o.organization_code) }, primary_key: :code, foreign_key: :department_code
@@ -24,8 +38,9 @@ class UserIdentity < ActiveRecord::Base
   validates :uid, presence: true
   validates :email, presence: true
   validates :organization, presence: true
+  validates_with UserIdentityValidator
 
-  before_validation :ensure_user_identity_has_valid_original_department
+  after_validation :ensure_user_identity_has_valid_original_department
   before_save :link_to_user
 
   def ensure_user_identity_has_valid_original_department
