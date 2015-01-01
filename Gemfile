@@ -5,7 +5,7 @@ ruby '2.1.5'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.1.8'
 # Use sqlite3 or pg as the database for Active Record
-gem 'sqlite3'
+gem 'sqlite3', :groups => [:development, :test]
 gem 'pg'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 4.0.3'
@@ -47,6 +47,8 @@ gem 'dotenv-rails', :groups => [:development, :test]
 
 # Handle settings by rails-settings-cached
 gem 'rails-settings-cached', '0.4.1'
+
+gem 'factory_girl_rails', '~> 4.5.0'
 
 # Add Slim support
 gem 'slim-rails'
@@ -97,7 +99,6 @@ end
 # RSpec
 group :development, :test do
   gem 'rspec-rails', '~> 3.0'
-  gem 'factory_girl_rails', '~> 4.5.0'
   gem 'shoulda-matchers', require: false
   gem 'rspec-its', require: false
   gem 'simplecov', '~> 0.9.1', require: false
