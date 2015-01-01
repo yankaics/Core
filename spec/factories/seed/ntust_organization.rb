@@ -5,7 +5,7 @@ FactoryGirl.define do
     short_name '台科大'
     after(:create) do |ntust|
       columns = [:organization_code, :code, :name, :short_name, :parent_code, :group]
-      ntust.departments.import(columns,
+      Department.import(columns,
         [
 
           ["NTUST", "U01", "校長室", "校長室", nil, 'U'],
@@ -86,7 +86,7 @@ FactoryGirl.define do
         ], :validate => false
       )
 
-      if EmailPattern.where(organization: ntust).count < 1
+      if ntust.email_patterns.count < 1
         create(:ntust_student_email_pattern)
         create(:ntust_staff_email_pattern)
       end
