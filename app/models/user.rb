@@ -20,7 +20,7 @@ class User < ActiveRecord::Base
            to: :data, prefix: false, allow_nil: true
   accepts_nested_attributes_for :emails, :unconfirmed_emails, allow_destroy: true
 
-  validates :name, presence: true
+  validates :name, presence: true, on: :update
   validates_associated :emails, :unconfirmed_emails
 
   before_create :build_data

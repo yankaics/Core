@@ -3,6 +3,7 @@ class UserEmail < ActiveRecord::Base
   scope :unconfirmed, -> { where(confirmed_at: nil) }
 
   belongs_to :user, touch: true
+  has_one :associated_user_identity, class_name: UserIdentity, primary_key: :email, foreign_key: :email
 
   validates :user, :email, presence: true
   validates :email, email_format: true

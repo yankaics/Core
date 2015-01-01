@@ -6,6 +6,7 @@ RSpec.describe UserEmail, :type => :model do
   let(:user_email) { user.emails.create(email: Faker::Internet.safe_email) }
 
   it { should belong_to(:user) }
+  it { should have_one(:associated_user_identity) }
   it { should validate_presence_of(:user) }
   it { should validate_presence_of(:email) }
 

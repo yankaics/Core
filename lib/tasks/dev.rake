@@ -7,7 +7,8 @@ namespace :dev do
     if Rails.env.development?
       include FactoryGirl::Syntax::Methods
 
-      create(:organization_ntust)
+      create(:ntust_organization)
+      create(:nthu_organization)
     end
   end
 end

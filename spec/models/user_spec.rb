@@ -11,7 +11,7 @@ RSpec.describe User, :type => :model do
 
   it { should respond_to(:organization, :organization_code, :department, :department_code) }
 
-  it { should validate_presence_of(:name) }
+  it { should validate_presence_of(:name).on(:update) }
 
   context "with emails" do
     subject { create(:user) }

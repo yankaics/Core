@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe UserIdentity, :type => :model do
   it { should belong_to(:user) }
+  it { should belong_to(:associated_user_email) }
   it { should have_one(:primary_user) }
   it { should belong_to(:email_pattern) }
   it { should belong_to(:organization) }

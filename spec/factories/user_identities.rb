@@ -1,6 +1,7 @@
 FactoryGirl.define do
   factory :user_identity do
     user nil
+    name nil
     sequence(:email) { |n| "#{Faker::Internet.user_name}#{n}@example.com" }
     organization
     identity 'staff'

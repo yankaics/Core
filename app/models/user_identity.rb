@@ -11,6 +11,7 @@ class UserIdentity < ActiveRecord::Base
   scope :predefined, -> { where(email_pattern_id: nil) }
 
   belongs_to :user, touch: true
+  belongs_to :associated_user_email, class_name: UserEmail, primary_key: :email, foreign_key: :email
   has_one :primary_user, class_name: :User, foreign_key: :primary_identity_id
   # has_one :user_email
   belongs_to :email_pattern
