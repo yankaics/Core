@@ -23,6 +23,7 @@ module Core
     # config.i18n.default_locale = :de
     config.i18n.default_locale = :"zh-TW"
 
+    config.action_mailer.default_url_options = { host: ENV['APP_URL'] }
     config.action_mailer.delivery_method = (ENV['MAILER_DELIVERY_METHOD'].presence || :letter_opener).to_sym
 
     # Send logs to a remote server

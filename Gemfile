@@ -61,6 +61,8 @@ gem 'omniauth-facebook', '~> 2.0.0'
 gem 'doorkeeper', '~> 2.0.1'
 gem 'httparty', '~> 0.13.1'
 
+gem 'validates_email_format_of'
+
 gem 'simple_form', '~> 3.1.0'
 
 gem 'mailgunner', '~> 2.0.0'
