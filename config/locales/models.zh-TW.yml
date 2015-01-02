@@ -1,10 +1,13 @@
 zh-TW:
   activerecord:
     models:
-      setting: "系統設定"
+      settings: "系統設定"
       organization: "組織資料"
       department: "部門資料"
-      email_pattern: "電子郵件地址規則"
+      email_pattern: "電子郵件識別模型"
+      user_identity: "使用者身份資料"
+      admin: "系統管理員"
+      user: "使用者"
 
     attributes:
       organization:
@@ -23,13 +26,36 @@ zh-TW:
         parent: "父部門"
         parent_code: "父部門代碼"
       email_pattern:
+        organization: "所屬組織"
         priority: "優先級"
         corresponded_identity: "對應身份"
         email_regexp: "Email 正規表示式"
-        uid_postparser: "學號運算式"
+        uid_postparser: "識別碼運算式"
         identity_detail_postparser: "詳細身份運算式"
-        department_code_postparser: "系所代碼運算式"
-        unit_code_postparser: "單位代碼運算式"
+        department_code_postparser: "部門代碼運算式"
         started_at_postparser: "開始日期運算式"
         permit_changing_department_in_group: "允許切換到同類型的部門"
         permit_changing_department_in_organization: "允許切換到同組織的部門"
+      user_identity:
+        user: "對應使用者"
+        email_pattern: "對應電子郵件識別模型"
+        name: "使用者名稱"
+        email: "對應電子郵件"
+        organization: "所屬組織"
+        organization_code: "所屬組織代碼"
+        identity: "身份"
+        uid: "唯一識別碼"
+        department: "所屬部門"
+        original_department: "原所屬部門"
+        department_code: "所屬部門代碼"
+        original_department_code: "原所屬部門代碼"
+        permit_changing_department_in_group: "可切換同型部門"
+        permit_changing_department_in_organization: "可切換部門"
+      admin:
+        username: "帳號"
+        password: "密碼"
+        email: "電子郵件"
+        password: "密碼"
+        password_confirmation: "密碼確認"
+        scoped_organization: "所屬組織"
+        scoped_organization_code: "所屬組織"

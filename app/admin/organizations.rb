@@ -1,6 +1,8 @@
 ActiveAdmin.register Organization do
-  menu priority: 110, parent: "組織資料"
+  menu priority: 110, parent: "組織資料", if: proc { current_admin.root? }
   config.sort_order = :code_asc
+
+  scope_to(if: proc { current_admin.scoped? }) { current_admin }
 
   controller do
     def find_resource
@@ -48,24 +50,25 @@ ActiveAdmin.register Organization do
     actions
   end
 
-  sidebar "說明", only: [:edit, :new] do
+  sidebar "組織資料", only: [:edit, :new, :show] do
     ul do
       li do
         strong '基本資料：'
         br
-        text_node '代碼、簡稱、全名等基本資料'
+        text_node '代碼、簡稱、全名等基本資料。'
       end
       li do
         strong 'Email 模型：'
         br
-        text_node '當使用者驗證 Email 時，若符合模型所設規則，會自動開通該校身份，並填入資料'
+        text_node '當使用者驗證 Email 時，若符合模型所設規則，會自動開通該校身份，並填入資料。'
       end
       li do
         strong '部門：'
         br
-        text_node '部門可以隸屬於另一個部門'
+        text_node '部門可以隸屬於另一個部門。'
       end
     end
+    para '詳情可參考各項說明。'
   end
 
   show do

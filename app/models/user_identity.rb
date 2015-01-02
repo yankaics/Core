@@ -24,6 +24,8 @@ class UserIdentity < ActiveRecord::Base
 
   scope :generated, -> { where.not(email_pattern_id: nil) }
   scope :predefined, -> { where(email_pattern_id: nil) }
+  scope :linked, -> { where.not(user_id: nil) }
+  scope :unlinked, -> { where(user_id: nil) }
 
   belongs_to :user, touch: true
   belongs_to :associated_user_email, class_name: UserEmail, primary_key: :email, foreign_key: :email

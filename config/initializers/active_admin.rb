@@ -4,7 +4,13 @@ ActiveAdmin.setup do |config|
   # Set the title that is displayed on the main layout
   # for each of the active admin pages.
   #
-  config.site_title = ENV['APP_NAME']
+  config.site_title = proc do
+    if current_admin && current_admin.scoped?
+      "#{ENV['APP_NAME']} / #{current_admin.scoped_organization_code}"
+    else
+      ENV['APP_NAME']
+    end
+  end
 
   # Set the link url for the title. For example, to take
   # users to your main site. Defaults to no link.
@@ -122,7 +128,7 @@ ActiveAdmin.setup do |config|
   # config.comments = false
   #
   # You can disable the menu item for the comments index page:
-  # config.show_comments_in_menu = false
+  config.show_comments_in_menu = false
   #
   # You can change the name under which comments are registered:
   # config.comments_registration_name = 'AdminComment'
@@ -230,4 +236,32 @@ ActiveAdmin.setup do |config|
   # You can enable or disable them for all resources here.
   #
   # config.filters = true
+end
+
+module ActiveAdmin
+  module Views
+    class IndexAsDetailedTable < ActiveAdmin::Views::IndexAsTable
+      def self.index_name
+        "detailed_table"
+      end
+    end
+  end
+  module Inputs
+    class FilterSelectInput < ::Formtastic::Inputs::SelectInput
+      def extra_input_html_options
+        {
+          :class => 'chosen'
+        }
+      end
+    end
+  end
+end
+
+class Formtastic::Inputs::SelectInput
+  def extra_input_html_options
+    {
+      :class => 'chosen',
+      :multiple => multiple?
+    }
+  end
 end

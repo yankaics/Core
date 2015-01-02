@@ -6,6 +6,7 @@ FactoryGirl.define do
     end
     sequence(:email) { |n| "#{Faker::Internet.user_name}#{n}@example.com" }
     password { Faker::Internet.password }
+    password_confirmation { password }
     name { Faker::Name.name }
     after(:create) do |user, evaluator|
       user.gender = evaluator.gender
@@ -31,6 +32,30 @@ FactoryGirl.define do
       end
       after(:create) do |user, evaluator|
         user.emails.create(email: evaluator.user_identity.email)
+        user.unconfirmed_emails.last.confirm!
+      end
+    end
+
+    trait :in_organization do
+      transient do
+        organization { create(:organization) }
+        identity 'staff'
+      end
+      after(:create) do |user, evaluator|
+        user_identity = create(:user_identity, organization: evaluator.organization, identity: evaluator.identity)
+        user.emails.create(email: user_identity.email)
+        user.unconfirmed_emails.last.confirm!
+      end
+    end
+
+    trait :in_department do
+      transient do
+        department { create(:department) }
+        identity 'staff'
+      end
+      after(:create) do |user, evaluator|
+        user_identity = create(:user_identity, organization: evaluator.department.organization, department: evaluator.department, identity: evaluator.identity)
+        user.emails.create(email: user_identity.email)
         user.unconfirmed_emails.last.confirm!
       end
     end

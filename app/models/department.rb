@@ -2,6 +2,7 @@ class Department < ActiveRecord::Base
   include Codeable
 
   scope :root, -> { where(parent: nil) }
+  scope :not_root, -> { where.not(parent: nil) }
 
   belongs_to :organization, primary_key: :code, foreign_key: :organization_code
   has_many :departments, ->(o) { where "departments.organization_code = ?", o.organization_code }, class_name: :Department, primary_key: :code, foreign_key: :parent_code, dependent: :destroy

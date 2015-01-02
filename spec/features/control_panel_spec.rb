@@ -87,7 +87,7 @@ feature "Control Panel", :type => :feature do
 
     scenario "Admin changes settings", :js => false do
       visit(admin_root_path)
-      find('#setting').find('a').click
+      find('#settings').find('a').click
       within("#main_content") do
         all('input[type=text]').each_with_index { |input, i| input.set "input_val#{i}" }
         all('textarea').each_with_index { |input, i| input.set "textarea_val#{i}" }
