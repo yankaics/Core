@@ -4,5 +4,19 @@ class Admin < ActiveRecord::Base
   devise :database_authenticatable, :rememberable, :trackable, :lockable,
          :authentication_keys => [:username]
 
+  belongs_to :organization, primary_key: :code, foreign_key: :scoped_organization_code
+
   validates_uniqueness_of :username, :email
+
+  def root?
+    scoped_organization_code.blank?
+  end
+
+  def scoped?
+    !scoped_organization_code.blank?
+  end
+
+  def admins
+    Admin.where(id: id)
+  end
 end

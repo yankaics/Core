@@ -1,9 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Admin, :type => :model do
-
   its(:devise_modules) { should include(:database_authenticatable, :rememberable, :lockable, :trackable) }
-
   its(:devise_modules) { should_not include(:registerable) }
 
   describe 'instantiation' do
@@ -17,9 +15,7 @@ RSpec.describe Admin, :type => :model do
     end
 
     it "can't be saved if having duplicated username" do
-      expect {
-        duplicated_admin.save!
-      }.to raise_error
+      expect { duplicated_admin.save! }.to raise_error
     end
   end
 end

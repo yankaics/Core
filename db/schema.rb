@@ -32,18 +32,19 @@ ActiveRecord::Schema.define(version: 20141230171421) do
   add_index "active_admin_comments", ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id", using: :btree
 
   create_table "admins", force: true do |t|
-    t.string   "username",            default: "", null: false
-    t.string   "email",               default: "", null: false
-    t.string   "encrypted_password",  default: "", null: false
+    t.string   "username",                 default: "", null: false
+    t.string   "email",                    default: "", null: false
+    t.string   "encrypted_password",       default: "", null: false
     t.datetime "remember_created_at"
-    t.integer  "sign_in_count",       default: 0,  null: false
+    t.integer  "sign_in_count",            default: 0,  null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip"
     t.string   "last_sign_in_ip"
-    t.integer  "failed_attempts",     default: 0,  null: false
+    t.integer  "failed_attempts",          default: 0,  null: false
     t.string   "unlock_token"
     t.datetime "locked_at"
+    t.string   "scoped_organization_code"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -66,15 +67,16 @@ ActiveRecord::Schema.define(version: 20141230171421) do
   add_index "departments", ["organization_code"], name: "index_departments_on_organization_code", using: :btree
 
   create_table "email_patterns", force: true do |t|
-    t.integer  "priority",                                      default: 100, null: false
-    t.string   "organization_code",                                           null: false
-    t.integer  "corresponded_identity",               limit: 2,               null: false
-    t.string   "email_regexp",                                                null: false
+    t.integer  "priority",                                             default: 100,   null: false
+    t.string   "organization_code",                                                    null: false
+    t.integer  "corresponded_identity",                      limit: 2,                 null: false
+    t.string   "email_regexp",                                                         null: false
     t.text     "uid_postparser"
     t.text     "department_code_postparser"
     t.text     "started_at_postparser"
     t.text     "identity_detail_postparser"
-    t.string   "permit_changing_department_in_group",           default: "f", null: false
+    t.boolean  "permit_changing_department_in_group",                  default: false, null: false
+    t.boolean  "permit_changing_department_in_organization",           default: false, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

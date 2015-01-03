@@ -21,6 +21,12 @@ RSpec.describe Organization, :type => :model do
     expect(org).not_to be_valid
   end
 
+  it "has friendly ID 'code'" do
+    thing = build(described_class)
+    thing.save!
+    expect(described_class.friendly.find(thing.code)).to eq thing
+  end
+
   context "destroyed" do
     before do
       @org = create(:organization)

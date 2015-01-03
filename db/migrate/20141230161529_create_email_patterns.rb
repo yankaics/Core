@@ -11,7 +11,8 @@ class CreateEmailPatterns < ActiveRecord::Migration
       t.text :started_at_postparser
       t.text :identity_detail_postparser
 
-      t.string :permit_changing_department_in_group, null: false, default: false
+      t.boolean :permit_changing_department_in_group, null: false, default: false
+      t.boolean :permit_changing_department_in_organization, null: false, default: false
 
       t.timestamps
     end
