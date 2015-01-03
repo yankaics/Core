@@ -15,8 +15,14 @@ namespace :dev do
       ntust.reload
       nthu.reload
 
-      20.times { create(:user, :in_department, department: ntust.departments.sample, identity: UserIdentity::IDENTITES.keys.sample) }
-      20.times { create(:user, :in_department, department: nthu.departments.sample, identity: UserIdentity::IDENTITES.keys.sample) }
+      12.times do
+        u = create(:user, :in_department, department: ntust.departments.sample, identity: UserIdentity::IDENTITES.keys.sample)
+        u.confirm!
+      end
+      12.times do
+        u = create(:user, :in_department, department: nthu.departments.sample, identity: UserIdentity::IDENTITES.keys.sample)
+        u.confirm!
+      end
     end
   end
 end

@@ -26,11 +26,18 @@ FactoryGirl.define do
       birth_date { 18.years.ago }
     end
 
+    trait :confirmed do
+      after(:create) do |user|
+        user.confirm!
+      end
+    end
+
     trait :with_identity do
       transient do
         user_identity { create(:user_identity) }
       end
       after(:create) do |user, evaluator|
+        user.confirm!
         user.emails.create(email: evaluator.user_identity.email)
         user.unconfirmed_emails.last.confirm!
       end
@@ -42,6 +49,7 @@ FactoryGirl.define do
         identity 'staff'
       end
       after(:create) do |user, evaluator|
+        user.confirm!
         user_identity = create(:user_identity, organization: evaluator.organization, identity: evaluator.identity)
         user.emails.create(email: user_identity.email)
         user.unconfirmed_emails.last.confirm!
@@ -54,9 +62,33 @@ FactoryGirl.define do
         identity 'staff'
       end
       after(:create) do |user, evaluator|
+        user.confirm!
         user_identity = create(:user_identity, organization: evaluator.department.organization, department: evaluator.department, identity: evaluator.identity)
         user.emails.create(email: user_identity.email)
         user.unconfirmed_emails.last.confirm!
+      end
+    end
+  end
+
+  factory :user_email do
+    user
+    email { Faker::Internet.safe_email }
+
+    factory :user_identity_link do
+      transient do
+        user_identity { create(:user_identity) }
+      end
+      email { user_identity.email }
+      after(:create) do |user_email, evaluator|
+        user_email.confirm!
+      end
+
+      trait :in_organization do
+        transient do
+          organization { create(:organization) }
+          identity 'staff'
+          user_identity { create(:user_identity, organization: organization, identity: identity) }
+        end
       end
     end
   end

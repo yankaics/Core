@@ -18,7 +18,7 @@ class UserData < ActiveRecord::Base
   end
 
   def birth_date=(date)
-    if date
+    if date && (date = date.to_date)
       self.birth_year = date.year
       self.birth_month = date.month
       self.birth_day = date.day

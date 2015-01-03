@@ -20,7 +20,7 @@ SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
   SimpleCov::Formatter::HTMLFormatter,
   Coveralls::SimpleCov::Formatter
 ]
-SimpleCov.start
+SimpleCov.start :rails
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate

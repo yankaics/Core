@@ -1,15 +1,15 @@
 ActiveAdmin.register User do
   menu priority: 10
 
-  actions :all, except: [:create, :destroy]
+  actions :all, except: [:new, :create, :destroy]
 
   includes :data, :primary_identity
 
   scope_to(if: proc { current_admin.scoped? }) { current_admin.organization }
 
   permit_params do
-    params = []
-    params.concat [:username, :scoped_organization_code] if current_admin.root?
+    params = [:name, :avatar_url, :cover_photo_url, :gender, :birth_date, :birth_year, :birth_month, :birth_day, :url, :brief, :motto]
+    params.concat [:email, :username, :fbid, :encrypted_password, :reset_password_token, :reset_password_sent_at, :remember_created_at, :sign_in_count, :current_sign_in_at, :last_sign_in_at, :current_sign_in_ip, :last_sign_in_ip, :confirmation_token, :confirmed_at, :confirmation_sent_at, :unconfirmed_email, :failed_attempts, :unlock_token, :locked_at, :primary_identity_id, :fbtoken, :mobile, :unconfirmed_mobile, :mobile_confirmation_token, :mobile_confirmation_sent_at, :mobile_confirm_tries] if current_admin.root?
     params
   end
 
@@ -18,6 +18,8 @@ ActiveAdmin.register User do
   scope :unconfirmed
   scope :identified
   scope :unidentified
+
+  config.per_page = 100
 
   index do
     selectable_column
@@ -90,59 +92,41 @@ ActiveAdmin.register User do
 
   form do |f|
     f.inputs do
-      f.input :admin
+      f.input :email if current_admin.root?
       f.input :name
-      f.input :email
-      f.input :fbid
-      f.input :gender, :as => :select, :collection => options_for_select([['male', 'male'], ['female', 'female']], user.gender)
-      f.input :identity, :as => :select, :collection => options_for_select([[t('bachelor'), 'bachelor'], [t('master'), 'master'], [t('doctor'), 'doctor'], [t('professor'), 'professor'], [t('staff'), 'staff'], [t('other'), 'other'], [t('guest'), 'guest']], user.identity)
-      f.input :student_id
-      f.input :admission_year
-      f.input :admission_department_code, :as => :select, :collection => option_groups_from_collection_for_select(College.all, :departments, :name, :code, :name, user.admission_department_code)
-      f.input :department_code, :as => :select, :collection => option_groups_from_collection_for_select(College.all, :departments, :name, :code, :name, user.department_code)
-      f.input :mobile
-      f.input :birthday
-      f.input :address
+      f.input :username if current_admin.root?
+      f.input :fbid if current_admin.root?
+      f.input :encrypted_password if current_admin.root?
+      f.input :reset_password_token if current_admin.root?
+      f.input :reset_password_sent_at if current_admin.root?
+      f.input :remember_created_at if current_admin.root?
+      f.input :sign_in_count if current_admin.root?
+      f.input :current_sign_in_at if current_admin.root?
+      f.input :last_sign_in_at if current_admin.root?
+      f.input :current_sign_in_ip if current_admin.root?
+      f.input :last_sign_in_ip if current_admin.root?
+      f.input :confirmation_token if current_admin.root?
+      f.input :confirmed_at if current_admin.root?
+      f.input :confirmation_sent_at if current_admin.root?
+      f.input :unconfirmed_email if current_admin.root?
+      f.input :failed_attempts if current_admin.root?
+      f.input :unlock_token if current_admin.root?
+      f.input :locked_at if current_admin.root?
+      f.input :primary_identity_id if current_admin.root?
+      f.input :avatar_url
+      f.input :cover_photo_url
+      f.input :fbtoken if current_admin.root?
+      f.input :gender, as: :select, collection: options_for_select(UserData::GENDERS.map { |k, v| [k, k] }, user.gender)
+      f.input :birth_date, as: :datepicker
+      f.input :url
       f.input :brief
+      f.input :motto
+      f.input :mobile if current_admin.root?
+      f.input :unconfirmed_mobile if current_admin.root?
+      f.input :mobile_confirmation_token if current_admin.root?
+      f.input :mobile_confirmation_sent_at if current_admin.root?
+      f.input :mobile_confirm_tries if current_admin.root?
     end
     f.actions
   end
-
 end
-
-# column :email
-# column :name
-# column :username
-# column :fbid
-# column :encrypted_password
-# column :reset_password_token
-# column :reset_password_sent_at
-# column :remember_created_at
-# column :sign_in_count
-# column :current_sign_in_at
-# column :last_sign_in_at
-# column :current_sign_in_ip
-# column :last_sign_in_ip
-# column :confirmation_token
-# column :confirmed_at
-# column :confirmation_sent_at
-# column :unconfirmed_email
-# column :failed_attempts
-# column :unlock_token
-# column :locked_at
-# column :primary_identity_id
-# column :avatar_url
-# column :cover_photo_url
-# column :fbtoken
-# column :gender
-# column :birth_year
-# column :birth_month
-# column :birth_day
-# column :url
-# column :brief
-# column :motto
-# column :mobile
-# column :unconfirmed_mobile
-# column :mobile_confirmation_token
-# column :mobile_confirmation_sent_at
-# column :mobile_confirm_tries

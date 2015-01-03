@@ -18,7 +18,7 @@ ActiveAdmin.register Department do
   filter :code_cont
   filter :name
   filter :short_name
-  filter :parent
+  # filter :parent, if: proc { current_admin.root? }
   filter :group
   filter :created_at
   filter :updated_at

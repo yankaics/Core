@@ -28,8 +28,6 @@ ActiveAdmin.register UserIdentity do
   filter :created_at
   filter :updated_at
 
-  config.per_page = 100
-
   sidebar "使用者身份" do
     para '使用者經由「使用者身份」關聯至組織與組織內的部門。一位使用者可擁有多重身份，並屬於多個組織。「使用者身份」可能由「電子郵件識別模型」自動解析 email 產生；或是手動輸入，當未來有使用者認證相同的 email 時，再連結到該使用者。'
     dl do
@@ -54,6 +52,8 @@ ActiveAdmin.register UserIdentity do
     end
   end
 
+  config.per_page = 100
+
   index do
     selectable_column
     column(:organization) { |user_identity| link_to user_identity.organization_code, admin_organization_path(user_identity.organization) } if current_admin.root?
@@ -73,7 +73,10 @@ ActiveAdmin.register UserIdentity do
   form do |f|
     f.inputs do
       f.input :organization_code, as: :select, collection: options_for_select(Organization.all.map { |u| [u.name, u.code] }, user_identity.organization_code) if current_admin.root?
-      f.input :department_code
+      f.input :department_code if current_admin.root?
+      f.input :original_department_code if current_admin.root?
+      f.input :department, as: :select, collection: options_for_select(current_admin.organization.departments.all.map { |d| [d.name, d.code] }, user_identity.department_code) if !current_admin.root?
+      f.input :original_department, as: :select, collection: options_for_select(current_admin.organization.departments.all.map { |d| [d.name, d.code] }, user_identity.original_department_code) if !current_admin.root?
       f.input :name
       f.input :email
       f.input :identity, as: :select, collection: options_for_select(UserIdentity::IDENTITES.map { |k, v| [k, k] }, user_identity.identity)

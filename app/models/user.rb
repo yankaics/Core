@@ -8,19 +8,34 @@ class User < ActiveRecord::Base
   scope :unidentified, -> { where(primary_identity: nil) }
 
   has_one :data, class_name: :UserData, dependent: :destroy, autosave: true
-  has_many :emails, -> { confirmed }, class_name: :UserEmail, dependent: :destroy, autosave: true
-  has_many :unconfirmed_emails, -> { unconfirmed }, class_name: :UserEmail, dependent: :destroy, autosave: true
+  has_many :emails, -> { confirmed },
+           class_name: :UserEmail, dependent: :destroy, autosave: true
+  has_many :unconfirmed_emails, -> { unconfirmed },
+           class_name: :UserEmail, dependent: :destroy, autosave: true
   has_many :identities, class_name: :UserIdentity
-  has_many :organizations, through: :identities, primary_key: :code, foreign_key: :organization_code
-  has_many :departments, through: :identities, primary_key: :code, foreign_key: :department_code
+  has_many :organizations,
+           through: :identities,
+           primary_key: :code, foreign_key: :organization_code
+  has_many :departments,
+           through: :identities,
+           primary_key: :code, foreign_key: :department_code
   belongs_to :primary_identity, class_name: :UserIdentity
 
-  delegate :organization, :organization_code, :department, :department_code, :uid, :identity, to: :primary_identity, prefix: false, allow_nil: true
+  delegate :organization, :organization_code,
+           :department, :department_code, :uid, :identity,
+           to: :primary_identity, prefix: false, allow_nil: true
   accepts_nested_attributes_for :data, allow_destroy: false
-  delegate :gender,  :birth_year,  :birth_month,  :birth_day,  :birth_date,  :url,  :brief,  :motto,
-           :gender=, :birth_year=, :birth_month=, :birth_day=, :birth_date=, :url=, :brief=, :motto=,
+  delegate :mobile,  :unconfirmed_mobile,  :mobile_confirmation_token,
+           :mobile=, :unconfirmed_mobile=, :mobile_confirmation_token=,
+           :mobile_confirmation_sent_at,  :mobile_confirm_tries,
+           :mobile_confirmation_sent_at=, :mobile_confirm_tries=,
+           :gender,  :birth_year,  :birth_month,  :birth_day,  :birth_date,
+           :gender=, :birth_year=, :birth_month=, :birth_day=, :birth_date=,
+           :url,  :brief,  :motto,
+           :url=, :brief=, :motto=,
            to: :data, prefix: false, allow_nil: true
-  accepts_nested_attributes_for :emails, :unconfirmed_emails, allow_destroy: true
+  accepts_nested_attributes_for :emails, :unconfirmed_emails,
+                                allow_destroy: true
 
   validates :name, presence: true, on: :update
   validates_associated :emails, :unconfirmed_emails
