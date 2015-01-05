@@ -105,9 +105,9 @@ group :development, :test do
   gem 'coveralls', require: false
   gem 'capybara-webkit', '>= 1.2.0'
   gem 'database_cleaner'
+  gem 'webmock', require: false
   gem 'formulaic'
   gem 'launchy'
-  gem 'webmock'
   gem 'timecop'
   gem 'faker'
 end

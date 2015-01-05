@@ -47,7 +47,7 @@ ActiveAdmin.register_page "Dashboard" do
           table_for User.where('current_sign_in_at IS NOT NULL').order("current_sign_in_at DESC").limit(10) do
             column("Name") { |user| link_to(user.name, admin_user_path(user)) }
             column("Fbid") { |user| link_to(truncate(user.fbid, length: 8), "https://facebook.com/#{user.fbid}", :target => "_blank") }
-            column("SID") { |user| user.student_id }
+            column("UID") { |user| user.uid }
             column("Sign In Time") { |user| user.current_sign_in_at && distance_of_time_in_words_to_now(user.current_sign_in_at) }
             column("Sign In Count") { |user| "#{user.sign_in_count} (#{'%.3f' % (user.sign_in_count.to_f / ((Time.now - user.created_at) / 1.day)+0.5)}/day)" }
             column("IP") { |user| (user.current_sign_in_ip == user.last_sign_in_ip) ? status_tag(user.current_sign_in_ip, :class => 'yes') : status_tag(user.current_sign_in_ip) }
