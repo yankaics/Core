@@ -1,6 +1,8 @@
 class User < ActiveRecord::Base
+  include OmniauthCallable
   devise :database_authenticatable, :timeoutable, :registerable, :confirmable,
-         :lockable, :recoverable, :rememberable, :trackable, :validatable
+         :lockable, :recoverable, :rememberable, :trackable, :validatable,
+         :omniauthable, :omniauth_providers => [:facebook]
 
   scope :confirmed, -> { where.not(confirmed_at: nil) }
   scope :unconfirmed, -> { where(confirmed_at: nil) }
