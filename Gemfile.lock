@@ -60,6 +60,8 @@ GEM
       rack (>= 0.9.0)
     binding_of_caller (0.7.2)
       debug_inspector (>= 0.0.1)
+    bootstrap-sass (3.3.1.0)
+      sass (~> 3.2)
     bourbon (3.2.3)
       sass (~> 3.2)
       thor
@@ -126,6 +128,9 @@ GEM
     dotenv (1.0.2)
     dotenv-rails (1.0.2)
       dotenv (= 1.0.2)
+    email_spec (1.6.0)
+      launchy (~> 2.1)
+      mail (~> 2.2)
     erubis (2.7.0)
     execjs (2.2.2)
     factory_girl (4.5.0)
@@ -403,6 +408,7 @@ DEPENDENCIES
   babosa
   better_errors (~> 2.1.0)
   binding_of_caller (~> 0.7.2)
+  bootstrap-sass
   byebug
   cancancan (~> 1.10.0)
   capybara-webkit (>= 1.2.0)
@@ -414,6 +420,7 @@ DEPENDENCIES
   devise (~> 3.4.0)
   doorkeeper (~> 2.0.1)
   dotenv-rails
+  email_spec
   factory_girl_rails (~> 4.5.0)
   faker
   formulaic

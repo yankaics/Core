@@ -10,6 +10,7 @@ class UserData < ActiveRecord::Base
 
   enum gender: GENDERS
 
+  validates :user, presence: true
   validates :birth_month, inclusion: { in: (1..12) }, allow_nil: true
   validates :birth_day, inclusion: { in: (1..31) }, allow_nil: true
 

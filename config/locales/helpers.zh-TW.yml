@@ -1,0 +1,6 @@
+zh-TW:
+  helpers:
+    submit:
+      user:
+        create: "註冊"
+

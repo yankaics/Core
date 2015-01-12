@@ -1,15 +1,6 @@
 zh-TW:
-  activerecord:
-    models:
-      settings: "系統設定"
-      organization: "組織資料"
-      department: "部門資料"
-      email_pattern: "電子郵件識別模型"
-      user_identity: "使用者身份資料"
-      admin: "系統管理員"
-      user: "使用者"
-
-    attributes:
+  simple_form:
+    labels:
       user:
         email: "慣用電子郵件信箱"
         password: "登入密碼"

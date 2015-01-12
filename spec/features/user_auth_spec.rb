@@ -88,4 +88,30 @@ eod
     click_on('Sign in with Facebook', match: :first)
     # expect(page).to ...
   end
+
+  scenario "new User signs up with email" do
+    user_rigister_credentials = attributes_for(:user).slice(:name, :email, :password, :password_confirmation)
+    user_login_credentials = user_rigister_credentials.slice(:email, :password)
+    visit(new_user_session_path)
+    click_on('Sign up', match: :first)
+    fill_form_and_submit(:user, user_rigister_credentials)
+
+    visit(new_user_session_path)
+    fill_form(:user, user_login_credentials)
+    find('form input[type=submit]').click
+    # expect(page).to fail...
+
+    user = User.last
+    confirmation_path = open_last_email.body.match /confirmation\?confirmation_token=[^"]+/
+    expect {
+      visit "/#{confirmation_path}"
+      user.reload
+    }.to change{user.confirmed?}.from(false).to(true)
+
+    visit(new_user_session_path)
+    fill_form(:user, user_login_credentials)
+    find('form input[type=submit]').click
+
+    # expect(page).to ...
+  end
 end

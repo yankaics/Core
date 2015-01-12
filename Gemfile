@@ -105,6 +105,7 @@ group :development, :test do
   gem 'coveralls', require: false
   gem 'capybara-webkit', '>= 1.2.0'
   gem 'database_cleaner'
+  gem 'email_spec'
   gem 'webmock', require: false
   gem 'formulaic'
   gem 'launchy'
@@ -133,3 +134,4 @@ gem 'modernizr-rails'
 gem 'nprogress-rails', '~> 0.1.6.5'
 gem 'select2-rails', '~> 3.5.9'
 gem 'chosen-rails'
+gem 'bootstrap-sass'
