@@ -44,6 +44,8 @@ RSpec.describe EmailPattern, :type => :model do
       expect(identity_data[:uid]).to eq('b10132023')
       expect(identity_data[:started_at].year).to eq(2012)
       expect(identity_data[:email_pattern_id]).not_to be_nil
+      expect(identity_data[:permit_changing_department_in_group]).to be true
+      expect(identity_data[:permit_changing_department_in_organization]).to be false
 
       identity_data = EmailPattern.identify('b9832018@mail.ntust.edu.tw')
       expect(identity_data).to be_a_kind_of(Hash)

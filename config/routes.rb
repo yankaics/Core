@@ -15,6 +15,7 @@ Rails.application.routes.draw do
 
   resource :my_account do
     resources :emails, controller: :user_emails
+    resources :identities, controller: :user_identities
   end
 
   get '/user_emails/confirmation' => 'user_emails#confirm'
