@@ -1,0 +1,10 @@
+h1
+  | Emails
+  small=< link_to 'New', new_my_account_email_path
+ul
+  - @emails.each do |email|
+    li
+      => email.email
+      => email.confirmed_at
+      => link_to 'Delete', my_account_email_path(email), method: :delete, confirm: 'Are you sure?'
+      = link_to 'Resend confirm email', my_account_email_path(email), method: :patch, confirm: 'Are you sure?'

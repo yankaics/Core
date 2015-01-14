@@ -4,12 +4,15 @@ class User < ActiveRecord::Base
          :lockable, :recoverable, :rememberable, :trackable, :validatable,
          :omniauthable, :omniauth_providers => [:facebook]
 
+  scope :with_data, -> { includes(:data) }
   scope :confirmed, -> { where.not(confirmed_at: nil) }
   scope :unconfirmed, -> { where(confirmed_at: nil) }
   scope :identified, -> { where.not(primary_identity: nil) }
   scope :unidentified, -> { where(primary_identity: nil) }
 
   has_one :data, class_name: :UserData, dependent: :destroy, autosave: true
+  has_many :all_emails,
+           class_name: :UserEmail, dependent: :destroy, autosave: true
   has_many :emails, -> { confirmed },
            class_name: :UserEmail, dependent: :destroy, autosave: true
   has_many :unconfirmed_emails, -> { unconfirmed },

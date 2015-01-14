@@ -135,12 +135,16 @@ ActiveRecord::Schema.define(version: 20141230171421) do
   end
 
   create_table "user_emails", force: true do |t|
-    t.integer  "user_id",      null: false
-    t.string   "email",        null: false
+    t.integer  "user_id",              null: false
+    t.string   "email",                null: false
+    t.string   "confirmation_token"
+    t.datetime "confirmation_sent_at"
     t.datetime "confirmed_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "user_emails", ["confirmation_token"], name: "index_user_emails_on_confirmation_token", unique: true, using: :btree
 
   create_table "user_identities", force: true do |t|
     t.integer  "email_pattern_id"
