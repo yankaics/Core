@@ -1,5 +1,5 @@
 class UserEmailsController < ApplicationController
-  before_action :authenticate_user!
+  before_action :authenticate_user!, except: [:confirm]
 
   def index
     @emails = current_user.all_emails
@@ -27,7 +27,7 @@ class UserEmailsController < ApplicationController
   end
 
   def confirm
-    @email = current_user.unconfirmed_emails.find_and_confirm(params[:confirmation_token])
+    @email = Email.find_and_confirm(params[:confirmation_token])
 
     redirect_to :action => :index
   end
@@ -38,9 +38,21 @@ class UserEmailsController < ApplicationController
     redirect_to :action => :index
   end
 
+  def query_departments
+    @departments = Department.where(organization_code: params[:organization_code])
+                   .select(:name, :short_name, :parent_code, :code, :group)
+    @departments = Hash[@departments.map { |obj| [obj.code, obj] }]
+
+    @departments[:organization_code] = params[:organization_code]
+
+    respond_to do |format|
+      format.json { render json: @departments }
+    end
+  end
+
   private
 
   def user_email_params
-    params.require(:user_email).permit(:email)
+    params.require(:user_email).permit(:email, :department_code)
   end
 end

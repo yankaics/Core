@@ -19,6 +19,7 @@ Rails.application.routes.draw do
   end
 
   get '/user_emails/confirmation' => 'user_emails#confirm'
+  get '/user_emails/query_departments' => 'user_emails#query_departments'
 
   root 'pages#index'
 
