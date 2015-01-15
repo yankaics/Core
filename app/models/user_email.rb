@@ -13,6 +13,8 @@ class UserEmail < ActiveRecord::Base
   belongs_to :user, touch: true
   has_one :associated_user_identity, class_name: UserIdentity, primary_key: :email, foreign_key: :email
 
+  store :options, accessors: [:department_code]
+
   validates :user, :email, presence: true
   validates :email, email_format: true
   validates :confirmation_token, uniqueness: true, allow_nil: true

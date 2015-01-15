@@ -9,6 +9,7 @@ class UserEmailsController < ApplicationController
 
   def new
     @email = current_user.emails.build
+    @email_patterns = EmailPattern.includes(:organization).all.serialize_it.as_json
   end
 
   def create

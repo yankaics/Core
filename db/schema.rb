@@ -140,6 +140,7 @@ ActiveRecord::Schema.define(version: 20141230171421) do
     t.string   "confirmation_token"
     t.datetime "confirmation_sent_at"
     t.datetime "confirmed_at"
+    t.text     "options"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

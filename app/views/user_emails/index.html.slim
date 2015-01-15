@@ -6,5 +6,5 @@ ul
     li
       => email.email
       => email.confirmed_at
-      => link_to 'Delete', my_account_email_path(email), method: :delete, confirm: 'Are you sure?'
-      = link_to 'Resend confirm email', my_account_email_path(email), method: :patch, confirm: 'Are you sure?'
+      => link_to 'Delete', my_account_email_path(email), method: :delete, data: { confirm: 'Are you sure?' }
+      = link_to 'Resend confirm email', my_account_email_path(email), method: :patch, data: { confirm: 'Are you sure?' }

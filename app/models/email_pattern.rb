@@ -18,6 +18,8 @@ class EmailPatternValidator < ActiveModel::Validator
 end
 
 class EmailPattern < ActiveRecord::Base
+  include Serializable
+
   default_scope { order('priority ASC') }
 
   belongs_to :organization, primary_key: :code, foreign_key: :organization_code

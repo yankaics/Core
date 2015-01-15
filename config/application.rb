@@ -26,6 +26,8 @@ module Core
     config.action_mailer.default_url_options = { host: ENV['APP_URL'] }
     config.action_mailer.delivery_method = (ENV['MAILER_DELIVERY_METHOD'].presence || :letter_opener).to_sym
 
+    config.react.addons = true
+
     # Send logs to a remote server
     config.to_prepare do
       if !ENV['REMOTE_LOGGER_HOST'].blank? && !ENV['REMOTE_LOGGER_PORT'].blank?

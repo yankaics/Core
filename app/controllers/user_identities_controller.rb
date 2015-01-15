@@ -3,5 +3,9 @@ class UserIdentitiesController < ApplicationController
 
   def index
     @identities = current_user.identities
+    @identities = EmailPattern.all
+    respond_to do |format|
+      format.json { asdf;render json: @identities }
+    end
   end
 end
