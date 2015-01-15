@@ -166,8 +166,7 @@ NewUserEmailBox = React.createClass
           {Object.keys(this.state.departments).map(function(value, index) {
             d = this.state.departments[value];
             if (baseGroup == d.group || permit_changing_department_in_organization)
-              return (
-                <option
+              return (<option
                   value={d.code} >
                     {d.name}
                 </option>);
@@ -176,6 +175,10 @@ NewUserEmailBox = React.createClass
 
     else
       department_selector = this.state.department_name
+
+    submitButtonClassName = React.addons.classSet(
+      'btn btn-default',
+      (if @state.submitActivate then '' else 'disabled'))
 
     `<div>
       <div>{this.state.organization_name}</div>
@@ -196,11 +199,15 @@ NewUserEmailBox = React.createClass
         id="user_email_email"
         name="user_email[email]"
         autofocus="true" />
+      <input className={submitButtonClassName} name="commit" type="submit" value="驗證" />
     </div>`
 
   componentDidUpdate: ->
     document.getElementById('department-select')?.value = @state.department_code
     $('#department-select').chosen()
     $('#department-select').trigger('chosen:updated')
+    $("form#new_user_email").submit (e) =>
+      if not @state.submitActivate
+        e.preventDefault()
 
 window.NewUserEmailBox = NewUserEmailBox
