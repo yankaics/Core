@@ -71,7 +71,7 @@ var AutocompleteInput = React.createClass({
     this.sendValueChange();
     setTimeout(function() {
       this.sendValueChange();
-    }.bind(this), 10);
+    }.bind(this), 100);
   },
 
   componentWillReceiveProps: function(nextProps) {
@@ -97,6 +97,9 @@ var AutocompleteInput = React.createClass({
     this.setState({inputValue: value, value: value, valueLength: value.length});
     this.sendValueChange(value);
     this.updateResults();
+    setTimeout(function() {
+      this.sendValueChange();
+    }.bind(this), 100);
   },
 
   handleInputKeyDown: function(e) {

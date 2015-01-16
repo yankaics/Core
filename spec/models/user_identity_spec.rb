@@ -36,15 +36,21 @@ RSpec.describe UserIdentity, :type => :model do
   describe "instantiation" do
     subject(:user_identity) { create :user_identity, :with_department }
 
-    context "department changed while changing it isn't permitted" do
+    context "its associated department changed while changing it isn't permitted" do
       before do
         department_2 = create(:department, organization: subject.organization)
         subject.department = department_2
       end
       it { is_expected.not_to be_valid }
+
+      before do
+        department_2 = create(:department, organization: subject.organization)
+        subject.department_code = department_2.code
+      end
+      it { is_expected.not_to be_valid }
     end
 
-    context "department changed to a different group that isn't permitted" do
+    context "its associated department changed to another one in different group, while doing so isn't permitted" do
       before do
         subject.update(permit_changing_department_in_group: true)
         subject.department.update(group: 'M')
@@ -52,9 +58,17 @@ RSpec.describe UserIdentity, :type => :model do
         subject.department = department_2
       end
       it { is_expected.not_to be_valid }
+
+      before do
+        subject.update(permit_changing_department_in_group: true)
+        subject.department.update(group: 'M')
+        department_2 = create(:department, organization: subject.organization, group: 'N')
+        subject.department_code = department_2.code
+      end
+      it { is_expected.not_to be_valid }
     end
 
-    context "department changed to a different group that is permitted" do
+    context "its associated department changed to another one in same group, while doing so is permitted" do
       before do
         subject.update(permit_changing_department_in_group: true)
         subject.department.update(group: 'M')
@@ -62,9 +76,17 @@ RSpec.describe UserIdentity, :type => :model do
         subject.department = department_2
       end
       it { is_expected.to be_valid }
+
+      before do
+        subject.update(permit_changing_department_in_group: true)
+        subject.department.update(group: 'M')
+        department_2 = create(:department, organization: subject.organization, group: 'M')
+        subject.department_code = department_2.code
+      end
+      it { is_expected.to be_valid }
     end
 
-    context "department changed to a different group that is permitted" do
+    context "its associated department changed to another one in a different organization" do
       before do
         subject.update(permit_changing_department_in_group: true)
         subject.department.update(group: 'M')

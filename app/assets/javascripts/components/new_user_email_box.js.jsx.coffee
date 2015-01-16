@@ -19,6 +19,7 @@ NewUserEmailBox = React.createClass
     permit_changing_department_in_group: null
     permit_changing_department_in_organization: null
     submitActivate: false
+    i: 1
 
   componentWillMount: ->
     for emailPattern in @props.emailPatterns
@@ -191,7 +192,7 @@ NewUserEmailBox = React.createClass
       <div>{this.state.identity_detail}</div>
       <div>{this.state.organization_code}</div>
       <div>{this.state.department_code}</div>
-      <div>{department_selector}</div>
+      <div key={this.state.i++}>{department_selector}</div>
       <div>{this.state.started_at}</div>
       <div>{this.state.permit_changing_department_in_group}</div>
       <div>{this.state.permit_changing_department_in_organization}</div>
@@ -208,11 +209,9 @@ NewUserEmailBox = React.createClass
 
   componentDidUpdate: ->
     document.getElementById('department-select')?.value = @state.department_code
-    $('#department-select').chosen()
-    $('#department-select').trigger('chosen:updated')
-    $('.chosen-container + .chosen-container').remove()
-    $('.chosen-container').hover ->
-      $('#department-select').focus()
+    $('#department-select').select2()
+    $('.select2-choice').hover ->
+      $('.select2-choice')[0].focus()
     $("form#new_user_email").submit (e) =>
       if not @state.submitActivate
         e.preventDefault()

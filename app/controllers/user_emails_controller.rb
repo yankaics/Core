@@ -27,7 +27,7 @@ class UserEmailsController < ApplicationController
   end
 
   def confirm
-    @email = Email.find_and_confirm(params[:confirmation_token])
+    @email = UserEmail.find_and_confirm(params[:confirmation_token])
 
     redirect_to :action => :index
   end

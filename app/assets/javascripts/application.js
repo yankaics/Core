@@ -16,5 +16,7 @@
 //= require react
 //= require react_ujs
 //= require chosen-jquery
+//= require select2
+//= require select2_locale_zh-TW
 //= require_tree ./lib/
 //= require components

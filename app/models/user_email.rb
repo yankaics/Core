@@ -57,9 +57,10 @@ class UserEmail < ActiveRecord::Base
       identity.update(user: user)
     # or matching email patterns
     elsif (pattern_identity = EmailPattern.identify(email))
-      user.identities.create!(pattern_identity)
+      identity = user.identities.create!(pattern_identity)
+      identity.update(department_code: department_code) unless department_code.blank?
     end
-    return false unless user.valid?
+    return false unless user.reload.valid?
     self
   end
 
