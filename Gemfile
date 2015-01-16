@@ -34,7 +34,6 @@ gem 'spring',        group: :development
 
 # Use unicorn as the app server
 gem 'unicorn'
-gem 'rack-timeout'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
@@ -103,6 +102,7 @@ end
 # RSpec
 group :development, :test do
   gem 'rspec-rails', '~> 3.0'
+  gem 'spring-commands-rspec'
   gem 'shoulda-matchers', require: false
   gem 'rspec-its', require: false
   gem 'simplecov', '~> 0.9.1', require: false
