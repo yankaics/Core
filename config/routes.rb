@@ -13,6 +13,14 @@ Rails.application.routes.draw do
   devise_for :admins, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
 
+  resource :my_account do
+    resources :emails, controller: :user_emails
+    resources :identities, controller: :user_identities
+  end
+
+  get '/user_emails/confirmation' => 'user_emails#confirm'
+  get '/user_emails/query_departments' => 'user_emails#query_departments'
+
   root 'pages#index'
 
   # The priority is based upon order of creation: first created -> highest priority.

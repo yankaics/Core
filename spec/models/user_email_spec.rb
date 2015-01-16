@@ -9,6 +9,7 @@ RSpec.describe UserEmail, :type => :model do
   it { should have_one(:associated_user_identity) }
   it { should validate_presence_of(:user) }
   it { should validate_presence_of(:email) }
+  # it { should validate_uniqueness_of(:confirmation_token).allow_nil }
 
   it "validates email format" do
     user_email.email = 'the_quick_brown-fox*jumps^over-the_lazy_dog'
@@ -19,6 +20,37 @@ RSpec.describe UserEmail, :type => :model do
   context "when created" do
     subject { user_email }
     it { is_expected.not_to be_confirmed }
+  end
+
+  context "when a same and confirmed email exists" do
+    before do
+      @email = Faker::Internet.safe_email
+      create(:user).emails.create(email: @email).confirm!
+    end
+    subject { user.emails.create(email: @email) }
+
+    it { is_expected.not_to be_valid }
+
+    it "can't be confirmed" do
+      expect { subject.confirm! }.to raise_error
+      expect(subject.confirm).to be false
+      expect(subject.confirmed?).to be false
+    end
+  end
+
+  context "when a same and unconfirmed email exists" do
+    before do
+      @email = Faker::Internet.safe_email
+      create(:user).emails.create(email: @email)
+    end
+    subject { user.emails.create(email: @email) }
+
+    it { is_expected.to be_valid }
+
+    it "can be confirmed" do
+      expect(subject.confirm).not_to be false
+      expect(subject.confirmed?).to be true
+    end
   end
 
   context "when confirmed" do

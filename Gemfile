@@ -34,7 +34,6 @@ gem 'spring',        group: :development
 
 # Use unicorn as the app server
 gem 'unicorn'
-gem 'rack-timeout'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
@@ -45,6 +44,8 @@ gem 'rack-timeout'
 # Loads environment variables from `.env`
 gem 'dotenv-rails', :groups => [:development, :test]
 
+gem 'active_model_serializers', '~> 0.8.0'
+
 # Handle settings by rails-settings-cached
 gem 'rails-settings-cached', '0.4.1'
 
@@ -53,6 +54,7 @@ gem 'factory_girl_rails', '~> 4.5.0'
 # Add Slim support
 gem 'slim-rails'
 
+# Create human-friendly IDs for models
 gem 'friendly_id', '~> 5.0.4'
 gem 'babosa'
 gem 'ruby-pinyin'
@@ -67,6 +69,7 @@ gem 'validates_email_format_of'
 
 gem 'simple_form', '~> 3.1.0'
 
+# Wrappers for 3rd service APIs
 gem 'mailgunner', '~> 2.0.0'
 gem 'nexmo'
 
@@ -99,11 +102,13 @@ end
 # RSpec
 group :development, :test do
   gem 'rspec-rails', '~> 3.0'
+  gem 'spring-commands-rspec'
   gem 'shoulda-matchers', require: false
   gem 'rspec-its', require: false
   gem 'simplecov', '~> 0.9.1', require: false
   gem 'coveralls', require: false
   gem 'capybara-webkit', '>= 1.2.0'
+  gem 'capybara-screenshot'
   gem 'database_cleaner'
   gem 'email_spec'
   gem 'webmock', require: false
@@ -128,6 +133,7 @@ gem 'hirb', :require => false
 gem 'hirb-unicode', :require => false
 
 # Assets related Gems
+gem 'react-rails', '~> 1.0.0.pre', github: 'reactjs/react-rails'
 gem 'normalize-rails', '>= 3.0.1'
 gem 'modernizr-rails'
 # gem 'react-rails', '~> 1.0.0.pre', github: 'reactjs/react-rails'

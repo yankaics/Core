@@ -18,6 +18,8 @@ class EmailPatternValidator < ActiveModel::Validator
 end
 
 class EmailPattern < ActiveRecord::Base
+  include Serializable
+
   default_scope { order('priority ASC') }
 
   belongs_to :organization, primary_key: :code, foreign_key: :organization_code
@@ -40,13 +42,16 @@ class EmailPattern < ActiveRecord::Base
         matchdata_hash[:identity] = pattern.corresponded_identity
         matchdata_hash[:uid] = matchdata.to_s unless matchdata_hash.key?(:uid)
 
-        return eval_email_matches(matchdata_hash, pattern)
+        matchdata_hash[:permit_changing_department_in_group] = pattern.permit_changing_department_in_group
+        matchdata_hash[:permit_changing_department_in_organization] = pattern.permit_changing_department_in_organization
+
+        return parse_email_matches(matchdata_hash, pattern)
       end
     end
     return nil
   end
 
-  def self.eval_email_matches(hash, pattern)
+  def self.parse_email_matches(hash, pattern)
     cxt = V8::Context.new
 
     { uid:              :uid_postparser,
@@ -69,5 +74,5 @@ class EmailPattern < ActiveRecord::Base
 
     return hash
   end
-  private_class_method :eval_email_matches
+  private_class_method :parse_email_matches
 end

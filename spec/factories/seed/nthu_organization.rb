@@ -230,6 +230,7 @@ FactoryGirl.define do
     department_code_postparser ""
     identity_detail_postparser "switch (n.toLowerCase()) { case '0': case '1': case '2': case '3': 'bachelor'; break; case '4': case '5': case '6': case '7': 'master'; break; case '8': case '9': 'doctor'; break; }"
     started_at_postparser "new Date((parseInt(n)+1911) + '-9')"
+    permit_changing_department_in_group true
   end
 
   factory :nthu_student_email_pattern_2, parent: :email_pattern do
