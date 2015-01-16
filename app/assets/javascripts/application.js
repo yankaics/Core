@@ -10,11 +10,11 @@
 // Read Sprockets README (https://github.com/sstephenson/sprockets#sprockets-directives) for details
 // about supported directives.
 //
+//= require es5-shim
 //= require jquery
 //= require jquery_ujs
 //= require react
 //= require react_ujs
-//x= require turbolinks
 //= require chosen-jquery
 //= require_tree ./lib/
 //= require components

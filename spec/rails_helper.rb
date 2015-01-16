@@ -8,6 +8,7 @@ require 'shoulda/matchers'
 require 'rspec/its'
 require 'email_spec'
 require 'webmock/rspec'
+require 'capybara-screenshot/rspec'
 Capybara.javascript_driver = :webkit
 WebMock.disable_net_connect!(:allow_localhost => true)
 OmniAuth.config.test_mode = true

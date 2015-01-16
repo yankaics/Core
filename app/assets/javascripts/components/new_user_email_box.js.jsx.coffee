@@ -12,7 +12,9 @@ NewUserEmailBox = React.createClass
     corresponded_identity: null
     identity_detail: null
     organization_code: null
+    department: null
     department_code: null
+    department_name: null
     started_at: null
     permit_changing_department_in_group: null
     permit_changing_department_in_organization: null
@@ -50,6 +52,7 @@ NewUserEmailBox = React.createClass
 
   _UpdateDepartments: ->
     @setState
+      department: @state.departments[@state.department_code]
       department_name: @state.departments[@state.department_code]?['name']
 
   handleEmailChange: (email) ->
@@ -59,6 +62,7 @@ NewUserEmailBox = React.createClass
       corresponded_identity: null
       identity_detail: null
       organization_code: null
+      department: null
       department_code: null
       department_name: null
       started_at: null
@@ -154,9 +158,9 @@ NewUserEmailBox = React.createClass
     permit_changing_department_in_group = @state.permit_changing_department_in_group
     permit_changing_department_in_organization = @state.permit_changing_department_in_organization
 
-    baseD = @state.departments[@state.department_code]
-    baseGroup = baseD?.group
-    if (@state.permit_changing_department_in_group || @state.permit_changing_department_in_organization) && baseD
+    @state.department = @state.departments[@state.department_code]
+    baseGroup = @state.department?.group
+    if (@state.permit_changing_department_in_group || @state.permit_changing_department_in_organization) && @state.department
 
       department_selector =
         `<select ref="deps"
@@ -206,6 +210,9 @@ NewUserEmailBox = React.createClass
     document.getElementById('department-select')?.value = @state.department_code
     $('#department-select').chosen()
     $('#department-select').trigger('chosen:updated')
+    $('.chosen-container + .chosen-container').remove()
+    $('.chosen-container').hover ->
+      $('#department-select').focus()
     $("form#new_user_email").submit (e) =>
       if not @state.submitActivate
         e.preventDefault()
