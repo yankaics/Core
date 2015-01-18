@@ -25,6 +25,7 @@ class User < ActiveRecord::Base
            through: :identities,
            primary_key: :code, foreign_key: :department_code
   belongs_to :primary_identity, class_name: :UserIdentity
+  has_many :oauth_applications, class_name: 'Doorkeeper::Application', as: :owner
 
   delegate :organization, :organization_code,
            :department, :department_code, :uid, :identity,
