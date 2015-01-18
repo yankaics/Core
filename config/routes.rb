@@ -25,6 +25,10 @@ Rails.application.routes.draw do
     resources :identities, controller: :user_identities
   end
 
+  scope '/developers' do
+    resources :applications, :controller => 'oauth/applications'
+  end
+
   get '/user_emails/confirmation' => 'user_emails#confirm'
   get '/user_emails/query_departments' => 'user_emails#query_departments'
 

@@ -99,11 +99,5 @@ Doorkeeper.configure do
   wildcard_redirect_uri true
 end
 
-class Doorkeeper::Application < ActiveRecord::Base
-  scope :user_apps, -> { where("owner_type = ?", 'User') }
-  scope :core_apps, -> { where("owner_type = ?", 'Admin') }
-
-  def core_app?
-    owner_type == 'Admin'
-  end
-end
+require Rails.root.join('app', 'models', 'oauth_application')
+Doorkeeper::Application.send :include, OAuthApplication
