@@ -1,5 +1,6 @@
 class API::V1::Me < API::V1
-  rescue_from :all
+  # rescue_from :all
+  guard_all!
 
   resource :me, desc: "Operations about the current user" do
     desc "Get data of the current user", {
