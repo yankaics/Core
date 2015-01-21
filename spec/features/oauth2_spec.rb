@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-feature "OAuth2", :type => :feature do
+feature "OAuth 2.0", :type => :feature do
   before :each do
     @user = create(:user)
     @user.confirm!
