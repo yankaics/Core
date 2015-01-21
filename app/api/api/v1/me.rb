@@ -17,11 +17,20 @@ class API::V1::Me < API::V1
       optional :include, desc: "Returning compound documents that include specific associated objects."
     end
     get "/", rabl: 'user' do
+      permitted_attrs = []
+      permitted_attrs += User::PUBLIC_ATTRS if scopes.include? :public
+      permitted_attrs += User::EMAIL_ATTRS if scopes.include? :email
+      permitted_attrs += User::ACCOUNT_ATTRS if scopes.include? :account
+      permitted_attrs += User::FB_ATTRS if scopes.include? :fb
+      permitted_attrs += User::INFO_ATTRS if scopes.include? :info
+      permitted_attrs += User::IDENTITY_ATTRS if scopes.include? :identity
+
       fields = (params[:fields].is_a? Hash) ? params[:fields] : { user: params[:fields] }
       @user_fields = fields[:user] ? fields[:user].split(',').map(&:to_sym) : []
+      @user_fields = @user_fields & permitted_attrs
       @user_include = params[:include] ? params[:include].split(',').map(&:to_sym) : []
       @organization_fields = fields[:organization] ? fields[:organization].split(',').map(&:to_sym) : []
-      @user = User.includes(:data).last
+      @user = current_user
     end
   end
 

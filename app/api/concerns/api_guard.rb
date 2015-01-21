@@ -59,7 +59,7 @@ module APIGuard
     end
 
     def scopes
-      @scopes ||= access_token.scopes.map(&:to_sym)
+      @scopes ||= @access_token.scopes.map(&:to_sym)
     end
 
     def current_user

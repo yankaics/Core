@@ -14,3 +14,4 @@ else
     u.organization_code
   end
 end if user_fields.include?(:organization)
+

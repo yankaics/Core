@@ -1,4 +1,4 @@
-class Oauth::ApplicationsController < Doorkeeper::ApplicationsController
+class OAuth::ApplicationsController < Doorkeeper::ApplicationsController
   before_filter :authenticate_user!
   before_filter :get_application, only: [:show, :edit, :update, :destroy]
 
