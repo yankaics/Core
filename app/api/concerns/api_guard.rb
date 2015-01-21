@@ -1,5 +1,5 @@
 # Guard API with OAuth 2.0 Access Token
-# From https://github.com/chitsaou/oauth2-api-sample/blob/master/app/api/concerns/api_guard.rb
+# Original code from https://github.com/chitsaou/oauth2-api-sample/blob/master/app/api/concerns/api_guard.rb
 
 require 'rack/oauth2'
 
@@ -9,9 +9,6 @@ module APIGuard
   included do |base|
     # OAuth2 Resource Server Authentication
     use Rack::OAuth2::Server::Resource::Bearer, 'The API' do |request|
-      # The authenticator only fetches the raw token string
-
-      # Must yield access token to store it in the env
       request.access_token
     end
 
@@ -20,8 +17,8 @@ module APIGuard
     install_error_responders(base)
   end
 
-  # Helper Methods for Grape Endpoint
   module HelperMethods
+    ##
     # Invokes the doorkeeper guard.
     #
     # If token string is blank, then it raises MissingTokenError.
@@ -29,11 +26,11 @@ module APIGuard
     # If token is presented and valid, then it sets @current_user.
     #
     # If the token does not have sufficient scopes to cover the requred scopes,
-    # then it raises InsufficientScopeError.
+    # then it raises InsufficientTokenScopeError.
     #
-    # If the token is expired, then it raises ExpiredError.
+    # If the token is expired, then it raises ExpiredTokenError.
     #
-    # If the token is revoked, then it raises RevokedError.
+    # If the token is revoked, then it raises RevokedTokenError.
     #
     # If the token is not found (nil), then it raises TokenNotFoundError.
     #
@@ -43,53 +40,41 @@ module APIGuard
     #           Defaults to empty array.
     #
     def guard!(scopes: [])
-      token_string = get_token_string()
+      token_string = request.env[Rack::OAuth2::Server::Resource::ACCESS_TOKEN]
+      fail OAuth::MissingTokenError if token_string.blank?
+      fail OAuth::TokenNotFoundError if (@access_token = find_access_token(token_string)).nil?
 
-      if token_string.blank?
-        raise MissingTokenError
+      OAuth::AccessTokenValidationService.validate!(@access_token, scopes: scopes)
 
-      elsif (access_token = find_access_token(token_string)).nil?
-        raise TokenNotFoundError
+      @current_resource_owner = User.find(@access_token.resource_owner_id)
+      @current_user = @current_resource_owner
+    end
 
-      else
-        case validate_access_token(access_token, scopes)
-        when Oauth2::AccessTokenValidationService::INSUFFICIENT_SCOPE
-          raise InsufficientScopeError.new(scopes)
+    def current_resource_owner
+      @current_resource_owner ||= User.find(@access_token.resource_owner_id)
+    end
 
-        when Oauth2::AccessTokenValidationService::EXPIRED
-          raise ExpiredError
+    def current_application
+      @access_token.application
+    end
 
-        when Oauth2::AccessTokenValidationService::REVOKED
-          raise RevokedError
-
-        when Oauth2::AccessTokenValidationService::VALID
-          @current_user = User.find(access_token.resource_owner_id)
-
-        end
-      end
+    def scopes
+      @scopes ||= access_token.scopes.map(&:to_sym)
     end
 
     def current_user
-      @current_user
+      @current_user ||= current_resource_owner
     end
 
     private
-    def get_token_string
-      # The token was stored after the authenticator was invoked.
-      # It could be nil. The authenticator does not check its existence.
-      request.env[Rack::OAuth2::Server::Resource::ACCESS_TOKEN]
-    end
 
     def find_access_token(token_string)
-      Doorkeeper::AccessToken.authenticate(token_string)
-    end
-
-    def validate_access_token(access_token, scopes)
-      Oauth2::AccessTokenValidationService.validate(access_token, scopes: scopes)
+      Doorkeeper::AccessToken.by_token(token_string)
     end
   end
 
   module ClassMethods
+    ##
     # Installs the doorkeeper guard on the whole Grape API endpoint.
     #
     # Arguments:
@@ -104,64 +89,45 @@ module APIGuard
     end
 
     private
-    def install_error_responders(base)
-      error_classes = [ MissingTokenError, TokenNotFoundError,
-                        ExpiredError, RevokedError, InsufficientScopeError]
 
-      base.send :rescue_from, *error_classes, oauth2_bearer_token_error_handler
+    def install_error_responders(base)
+      base.send :rescue_from, OAuth::OAuthError, oauth2_bearer_token_error_handler
     end
 
     def oauth2_bearer_token_error_handler
-      Proc.new {|e|
-        response = case e
-          when MissingTokenError
+      proc do |e|
+        response = (
+          case e
+          when OAuth::MissingTokenError
             Rack::OAuth2::Server::Resource::Bearer::Unauthorized.new
 
-          when TokenNotFoundError
+          when OAuth::TokenNotFoundError
             Rack::OAuth2::Server::Resource::Bearer::Unauthorized.new(
               :invalid_token,
-              "Bad Access Token.")
+              "Bad credentials.")
 
-          when ExpiredError
+          when OAuth::ExpiredTokenError
             Rack::OAuth2::Server::Resource::Bearer::Unauthorized.new(
               :invalid_token,
-              "Token is expired. You can either do re-authorization or token refresh.")
+              "Token is expired.")
 
-          when RevokedError
+          when OAuth::RevokedTokenError
             Rack::OAuth2::Server::Resource::Bearer::Unauthorized.new(
               :invalid_token,
-              "Token was revoked. You have to re-authorize from the user.")
+              "Token is revoked.")
 
-          when InsufficientScopeError
+          when OAuth::InsufficientTokenScopeError
             # FIXME: ForbiddenError (inherited from Bearer::Forbidden of Rack::Oauth2)
             # does not include WWW-Authenticate header, which breaks the standard.
             Rack::OAuth2::Server::Resource::Bearer::Forbidden.new(
               :insufficient_scope,
-              Rack::OAuth2::Server::Resource::ErrorMethods::DEFAULT_DESCRIPTION[:insufficient_scope],
-              { :scope => e.scopes})
+              "The request requires higher privileges than provided by the access token.",
+              scope: e.scopes)
           end
+        )
 
         response.finish
-      }
-    end
-  end
-
-  #
-  # Exceptions
-  #
-
-  class MissingTokenError < StandardError; end
-
-  class TokenNotFoundError < StandardError; end
-
-  class ExpiredError < StandardError; end
-
-  class RevokedError < StandardError; end
-
-  class InsufficientScopeError < StandardError
-    attr_reader :scopes
-    def initialize(scopes)
-      @scopes = scopes
+      end
     end
   end
 end

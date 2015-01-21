@@ -1,11 +1,11 @@
-# From https://github.com/chitsaou/oauth2-api-sample/blob/master/app/services/oauth2/access_token_validation_service.rb
+# Origional code from https://github.com/chitsaou/oauth2-api-sample/blob/master/app/services/oauth2/access_token_validation_service.rb
 
-module Oauth2::AccessTokenValidationService
+module OAuth::AccessTokenValidationService
   # Results:
   VALID = :valid
   EXPIRED = :expired
   REVOKED = :revoked
-  INSUFFICIENT_SCOPE = :insufficient_scope
+  INSUFFICIENT_TOKEN_SCOPE = :insufficient_token_scope
 
   class << self
     def validate(token, scopes: [])
@@ -16,14 +16,29 @@ module Oauth2::AccessTokenValidationService
         return REVOKED
 
       elsif !self.sufficent_scope?(token, scopes)
-        return INSUFFICIENT_SCOPE
+        return INSUFFICIENT_TOKEN_SCOPE
 
       else
         return VALID
       end
     end
 
+    def validate!(token, scopes: [])
+      case validate(token, scopes: scopes)
+
+      when INSUFFICIENT_TOKEN_SCOPE
+        fail OAuth::InsufficientTokenScopeError, scopes
+
+      when EXPIRED
+        fail OAuth::ExpiredTokenError
+
+      when REVOKED
+        fail OAuth::RevokedTokenError
+      end
+    end
+
     protected
+
     # True if the token's scope is a superset of required scopes,
     # or the required scopes is empty.
     def sufficent_scope?(token, scopes)
