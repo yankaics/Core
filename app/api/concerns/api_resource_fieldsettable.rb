@@ -7,6 +7,7 @@ module APIResourceFieldsettable
 
   module HelperMethods
     def fieldset_for(resource, permitted_fields = [], default_all_permitted_fields = false)
+      @fields ||= {}
       # put the fields in place
       @fields = (params[:fields].is_a? Hash) ? params[:fields] : Hashie::Mash.new(resource => params[:fields])
       @fields[resource] ||= ''

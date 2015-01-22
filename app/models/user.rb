@@ -58,6 +58,16 @@ class User < ActiveRecord::Base
     @skip_confirmation_notification = true
   end
 
+  def organization_codes
+    identities.map(&:organization_code)
+  end
+
+  def department_codes
+    identities.map(&:department_code)
+  end
+
+  private
+
   def ensure_user_has_valid_primary_identity
     if identities.count > 0
       self.primary_identity = identities.first if primary_identity.nil?

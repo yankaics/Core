@@ -30,6 +30,14 @@ class API::V1::Me < API::V1
 
       @user = current_user
     end
+
+    get "/emails", rabl: 'user_email' do
+      @user_email = current_user.emails if scopes.include? :identity
+    end
+
+    get "/identities", rabl: 'user_identity' do
+      @user_identity = current_user.identities if scopes.include? :identity
+    end
   end
 
   desc "Simulate errors"

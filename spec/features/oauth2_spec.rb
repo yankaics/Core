@@ -49,7 +49,7 @@ feature "OAuth 2.0", :type => :feature do
 
       visit "/api/v1/me"
       response = JSON.parse(page.body)
-      expect(response['user']['name']).to eq @user.name
+      expect(response['name']).to eq @user.name
     end
 
     # RFC 6749 OAuth 2.0 - Implicit Grant
@@ -78,7 +78,7 @@ feature "OAuth 2.0", :type => :feature do
 
       visit "/api/v1/me?access_token=#{access_token}"
       response = JSON.parse(page.body)
-      expect(response['user']['name']).to eq @user.name
+      expect(response['name']).to eq @user.name
     end
   end
 end

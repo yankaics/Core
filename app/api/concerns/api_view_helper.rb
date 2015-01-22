@@ -16,5 +16,13 @@ module APIViewHelper
       @include ||= {}
       @include[resource] ||= default_include
     end
+
+    def fields
+      @fields ||= {}
+    end
+
+    def include
+      @include ||= {}
+    end
   end
 end

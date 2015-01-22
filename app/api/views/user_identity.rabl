@@ -2,4 +2,4 @@ set_fields(:user_identity, [:id, :organization_code, :uid, :email, :identity, :i
 set_include(:user_identity)
 
 object @user_identity
-attributes(*@fields[:user_identity])
+attributes(*fields[:user_identity])
