@@ -4,12 +4,9 @@ set_include(:user)
 object @user
 attributes(*@fields[:user])
 
-if @include[:user].include?(:organization)
-  child :organization do
-    extends('organization')
-  end
-else
-  node :organization do |u|
-    u.organization_code
-  end
-end if @fields[:user].include?(:organization)
+node :primary_identity do
+  partial('user_identity', object: @user.primary_identity)
+end if @fields[:user].include?(:primary_identity)
+
+extends('extensions/includable_child', locals: { self_resource: :user, resource: :organization, unicode: :organization_code })
+extends('extensions/includable_child', locals: { self_resource: :user, resource: :department, unicode: :department_code })
