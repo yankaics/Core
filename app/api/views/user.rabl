@@ -1,17 +1,15 @@
-user_fields = @user_fields.presence || [:id, :name, :username, :avatar_url, :cover_photo_url, :gender]
-user_include = @user_include.presence || []
-organization_fields = @organization_fields.presence || [:code, :name]
+set_fields(:user, [:id, :name, :username, :avatar_url, :cover_photo_url])
+set_include(:user)
 
 object @user
-attributes(*user_fields)
+attributes(*@fields[:user])
 
-if user_include.include?(:organization)
+if @include[:user].include?(:organization)
   child :organization do
-    attributes(*organization_fields)
+    extends('organization')
   end
 else
   node :organization do |u|
     u.organization_code
   end
-end if user_fields.include?(:organization)
-
+end if @fields[:user].include?(:organization)

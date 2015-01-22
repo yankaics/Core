@@ -25,11 +25,9 @@ class API::V1::Me < API::V1
       permitted_attrs += User::INFO_ATTRS if scopes.include? :info
       permitted_attrs += User::IDENTITY_ATTRS if scopes.include? :identity
 
-      fields = (params[:fields].is_a? Hash) ? params[:fields] : { user: params[:fields] }
-      @user_fields = fields[:user] ? fields[:user].split(',').map(&:to_sym) : []
-      @user_fields = @user_fields & permitted_attrs
-      @user_include = params[:include] ? params[:include].split(',').map(&:to_sym) : []
-      @organization_fields = fields[:organization] ? fields[:organization].split(',').map(&:to_sym) : []
+      fieldset_for(:user, permitted_attrs, true)
+      include_for(:user)
+
       @user = current_user
     end
   end
