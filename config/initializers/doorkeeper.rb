@@ -21,7 +21,7 @@ Doorkeeper.configure do
   end
 
   # Authorization Code expiration time (default 10 minutes).
-  authorization_code_expires_in 10.minutes
+  authorization_code_expires_in 30.seconds
 
   # Access token expiration time (default 2 hours).
   # If you want to disable expiration, set this to nil.
@@ -129,3 +129,13 @@ module OAuthApplication
 end
 
 Doorkeeper::Application.send :include, OAuthApplication
+
+module OAuthAccessToken
+  extend ActiveSupport::Concern
+
+  included do
+    belongs_to :resource_owner, class_name: :User
+  end
+end
+
+Doorkeeper::AccessToken.send :include, OAuthAccessToken
