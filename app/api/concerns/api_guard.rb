@@ -48,6 +48,8 @@ module APIGuard
 
       @current_resource_owner = User.find(@access_token.resource_owner_id)
       @current_user = @current_resource_owner
+
+      @scopes = all_scopes if current_application.core_app?
     end
 
     def current_resource_owner
@@ -64,6 +66,15 @@ module APIGuard
 
     def current_user
       @current_user ||= current_resource_owner
+    end
+
+    def all_scopes
+      if @all_scopes
+        @all_scopes
+      else
+        @all_scopes = Doorkeeper.configuration.default_scopes.instance_variable_get('@scopes') + Doorkeeper.configuration.optional_scopes.instance_variable_get('@scopes')
+        @all_scopes = @all_scopes.map(&:to_sym)
+      end
     end
 
     private
