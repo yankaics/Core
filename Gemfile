@@ -54,10 +54,23 @@ gem 'factory_girl_rails', '~> 4.5.0'
 # Add Slim support
 gem 'slim-rails'
 
+# Markdown parser
+gem 'redcarpet'
+gem 'rouge'
+
 # Create human-friendly IDs for models
 gem 'friendly_id', '~> 5.0.4'
 gem 'babosa'
 gem 'ruby-pinyin'
+
+# Grape API
+gem 'grape', '~> 0.10.1'
+gem 'grape-rabl'
+gem 'grape-entity'
+gem 'grape-swagger'
+gem 'rack-cors', :require => 'rack/cors'
+gem 'grape-swagger-rails'
+gem 'rack-oauth2', '~> 1.0.10'
 
 gem 'devise', '~> 3.4.0'
 gem 'cancancan', '~> 1.10.0'

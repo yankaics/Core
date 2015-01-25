@@ -1,4 +1,10 @@
 Rails.application.routes.draw do
+  constraints subdomain: 'api' do
+    mount API => '/', as: '/'
+  end
+
+  root 'pages#index'
+
   devise_for :users,
              :controllers => {
                :omniauth_callbacks => "users/omniauth_callbacks",
@@ -10,18 +16,27 @@ Rails.application.routes.draw do
                :sign_out => "logout",
                :sign_up => "register"
              }
+
   devise_for :admins, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
+
+  use_doorkeeper do
+    controllers :applications => 'oauth/applications'
+  end
 
   resource :my_account do
     resources :emails, controller: :user_emails
     resources :identities, controller: :user_identities
   end
 
+  scope '/developers' do
+    resources :applications, :controller => 'oauth/applications'
+  end
+
   get '/user_emails/confirmation' => 'user_emails#confirm'
   get '/user_emails/query_departments' => 'user_emails#query_departments'
 
-  root 'pages#index'
+  mount API => '/api'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

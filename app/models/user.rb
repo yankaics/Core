@@ -25,6 +25,9 @@ class User < ActiveRecord::Base
            through: :identities,
            primary_key: :code, foreign_key: :department_code
   belongs_to :primary_identity, class_name: :UserIdentity
+  has_many :oauth_applications, class_name: 'Doorkeeper::Application', as: :owner
+  has_many :access_grants, class_name: 'Doorkeeper::AccessGrant', as: :resource_owner
+  has_many :access_tokens, class_name: 'Doorkeeper::AccessToken', as: :resource_owner
 
   delegate :organization, :organization_code,
            :department, :department_code, :uid, :identity,
@@ -55,6 +58,16 @@ class User < ActiveRecord::Base
     @skip_confirmation_notification = true
   end
 
+  def organization_codes
+    identities.map(&:organization_code)
+  end
+
+  def department_codes
+    identities.map(&:department_code)
+  end
+
+  private
+
   def ensure_user_has_valid_primary_identity
     if identities.count > 0
       self.primary_identity = identities.first if primary_identity.nil?
@@ -62,4 +75,47 @@ class User < ActiveRecord::Base
       self.primary_identity = nil
     end
   end
+
+  PUBLIC_ATTRS = [
+    :id,
+    :username,
+    :name,
+    :avatar_url,
+    :cover_photo_url,
+    :gender
+  ]
+
+  EMAIL_ATTRS = [
+    :email
+  ]
+
+  ACCOUNT_ATTRS = [
+    :sign_in_count,
+    :created_at,
+    :updated_at,
+    :last_sign_in_at
+  ]
+
+  FB_ATTRS = [
+    :fbid,
+    :fb_friends
+  ]
+
+  INFO_ATTRS = [
+    :birth_day,
+    :birth_month,
+    :brief,
+    :motto,
+    :url
+  ]
+
+  IDENTITY_ATTRS = [
+    :emails,
+    :identities,
+    :primary_identity,
+    :organizations,
+    :departments,
+    :organization,
+    :department,
+  ]
 end

@@ -16,11 +16,12 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 require 'simplecov'
 require 'coveralls'
+require "#{SimpleCov.root}/lib/simplecov/rails"
 SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
   SimpleCov::Formatter::HTMLFormatter,
   Coveralls::SimpleCov::Formatter
 ]
-SimpleCov.start :rails
+SimpleCov.start :rails_cov
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate

@@ -2,11 +2,12 @@
 if ENV['RAILS_ENV'] == 'test'
   require 'simplecov'
   require 'coveralls'
+  require "#{SimpleCov.root}/lib/simplecov/rails"
   SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
     SimpleCov::Formatter::HTMLFormatter,
     Coveralls::SimpleCov::Formatter
   ]
-  SimpleCov.start :rails
+  SimpleCov.start :rails_cov
   puts "required simplecov"
 end
 begin

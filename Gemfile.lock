@@ -63,7 +63,12 @@ GEM
     arbre (1.0.3)
       activesupport (>= 3.0.0)
     arel (5.0.1.20140414130214)
+    attr_required (1.0.0)
     awesome_print (1.6.1)
+    axiom-types (0.1.1)
+      descendants_tracker (~> 0.0.4)
+      ice_nine (~> 0.11.0)
+      thread_safe (~> 0.3, >= 0.3.1)
     babosa (1.0.2)
     bcrypt (3.1.9)
     better_errors (2.1.1)
@@ -105,6 +110,8 @@ GEM
       sass-rails (>= 3.2)
     chunky_png (1.3.3)
     coderay (1.1.0)
+    coercible (1.0.0)
+      descendants_tracker (~> 0.0.1)
     coffee-rails (4.1.0)
       coffee-script (>= 2.2.0)
       railties (>= 4.0.0, < 5.0)
@@ -132,6 +139,8 @@ GEM
     database_cleaner (1.4.0)
     debug_inspector (0.0.2)
     debugger-linecache (1.2.0)
+    descendants_tracker (0.0.4)
+      thread_safe (~> 0.3, >= 0.3.1)
     devise (3.4.1)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
@@ -149,6 +158,7 @@ GEM
     email_spec (1.6.0)
       launchy (~> 2.1)
       mail (~> 2.2)
+    equalizer (0.0.9)
     erubis (2.7.0)
     execjs (2.2.2)
     factory_girl (4.5.0)
@@ -170,6 +180,28 @@ GEM
     friendly_id (5.0.4)
       activerecord (>= 4.0.0)
     fssm (0.2.10)
+    grape (0.10.1)
+      activesupport
+      builder
+      hashie (>= 2.1.0)
+      multi_json (>= 1.3.2)
+      multi_xml (>= 0.5.2)
+      rack (>= 1.3.0)
+      rack-accept
+      rack-mount
+      virtus (>= 1.0.0)
+    grape-entity (0.4.4)
+      activesupport
+      multi_json (>= 1.3.2)
+    grape-rabl (0.3.0)
+      grape
+      i18n
+      rabl
+      tilt
+    grape-swagger (0.9.0)
+      grape (>= 0.8.0)
+      grape-entity
+    grape-swagger-rails (0.0.1)
     has_scope (0.6.0.rc)
       actionpack (>= 3.2, < 5)
       activesupport (>= 3.2, < 5)
@@ -182,7 +214,9 @@ GEM
     httparty (0.13.3)
       json (~> 1.8)
       multi_xml (>= 0.5.2)
+    httpclient (2.6.0.1)
     i18n (0.7.0)
+    ice_nine (0.11.1)
     inherited_resources (1.5.1)
       actionpack (>= 3.2, < 4.2)
       has_scope (~> 0.6.0.rc)
@@ -260,9 +294,22 @@ GEM
       pry (~> 0.10)
     pry-rails (0.3.2)
       pry (>= 0.9.10)
+    rabl (0.11.5)
+      activesupport (>= 2.3.14)
     rack (1.5.2)
+    rack-accept (0.4.5)
+      rack (>= 0.4)
     rack-contrib (1.2.0)
       rack (>= 0.9.1)
+    rack-cors (0.3.1)
+    rack-mount (0.8.3)
+      rack (>= 1.0.0)
+    rack-oauth2 (1.0.10)
+      activesupport (>= 2.3)
+      attr_required (>= 0.0.5)
+      httpclient (>= 2.4)
+      multi_json (>= 1.3.6)
+      rack (>= 1.1)
     rack-test (0.6.3)
       rack (>= 1.0)
     railroady (1.3.0)
@@ -299,6 +346,7 @@ GEM
     rdoc (4.2.0)
       json (~> 1.4)
     react-source (0.12.2)
+    redcarpet (3.2.2)
     ref (1.0.5)
     remote_syslog_logger (1.0.3)
       syslog_protocol
@@ -308,6 +356,7 @@ GEM
       mime-types (>= 1.16, < 3.0)
       netrc (~> 0.7)
     rmmseg-cpp (0.2.9)
+    rouge (1.7.7)
     rspec-core (3.1.7)
       rspec-support (~> 3.1.0)
     rspec-expectations (3.1.2)
@@ -405,6 +454,11 @@ GEM
       raindrops (~> 0.7)
     validates_email_format_of (1.6.1)
       i18n
+    virtus (1.0.4)
+      axiom-types (~> 0.1)
+      coercible (~> 1.0)
+      descendants_tracker (~> 0.0, >= 0.0.3)
+      equalizer (~> 0.0, >= 0.0.9)
     warden (1.2.3)
       rack (>= 1.0)
     webmock (1.20.4)
@@ -442,6 +496,11 @@ DEPENDENCIES
   faker
   formulaic
   friendly_id (~> 5.0.4)
+  grape (~> 0.10.1)
+  grape-entity
+  grape-rabl
+  grape-swagger
+  grape-swagger-rails
   hirb
   hirb-unicode
   httparty (~> 0.13.1)
@@ -461,12 +520,16 @@ DEPENDENCIES
   pg
   pry-byebug
   pry-rails
+  rack-cors
+  rack-oauth2 (~> 1.0.10)
   railroady
   rails (= 4.1.8)
   rails-erd
   rails-settings-cached (= 0.4.1)
   react-rails (~> 1.0.0.pre)!
+  redcarpet
   remote_syslog_logger
+  rouge
   rspec-its
   rspec-rails (~> 3.0)
   ruby-pinyin
