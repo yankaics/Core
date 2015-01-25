@@ -118,9 +118,6 @@ group :development, :test do
   gem 'faker'
 end
 
-# Follow the rules of 12Factor
-gem 'rails_12factor', group: :production
-
 # Logger and Monitoring Tools
 gem 'remote_syslog_logger'
 gem 'newrelic_rpm'

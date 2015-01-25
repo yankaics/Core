@@ -29,10 +29,8 @@ module Core
     config.react.addons = true
 
     # Send logs to a remote server
-    config.to_prepare do
-      if !ENV['REMOTE_LOGGER_HOST'].blank? && !ENV['REMOTE_LOGGER_PORT'].blank?
-        config.logger = RemoteSyslogLogger.new(ENV['REMOTE_LOGGER_HOST'], ENV['REMOTE_LOGGER_PORT'], local_hostname: (ENV['APP_NAME'].presence || Rails.application.class.parent_name), program: 'rails-' + Rails.application.class.parent_name.underscore)
-      end
+    if !ENV['REMOTE_LOGGER_HOST'].blank? && !ENV['REMOTE_LOGGER_PORT'].blank?
+      config.logger = RemoteSyslogLogger.new(ENV['REMOTE_LOGGER_HOST'], ENV['REMOTE_LOGGER_PORT'], local_hostname: (ENV['APP_NAME'].presence || Rails.application.class.parent_name).gsub(' ', '-'), program: 'rails-' + Rails.application.class.parent_name.underscore)
     end
   end
 end
