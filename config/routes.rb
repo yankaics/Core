@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  constraints subdomain: 'api' do
+    mount API => '/', as: '/'
+  end
+
   root 'pages#index'
 
   devise_for :users,

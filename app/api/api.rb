@@ -24,5 +24,9 @@ class API < Grape::API
     }
   }
 
+  get "/" do
+    { documentation_url: "#{request.url}docs" }
+  end
+
   add_swagger_documentation(documentation_settings)
 end
