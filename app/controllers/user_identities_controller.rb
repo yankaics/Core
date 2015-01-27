@@ -5,7 +5,7 @@ class UserIdentitiesController < ApplicationController
     @identities = current_user.identities
     @identities = EmailPattern.all
     respond_to do |format|
-      format.json { asdf;render json: @identities }
+      format.json { render json: @identities }
     end
   end
 end

@@ -16,6 +16,13 @@ ActiveAdmin.register UserIdentity do
     params
   end
 
+  active_admin_import :validate => false,
+                      :template => 'import',
+                      :template_object => ActiveAdminImport::Model.new(
+                        hint: "檔案格式： 教授姓名, email, 系所代號, 組織名稱, uid, 身份",
+                        csv_headers: ["name","email","department_code", "organization_code", "uid", "identity"],
+                      )
+
   filter :organization, if: proc { current_admin.root? }
   filter :department
   filter :original_department
