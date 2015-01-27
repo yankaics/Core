@@ -32,7 +32,7 @@ describe "Me API" do
     'account' => %w(sign_in_count last_sign_in_at),
     'fb' => %w(fbid),
     'info' => %w(birth_month motto),
-    'identity' => %w(emails identities organizations department)
+    'identity' => %w(emails identities organizations department uid identity)
   }.each do |scope, attrs|
 
     context "with a token contains #{scope} scope" do

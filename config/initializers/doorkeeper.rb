@@ -118,6 +118,12 @@ module OAuthApplication
     owner_type == 'Admin'
   end
 
+  def regenerate_secret!
+    self.secret = nil
+    send :generate_secret
+    save!
+  end
+
   private
 
   def set_initial_refresh_time

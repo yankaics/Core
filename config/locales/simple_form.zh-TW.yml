@@ -55,3 +55,11 @@ zh-TW:
         password_confirmation: "密碼確認"
         scoped_organization: "所屬組織"
         scoped_organization_code: "所屬組織"
+      doorkeeper_application:
+        name: "名稱"
+        description: "簡介"
+        app_url: "主要網址"
+        uid: "應用程式 ID"
+        secret: "應用程式密鑰"
+        redirect_uri: "應用程式網址"
+        owner: 擁有者

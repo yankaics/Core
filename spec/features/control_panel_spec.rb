@@ -391,6 +391,80 @@ feature "Control Panel", :type => :feature do
       end
     end
   end
+
+  describe "Applications Control Panel" do
+    before(:all) { DatabaseCleaner.clean_with(:deletion) }
+    before :each do
+      login_as @admin, scope: :admin
+      visit(admin_root_path)
+    end
+
+    context "signed in as a root admin" do
+      before(:all) do
+        @admin = create(:admin)
+        @core_app_1 = create(:oauth_application, :owned_by_admin)
+        @core_app_2 = create(:oauth_application, :owned_by_admin)
+        @user_app_1 = create(:oauth_application)
+        @user_app_2 = create(:oauth_application)
+      end
+      before :each do
+        find('#doorkeeper_applications a').click
+      end
+
+      scenario "Admin views applications", :js => false do
+        visit(current_path)
+        first('.scope.core_apps a').click
+        expect(page).to have_content(@core_app_1.name)
+        expect(page).to have_content(@core_app_2.name)
+        first('.scope.user_apps a').click
+        expect(page).to have_content(@user_app_1.name)
+        expect(page).to have_content(@user_app_2.name)
+      end
+
+      scenario "Admin views a application", :js => false do
+        visit(admin_doorkeeper_application_path(Doorkeeper::Application.last))
+        expect(page).to have_content(Doorkeeper::Application.last.name)
+      end
+
+      scenario "Admin creates application", :js => false do
+        visit(new_admin_doorkeeper_application_path)
+        within("#main_content") do
+          find('input[type=submit]').click
+        end
+        within("#main_content") do
+          fill_in 'doorkeeper_application_name', with: "TEST01"
+          fill_in 'doorkeeper_application_redirect_uri', with: "urn:ietf:wg:oauth:2.0:oob"
+          find('input[type=submit]').click
+        end
+        expect(page).to have_content(Doorkeeper::Application.last.uid)
+      end
+
+      scenario "Admin updates application", :js => false do
+        visit(edit_admin_doorkeeper_application_path(Doorkeeper::Application.last))
+        within("#main_content") do
+          fill_in 'doorkeeper_application_name', with: ""
+          find('input[type=submit]').click
+        end
+        within("#main_content") do
+          fill_in 'doorkeeper_application_name', with: "Hello App"
+          fill_in 'doorkeeper_application_sms_quota', with: "101"
+          find('input[type=submit]').click
+        end
+        expect(page).to have_content(Doorkeeper::Application.last.uid)
+        expect(Doorkeeper::Application.last.sms_quota).to eq 101
+      end
+    end
+
+    context "signed in as a scoped admin" do
+      before(:all) do
+        @admin = create(:admin, scoped_organization_code: 'ORG')
+      end
+
+      scenario "Admin can't manage applications", :js => false do
+        expect { visit(admin_doorkeeper_applications_path) }.to raise_error
+      end
+    end
+  end
 end
 
   # describe "Some Control Panel" do

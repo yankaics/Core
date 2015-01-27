@@ -8,6 +8,7 @@ zh-TW:
       user_identity: "使用者身份資料"
       admin: "系統管理員"
       user: "使用者"
+      doorkeeper_application: "應用程式"
 
     attributes:
       user:
@@ -64,3 +65,10 @@ zh-TW:
         password_confirmation: "密碼確認"
         scoped_organization: "所屬組織"
         scoped_organization_code: "所屬組織"
+      doorkeeper_application:
+        name: "名稱"
+        description: "簡介"
+        app_url: "主要網址"
+        uid: "應用程式 ID"
+        secret: "應用程式密鑰"
+        redirect_uri: "應用程式網址"

@@ -19,4 +19,16 @@ RSpec.describe Doorkeeper::Application, :type => :model do
 
     it { is_expected.to be_core_app }
   end
+
+  describe "#regenerate_secret!" do
+    subject(:app) { create(:oauth_application) }
+    it "regenerates the application secret" do
+      expect do
+        app.regenerate_secret!
+      end.to change { app.secret }
+      new_secret = app.secret
+      app.reload
+      expect(app.secret).to eq new_secret
+    end
+  end
 end

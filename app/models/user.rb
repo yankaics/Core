@@ -113,6 +113,8 @@ class User < ActiveRecord::Base
     :emails,
     :identities,
     :primary_identity,
+    :identity,
+    :uid,
     :organizations,
     :departments,
     :organization,
