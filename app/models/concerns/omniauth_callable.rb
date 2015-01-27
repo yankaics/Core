@@ -14,8 +14,8 @@ module OmniauthCallable
       )
       info = get_info_connection.parsed_response
 
-      user = where(fbid: auth[:uid]).first_or_create! do |new_user|
-        new_user.email = auth[:info][:email]
+      user = where(email: auth[:info][:email]).first_or_create! do |new_user|
+        new_user.fbid = auth[:uid]
         new_user.password = Devise.friendly_token[0, 20]
         new_user.name = auth[:info][:name]
         new_user.gender = auth[:extra][:raw_info][:gender]

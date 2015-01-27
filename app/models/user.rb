@@ -116,6 +116,6 @@ class User < ActiveRecord::Base
     :organizations,
     :departments,
     :organization,
-    :department,
+    :department
   ]
 end
