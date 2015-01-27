@@ -94,6 +94,7 @@ gem 'activerecord-import', '~> 0.7.0'
 
 # Use ActiveAdmin as the administration framework
 gem 'activeadmin', github: 'activeadmin'
+gem "active_admin_import" , '2.1.2'
 
 # Integrate swagger docs
 gem 'swagger-docs', '~> 0.1.8'
