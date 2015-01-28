@@ -16,7 +16,10 @@ class CoreSessionsController < Devise::SessionsController
     else
       SiteIdentityToken::MaintainService.destroy_cookie_token(cookies)
     end
-    redirect_to :back if request.env["HTTP_REFERER"]
-    redirect_to '/'
+    if request.env["HTTP_REFERER"]
+      redirect_to request.env["HTTP_REFERER"]
+    else
+      redirect_to root_path
+    end
   end
 end

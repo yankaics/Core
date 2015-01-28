@@ -10,7 +10,11 @@ module SiteIdentityToken
       end
 
       def destroy_cookie_token(cookies)
-        cookies[:_identity_token] = nil
+        identity_token_cookie = { value: '',
+                                  domain: '.' + domain,
+                                  expires: 1.year.from_now }
+        identity_token_cookie.except!(:domain) if Rails.env.test?
+        cookies[:_identity_token] = identity_token_cookie
       end
 
       def generate_token(user)
