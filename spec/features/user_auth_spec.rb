@@ -78,15 +78,41 @@ eod
   scenario "new User signs in with Facebook" do
     visit(new_user_session_path)
     click_on('Sign in with Facebook', match: :first)
+    user = User.last
+
     # expect(page).to ...
+
+    if (page.driver.request.cookies['_identity_token'] !=
+        SiteIdentityToken::MaintainService.generate_token(user))
+      visit('/refresh_it')
+    end
+    expect(page.driver.request.cookies['_identity_token'])
+      .to eq SiteIdentityToken::MaintainService.generate_token(user)
+
+    visit('/logout')
+
+    expect(page.driver.request.cookies['_identity_token'])
+      .to be_blank
   end
 
   scenario "returning User signs in with Facebook" do
-    user = create(:user)
-    user.update(fbid: '87654321')
+    user = create(:user, email: 'mock_user@facebook.com')
     visit(new_user_session_path)
     click_on('Sign in with Facebook', match: :first)
+
     # expect(page).to ...
+
+    if (page.driver.request.cookies['_identity_token'] !=
+        SiteIdentityToken::MaintainService.generate_token(user))
+      visit('/refresh_it')
+    end
+    expect(page.driver.request.cookies['_identity_token'])
+      .to eq SiteIdentityToken::MaintainService.generate_token(user)
+
+    visit('/logout')
+
+    expect(page.driver.request.cookies['_identity_token'])
+      .to be_blank
   end
 
   scenario "new User signs up with email" do
@@ -103,15 +129,27 @@ eod
 
     user = User.last
     confirmation_path = open_last_email.body.match /confirmation\?confirmation_token=[^"]+/
-    expect {
+    expect do
       visit "/#{confirmation_path}"
       user.reload
-    }.to change{user.confirmed?}.from(false).to(true)
+    end.to change { user.confirmed? }.from(false).to(true)
 
     visit(new_user_session_path)
     fill_form(:user, user_login_credentials)
     find('form input[type=submit]').click
 
     # expect(page).to ...
+
+    if (page.driver.request.cookies['_identity_token'] !=
+        SiteIdentityToken::MaintainService.generate_token(user))
+      visit('/refresh_it')
+    end
+    expect(page.driver.request.cookies['_identity_token'])
+      .to eq SiteIdentityToken::MaintainService.generate_token(user)
+
+    visit('/logout')
+
+    expect(page.driver.request.cookies['_identity_token'])
+      .to be_blank
   end
 end

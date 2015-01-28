@@ -7,6 +7,7 @@ Rails.application.routes.draw do
 
   devise_for :users,
              :controllers => {
+               :sessions => "core_sessions",
                :omniauth_callbacks => "users/omniauth_callbacks",
                :registrations => "registrations"
              },
@@ -16,6 +17,10 @@ Rails.application.routes.draw do
                :sign_out => "logout",
                :sign_up => "register"
              }
+
+  devise_scope :user do
+    get '/refresh_it' => 'core_sessions#refresh_it'
+  end
 
   devise_for :admins, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
