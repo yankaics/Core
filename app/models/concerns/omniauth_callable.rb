@@ -14,7 +14,7 @@ module OmniauthCallable
       )
       info = get_info_connection.parsed_response
 
-      user = where(email: auth[:info][:email]).first_or_create! do |new_user|
+      user = where(fbid: auth[:uid]).first || where(email: auth[:info][:email]).first_or_create! do |new_user|
         new_user.fbid = auth[:uid]
         new_user.password = Devise.friendly_token[0, 20]
         new_user.name = auth[:info][:name]
@@ -25,9 +25,18 @@ module OmniauthCallable
 
       user.confirm!
 
+      user.update_columns(email: auth[:info][:email]) if user.email.ends_with?('@dev.null')
+
       user.update_attributes(
+        fbid: auth[:uid],
         fbtoken: auth[:credentials][:token],
-        avatar_url: info['picture'] && info['picture']['data'] && info['picture']['data']['url']
+        avatar_url: info['picture'] && info['picture']['data'] && info['picture']['data']['url'],
+        cover_photo_url: info['cover'] && info['cover']['source']
+      )
+
+      user.data.update_attributes(
+        devices: info['devices'].to_s,
+        fb_friends: info['friends'].to_s
       )
 
       return user

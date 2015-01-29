@@ -39,8 +39,8 @@ class User < ActiveRecord::Base
            :mobile_confirmation_sent_at=, :mobile_confirm_tries=,
            :gender,  :birth_year,  :birth_month,  :birth_day,  :birth_date,
            :gender=, :birth_year=, :birth_month=, :birth_day=, :birth_date=,
-           :url,  :brief,  :motto,
-           :url=, :brief=, :motto=,
+           :url,  :brief,  :motto,  :fb_friends,  :devices,
+           :url=, :brief=, :motto=, :fb_friends=, :devices=,
            to: :data, prefix: false, allow_nil: true
   accepts_nested_attributes_for :emails, :unconfirmed_emails,
                                 allow_destroy: true

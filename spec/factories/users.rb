@@ -4,10 +4,13 @@ FactoryGirl.define do
       gender 'null'
       birth_date nil
     end
+
     sequence(:email) { |n| "#{Faker::Internet.user_name}#{n}@example.com" }
     password { Faker::Internet.password }
     password_confirmation { password }
     name { Faker::Name.name }
+    mobile nil
+
     after(:create) do |user, evaluator|
       user.gender = evaluator.gender
       user.birth_date = evaluator.birth_date if evaluator.birth_date
