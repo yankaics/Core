@@ -39,7 +39,7 @@ class UserIdentity < ActiveRecord::Base
   enum identity: IDENTITES
 
   validates :uid, presence: true
-  validates :email, presence: true
+  validates :email, presence: true, uniqueness: { scope: :organization_code }
   validates :organization, presence: true
   validates_with UserIdentityValidator
 

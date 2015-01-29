@@ -283,6 +283,9 @@ feature "Control Panel", :type => :feature do
       visit(admin_root_path)
       find('#user_identities a').click
     end
+    let(:user_identity_csv_file) do
+      Rails.root.join('spec', 'fixtures', 'files', 'sample_user_identity.csv')
+    end
 
     context "signed in as a root admin" do
       before(:all) do
@@ -309,6 +312,42 @@ feature "Control Panel", :type => :feature do
           find('input[type=submit]').click
         end
         expect(page).to have_content('someone@example.com.tw')
+      end
+
+      scenario "Admin imports user_identities", :js => false do
+        visit(import_admin_user_identities_path)
+        attach_file('active_admin_import_model_file', user_identity_csv_file)
+        find('input[type=submit]').click
+
+        imported_user_identities = UserIdentity.last(9)
+
+        [
+          ['professor', "A Prof", 'a_prof@example.com', 'a_prof@example.com', 'D15', 'NTUST', true, true, 'D15'],
+          ['professor', "Another Prof", 'another_prof@example.com', 'another_prof@example.com', 'D10', 'NTUST', true, true, 'D10'],
+          ['lecturer', "A Lecturer", 'a_lecturer@example.com', 'a_lecturer@example.com', 'D15', 'NTUST', true, true, 'D15'],
+          ['lecturer', "Another Lecturer", 'another_lecturer@example.com', 'another_lecturer@example.com', 'D10', 'NTUST', true, true, 'D10'],
+          ['staff', "A Staff", 'a_staff@example.com', 'a_staff@example.com', 'U13', 'NTUST', true, true, 'U13'],
+          ['student', "A Student", 'a_student@example.com', 'a_student@example.com', 'D15', 'NTUST', true, false, 'D15'],
+          ['student', "Another Student", 'another_student@example.com', 'another_student@example.com', 'D10', 'NTUST', true, false, 'D15'],
+          ['guest', "A Guest", 'a_guest@example.com', 'a_guest@example.com', nil, 'NTUST', false, false, nil],
+          ['guest', "Another Guest", 'another_guest@example.com', 'another_guest@example.com', nil, 'NTUST', false, false, nil]
+        ].each_with_index do |identity_data, i|
+          expect(imported_user_identities[i].identity).to eq identity_data[0]
+          expect(imported_user_identities[i].name).to eq identity_data[1]
+          expect(imported_user_identities[i].email).to eq identity_data[2]
+          expect(imported_user_identities[i].uid).to eq identity_data[3]
+          expect(imported_user_identities[i].department_code).to eq identity_data[4]
+          expect(imported_user_identities[i].organization_code).to eq identity_data[5]
+          expect(imported_user_identities[i].permit_changing_department_in_group).to eq identity_data[6]
+          expect(imported_user_identities[i].permit_changing_department_in_organization).to eq identity_data[7]
+          expect(imported_user_identities[i].original_department_code).to eq identity_data[8]
+        end
+
+        visit(import_admin_user_identities_path)
+        attach_file('active_admin_import_model_file', user_identity_csv_file)
+        find('input[type=submit]').click
+
+        expect(UserIdentity.where(organization_code: 'NTUST', email: 'a_prof@example.com').count).to eq 1
       end
     end
 
