@@ -1,0 +1,9 @@
+professor,"A Prof",a_prof@example.com,a_prof@example.com,D15,NTUST,true,true
+professor,"Another Prof",another_prof@example.com,another_prof@example.com,D10,NTUST,true,true
+lecturer,"A Lecturer",a_lecturer@example.com,a_lecturer@example.com,D15,NTUST,true,true
+lecturer,"Another Lecturer",another_lecturer@example.com,another_lecturer@example.com,D10,NTUST,true,true
+staff,"A Staff",a_staff@example.com,a_staff@example.com,U13,NTUST,true,true
+student,"A Student",a_student@example.com,a_student@example.com,D15,NTUST,true,false
+student,"Another Student",another_student@example.com,another_student@example.com,D10,NTUST,true,false,D15
+guest,"A Guest",a_guest@example.com,a_guest@example.com,,NTUST,false,false
+guest,"Another Guest",another_guest@example.com,another_guest@example.com,,NTUST
