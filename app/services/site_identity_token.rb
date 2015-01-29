@@ -18,12 +18,13 @@ module SiteIdentityToken
       end
 
       def generate_token(user)
-        Digest::MD5.hexdigest("#{user.id}#{secret_key}")
+        timestamp = Time.now.to_time.to_i
+        token_hash = Digest::MD5.hexdigest(user.id.to_s + Digest::MD5.hexdigest(secret_key + timestamp.to_s))
+        "#{token_hash}.#{timestamp}"
       end
 
       def secret_key
         @site_secret ||= Digest::MD5.hexdigest(ENV['SITE_SECRET'])[0..16]
-        @site_secret + Date.today.year.to_s + Date.today.strftime("%U")
       end
 
       def domain
