@@ -1,5 +1,5 @@
 zh-TW:
   active_admin_import:
     import_model: "匯入資料"
-    failed: "匯入失敗"
+    failed: "匯入失敗，無效的檔案或重複的資料？"
     imported: "匯入成功"

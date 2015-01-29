@@ -1,6 +1,7 @@
 ActiveAdmin.register UserIdentity do
   menu priority: 113, parent: "組織資料"
   config.sort_order = :organization_code_asc, :uid_asc
+  config.per_page = 1000
 
   scope_to(if: proc { current_admin.scoped? }) { current_admin.organization }
 
@@ -16,12 +17,51 @@ ActiveAdmin.register UserIdentity do
     params
   end
 
-  active_admin_import :validate => false,
-                      :template => 'import',
-                      :template_object => ActiveAdminImport::Model.new(
-                        hint: "檔案格式： 教授姓名, email, 系所代號, 組織名稱, uid, 身份",
-                        csv_headers: ["name","email","department_code", "organization_code", "uid", "identity"],
-                      )
+  if proc { current_admin.root? }
+    active_admin_import :validate => true,
+                        :template => 'admin/import',
+                        :template_object => ActiveAdminImport::Model.new(
+                          hint: "CSV 欄位順序：身份別代碼（訪客: guest, 學生: student, 職員: staff, 講師: lecturer, 教授: professor）、名稱、email、唯一識別碼、系所代碼、組織代碼、可切換同型部門（選填，true/false）、可切換部門（選填，true/false）、原系所代碼（選填）",
+                          csv_headers: %w(identity name email uid department_code organization_code permit_changing_department_in_group permit_changing_department_in_organization original_department_code)
+                        ),
+                        :before_batch_import => proc { |importer|
+                          importer_csv_lines = importer.instance_variable_get(:@csv_lines)
+
+                          # preprocess each line
+                          importer_csv_lines.each do |csv_line|
+                            # convert identity string to integer for batch import
+                            csv_line[0] = UserIdentity::IDENTITES[csv_line[0].to_sym]
+
+                            # set default value for unspecified columns
+                            unspecified_column_count = importer.headers.count - csv_line.count
+                            # permit_changing_department_in_group defaults to false
+                            if unspecified_column_count == 3
+                              csv_line.append(false)
+                              unspecified_column_count -= 1
+                            end
+                            # permit_changing_department_in_group defaults to false
+                            if unspecified_column_count == 2
+                              csv_line.append(false)
+                              unspecified_column_count -= 1
+                            end
+                            # original_department_code defaults to department_code
+                            if unspecified_column_count == 1
+                              csv_line.append(csv_line[4])
+                              unspecified_column_count -= 1
+                            end
+                          end
+
+                          # save the preprocessed lines
+                          importer.instance_variable_set(:@csv_lines, importer_csv_lines)
+                        }
+  else
+    # active_admin_import :validate => true,
+    #                     :template => 'admin/import',
+    #                     :template_object => ActiveAdminImport::Model.new(
+    #                       hint: "CSV 欄位：名稱,email,系所代碼,識別碼,身份別代碼 (訪客: guest, 學生: student, 職員: staff, 講師: lecturer, 教授: professor)",
+    #                       csv_headers: %w(name email department_code uid identity)
+    #                     )
+  end
 
   filter :organization, if: proc { current_admin.root? }
   filter :department
@@ -82,8 +122,8 @@ ActiveAdmin.register UserIdentity do
       f.input :organization_code, as: :select, collection: options_for_select(Organization.all.map { |u| [u.name, u.code] }, user_identity.organization_code) if current_admin.root?
       f.input :department_code if current_admin.root?
       f.input :original_department_code if current_admin.root?
-      f.input :department, as: :select, collection: options_for_select(current_admin.organization.departments.all.map { |d| [d.name, d.code] }, user_identity.department_code) if !current_admin.root?
-      f.input :original_department, as: :select, collection: options_for_select(current_admin.organization.departments.all.map { |d| [d.name, d.code] }, user_identity.original_department_code) if !current_admin.root?
+      f.input :department, as: :select, collection: options_for_select(current_admin.organization.departments.all.map { |d| [d.name, d.code] }, user_identity.department_code) unless current_admin.root?
+      f.input :original_department, as: :select, collection: options_for_select(current_admin.organization.departments.all.map { |d| [d.name, d.code] }, user_identity.original_department_code) unless current_admin.root?
       f.input :name
       f.input :email
       f.input :identity, as: :select, collection: options_for_select(UserIdentity::IDENTITES.map { |k, v| [k, k] }, user_identity.identity)
