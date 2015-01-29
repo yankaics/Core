@@ -27,7 +27,7 @@ module SiteIdentityToken
       end
 
       def domain
-        @domain ||= ENV['APP_URL'].gsub(%r{https?:\/\/}, '').gsub('/', '')
+        @domain ||= URI.parse(ENV['APP_URL']).host
       end
     end
   end
