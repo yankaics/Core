@@ -225,7 +225,7 @@ FactoryGirl.define do
     priority 10
     organization { Organization.find_by(code: 'NTHU') || create(:nthu_organization) }
     corresponded_identity UserIdentity::IDENTITES[:student]
-    email_regexp '^[a-z]?(?<uid>(?<started_at>\\d{3})(?<department_code>\\d{3}(?<identity_detail>\\d))\\d{2})@(?:[a-z0-9]+\\.)?nthu\\.edu\\.tw$'
+    email_regexp '^[a-z]?(?<uid>(?<started_at>\\d{3})(?<department_code>\\d{3}(?<identity_detail>\\d))\\d{2})@(?:[a-z0-9]{1,5}\\.)?nthu\\.edu\\.tw$'
     uid_postparser "n.toLowerCase()"
     department_code_postparser ""
     identity_detail_postparser "switch (n.toLowerCase()) { case '0': case '1': case '2': case '3': 'bachelor'; break; case '4': case '5': case '6': case '7': 'master'; break; case '8': case '9': 'doctor'; break; }"
@@ -237,7 +237,7 @@ FactoryGirl.define do
     priority 10
     organization { Organization.find_by(code: 'NTHU') || create(:nthu_organization) }
     corresponded_identity UserIdentity::IDENTITES[:student]
-    email_regexp '^[a-z]?(?<uid>(?<started_at>\\d{2})(?<department_code>\\d{2}(?<identity_detail>\\d))\\d{2})@(?:[a-z0-9]+\\.)?nthu\\.edu\\.tw$'
+    email_regexp '^[a-z]?(?<uid>(?<started_at>\\d{2})(?<department_code>\\d{2}(?<identity_detail>\\d))\\d{2})@(?:[a-z0-9]{1,5}\\.)?nthu\\.edu\\.tw$'
     uid_postparser "n.toLowerCase()"
     department_code_postparser "'0' + n"
     identity_detail_postparser "switch (n.toLowerCase()) { case '0': case '1': case '2': case '3': 'bachelor'; break; case '4': case '5': case '6': case '7': 'master'; break; case '8': case '9': 'doctor'; break; }"
@@ -249,7 +249,7 @@ FactoryGirl.define do
     priority 100
     organization { Organization.find_by(code: 'NTHU') || create(:nthu_organization) }
     corresponded_identity UserIdentity::IDENTITES[:staff]
-    email_regexp '^(?<uid>.+)@(?:[a-z0-9]+\\.)?nthu\\.edu\\.tw$'
+    email_regexp '^(?<uid>.+)@(?:[a-z0-9]{1,5}\\.)?nthu\\.edu\\.tw$'
     uid_postparser "n.toLowerCase()"
     department_code_postparser ""
     identity_detail_postparser ""

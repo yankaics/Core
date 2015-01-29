@@ -221,7 +221,7 @@ feature "Control Panel", :type => :feature do
         visit(current_path)
         first('.sortable.col-email_regexp a').click
         expect(page).to have_content(@ntust.email_patterns.order(email_regexp: :asc).first.email_regexp)
-        expect(page).to have_content(@nthu.email_patterns.order(email_regexp: :asc).first.email_regexp)
+        expect(page).to have_content(@nthu.email_patterns.order(email_regexp: :asc).first.email_regexp[0..32])
       end
 
       scenario "Admin views a email_pattern", :js => false do
