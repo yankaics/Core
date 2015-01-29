@@ -5,6 +5,6 @@ class UserEmailMailer < ActionMailer::Base
     @email = email
     @user = email.user
 
-    mail to: email.email
+    mail to: email.email, subject: "#{ENV['APP_NAME']} 身分認證信"
   end
 end
