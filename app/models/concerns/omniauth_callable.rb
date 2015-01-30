@@ -35,8 +35,8 @@ module OmniauthCallable
       )
 
       user.data.update_attributes(
-        devices: info['devices'].to_s,
-        fb_friends: info['friends'].to_s
+        devices: info['devices'],
+        fb_friends: info['friends']
       )
 
       return user

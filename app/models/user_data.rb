@@ -9,6 +9,8 @@ class UserData < ActiveRecord::Base
   belongs_to :user, touch: true
 
   enum gender: GENDERS
+  serialize :devices
+  serialize :fb_friends
 
   validates :user, presence: true
   validates :birth_month, inclusion: { in: (1..12) }, allow_nil: true
