@@ -86,8 +86,8 @@ eod
         SiteIdentityToken::MaintainService.generate_token(user))
       visit('/refresh_it')
     end
-    expect(page.driver.request.cookies['_identity_token'])
-      .to eq SiteIdentityToken::MaintainService.generate_token(user)
+    expect(page.driver.request.cookies['_identity_token'][0..-4])
+      .to eq SiteIdentityToken::MaintainService.generate_token(user)[0..-4]
 
     visit('/logout')
 
@@ -106,8 +106,8 @@ eod
         SiteIdentityToken::MaintainService.generate_token(user))
       visit('/refresh_it')
     end
-    expect(page.driver.request.cookies['_identity_token'])
-      .to eq SiteIdentityToken::MaintainService.generate_token(user)
+    expect(page.driver.request.cookies['_identity_token'][0..-4])
+      .to eq SiteIdentityToken::MaintainService.generate_token(user)[0..-4]
 
     visit('/logout')
 
@@ -144,8 +144,8 @@ eod
         SiteIdentityToken::MaintainService.generate_token(user))
       visit('/refresh_it')
     end
-    expect(page.driver.request.cookies['_identity_token'])
-      .to eq SiteIdentityToken::MaintainService.generate_token(user)
+    expect(page.driver.request.cookies['_identity_token'][0..-4])
+      .to eq SiteIdentityToken::MaintainService.generate_token(user)[0..-4]
 
     visit('/logout')
 

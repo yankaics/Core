@@ -18,10 +18,13 @@ feature "User Verificate", :type => :feature do
     login_as @user_a1
     visit(new_my_account_email_path)
 
+    tries = 10
     until page.has_content?('電資學士班')
       fill_in('user_email_email', with: 'b10132023@mail.ntust.edu.tw')
       execute_script("$('input[type=submit]')[0].focus()")
       sleep(2.3)
+      tries -= 1
+      break if tries == 0
     end
 
     expect(page).to have_content('國立臺灣科技大學')
