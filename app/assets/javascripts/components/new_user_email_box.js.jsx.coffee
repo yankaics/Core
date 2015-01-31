@@ -51,12 +51,18 @@ NewUserEmailBox = React.createClass
   _fetchDepartmentsFail: (xhr, status, err) =>
     console.error @props.url, status, err.toString()
 
+  _lookupEmailDone: (data, textStatus, jqXHR) ->
+    @handleEmailChange(data.email, data, true) if data
+
+  _lookupEmailFail: (xhr, status, err) =>
+    console.error @props.url, status, err.toString()
+
   _UpdateDepartments: ->
     @setState
       department: @state.departments[@state.department_code]
       department_name: @state.departments[@state.department_code]?['name']
 
-  handleEmailChange: (email) ->
+  handleEmailChange: (email, outerMatchEmailPattern, outerFound) ->
     @setState
       organization_name: null
       uid: null
@@ -73,19 +79,29 @@ NewUserEmailBox = React.createClass
       submitActivate: false
 
     matchData = null
-    matchEmailPattern = null
+    matchEmailPattern = outerMatchEmailPattern
     emailSelections = []
 
-    for emailPattern in @props.emailPatterns
-      match = email.keyMatch emailPattern.email_regexp
-      if match[0]
-        matchData = match[0]
-        matchEmailPattern = emailPattern
-        @setState
-          submitActivate: true
-        break
+    if !matchEmailPattern
+      for emailPattern in @props.emailPatterns
+        match = email.keyMatch emailPattern.email_regexp
+        if match[0]
+          matchData = match[0]
+          matchEmailPattern = emailPattern
+          break
 
-    if !matchData
+    if matchEmailPattern
+      @setState
+        submitActivate: true
+
+    if email?.match(/.+@.+\..+/) && !outerFound
+      $.ajax
+        url: "/user_emails/email_lookup.json?email=#{email}"
+        dataType: 'json'
+      .done @_lookupEmailDone
+      .fail @_lookupEmailFail
+
+    if !matchEmailPattern
       sp = email.split('@')
       for emailPattern in @props.emailPatterns
         match = sp[0].keyMatch emailPattern.email_account_regexp
@@ -111,9 +127,12 @@ NewUserEmailBox = React.createClass
             matchData = match[0]
             matchEmailPattern = emailPattern
 
-    if matchData
+    if matchEmailPattern
       {corresponded_identity, organization_code, permit_changing_department_in_group, permit_changing_department_in_organization} = matchEmailPattern
-      {uid, identity_detail, department_code, started_at} = matchData
+      if outerMatchEmailPattern
+        {uid, identity_detail, department_code, started_at} = matchEmailPattern
+      else
+        {uid, identity_detail, department_code, started_at} = matchData
 
       @_fetchDepartments(organization_code)
 

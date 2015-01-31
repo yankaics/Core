@@ -3,6 +3,8 @@ Rails.application.routes.draw do
     mount API => '/', as: '/'
   end
 
+  mount API => '/api'
+
   root 'pages#index'
 
   devise_for :users,
@@ -22,26 +24,25 @@ Rails.application.routes.draw do
     get '/refresh_it' => 'core_sessions#refresh_it'
   end
 
-  devise_for :admins, ActiveAdmin::Devise.config
-  ActiveAdmin.routes(self)
-
   use_doorkeeper do
     controllers :applications => 'oauth/applications'
   end
+
+  devise_for :admins, ActiveAdmin::Devise.config
+  ActiveAdmin.routes(self)
 
   resource :my_account do
     resources :emails, controller: :user_emails
     resources :identities, controller: :user_identities
   end
 
+  get '/user_emails/confirmation' => 'user_emails#confirm'
+  get '/user_emails/query_departments' => 'user_emails#query_departments'
+  get '/user_emails/email_lookup' => 'user_emails#email_lookup'
+
   scope '/developers' do
     resources :applications, :controller => 'oauth/applications'
   end
-
-  get '/user_emails/confirmation' => 'user_emails#confirm'
-  get '/user_emails/query_departments' => 'user_emails#query_departments'
-
-  mount API => '/api'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

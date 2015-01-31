@@ -22,6 +22,16 @@ RSpec.describe UserEmail, :type => :model do
     it { is_expected.not_to be_confirmed }
   end
 
+  context "when the user has a same email" do
+    before do
+      @email = Faker::Internet.safe_email
+      user.emails.create(email: @email)
+    end
+    subject { user.emails.create(email: @email) }
+
+    it { is_expected.not_to be_valid }
+  end
+
   context "when a same and confirmed email exists" do
     before do
       @email = Faker::Internet.safe_email

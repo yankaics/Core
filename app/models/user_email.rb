@@ -16,7 +16,7 @@ class UserEmail < ActiveRecord::Base
   store :options, accessors: [:department_code]
 
   validates :user, :email, presence: true
-  validates :email, email_format: true
+  validates :email, email_format: true, uniqueness: { scope: :user_id }
   validates :confirmation_token, uniqueness: true, allow_nil: true
   validates_with UserEmailValidator
 
