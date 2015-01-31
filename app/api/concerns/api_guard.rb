@@ -44,12 +44,14 @@ module APIGuard
       fail OAuth::MissingTokenError if token_string.blank?
       fail OAuth::TokenNotFoundError if (@access_token = find_access_token(token_string)).nil?
 
+      if current_application.core_app?
+        @access_token.scopes = all_scopes.join(' ')
+        @scopes = all_scopes
+      end
       OAuth::AccessTokenValidationService.validate!(@access_token, scopes: scopes)
 
       @current_resource_owner = User.find(@access_token.resource_owner_id)
       @current_user = @current_resource_owner
-
-      @scopes = all_scopes if current_application.core_app?
     end
 
     def current_resource_owner
@@ -58,6 +60,10 @@ module APIGuard
 
     def current_application
       @access_token.application
+    end
+
+    def current_app
+      current_application
     end
 
     def scopes

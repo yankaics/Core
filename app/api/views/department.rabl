@@ -1,5 +1,10 @@
-set_fields(:department, [:code, :name])
-set_include(:department)
+set_fieldset :department, default_fields: [:code, :name],
+                          permitted_fields: [:code, :name]
+set_inclusion :department
 
 object @department
-attributes(*fields[:department])
+attributes(*fieldset[:department])
+
+node :type do
+  :Department
+end

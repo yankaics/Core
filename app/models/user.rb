@@ -120,4 +120,10 @@ class User < ActiveRecord::Base
     :organization,
     :department
   ]
+
+  CORE_ATTRS = [
+    :devices,
+    :birth_date,
+    :fb_friends
+  ]
 end
