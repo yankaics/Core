@@ -1,11 +1,3 @@
-class UserEmailValidator < ActiveModel::Validator
-  def validate(record)
-    if UserEmail.confirmed.where.not(id: record.id).exists?(email: record.email)
-      record.errors[:base] << "This email is already being used."
-    end
-  end
-end
-
 class UserEmail < ActiveRecord::Base
   scope :confirmed, -> { where.not(confirmed_at: nil) }
   scope :unconfirmed, -> { where(confirmed_at: nil) }
@@ -14,6 +6,13 @@ class UserEmail < ActiveRecord::Base
   has_one :associated_user_identity, class_name: UserIdentity, primary_key: :email, foreign_key: :email
 
   store :options, accessors: [:department_code]
+
+  delegate :organization, :organization_name, :organization_short_name,
+           :department, :department_name, :department_short_name,
+           :original_department, :original_department_name,
+           :original_department_short_name,
+           :identity, :name,
+           to: :associated_user_identity, prefix: true, allow_nil: true
 
   validates :user, :email, presence: true
   validates :email, email_format: true, uniqueness: { scope: :user_id }
@@ -55,6 +54,7 @@ class UserEmail < ActiveRecord::Base
     identity = UserIdentity.find_by(user_id: nil, email: email)
     if identity
       identity.update(user: user)
+      identity.update(department_code: department_code) unless department_code.blank?
     # or matching email patterns
     elsif (pattern_identity = EmailPattern.identify(email))
       identity = user.identities.create!(pattern_identity)
