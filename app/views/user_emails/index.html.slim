@@ -1,10 +1,25 @@
-h1
+h1.container
   | Emails
   small=< link_to 'New', new_my_account_email_path
-ul
-  - @emails.each do |email|
-    li
-      => email.email
-      => email.confirmed_at
-      => link_to 'Delete', my_account_email_path(email), method: :delete, data: { confirm: 'Are you sure?' }
-      = link_to 'Resend confirm email', my_account_email_path(email), method: :patch, data: { confirm: 'Are you sure?' }
+
+.container
+  table.table
+    thead
+      tr
+        th email
+        th 學校
+        th 姓名
+        th 身份
+        th 建立時間
+        th 動作
+    tbody
+      - @emails.each do |email|
+        tr
+          td= email.email
+          td= email.associated_user_identity.organization_code
+          td= email.associated_user_identity.name
+          td= email.associated_user_identity.identity
+          td= email.confirmed_at
+          td
+            => link_to '刪除', my_account_email_path(email), method: :delete, data: { confirm: 'Are you sure?' }
+            => link_to '重新送出驗證信', my_account_email_path(email), method: :patch, data: { confirm: 'Are you sure?' }

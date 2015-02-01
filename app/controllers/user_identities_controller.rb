@@ -3,6 +3,5 @@ class UserIdentitiesController < ApplicationController
 
   def index
     @identities = current_user.identities
-    @identities = EmailPattern.all
   end
 end
