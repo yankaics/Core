@@ -1,30 +1,83 @@
 css:
-  body {
-    padding-top: 50px;
-    padding-bottom: 20px;
+
+  .col-description {
+    padding-left: 40px;
+    padding-right: 40px;
+    min-height: 400px;
+    margin-top: 20px;
+  }
+
+  .col-description > h2 {
+    text-align: center;
+  }
+
+  .col-description > p {
+    text-align: left;
+    padding: 10px;
+    margin: 10px;
+    font-size: 120%;
+  }
+
+  .col-description > .button {
+    bottom: 60px;
+    position: absolute;
+    left: calc(50% - 65px);
+  }
+
+  .button {
+    text-align: center !important;
+  }
+
+  .icon-image {
+    text-align: center;
+  }
+
+  .icon-image > img {
+    height: 100px;
+  }
+
+  .jumbotron {
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    min-height: 500px;
+    padding-top: 120px;
+  }
+
+  .home-header > h1 {
+    color: rgb(120,120,120);
+    text-shadow: 1px 1px rgba(0,0,0,0.3);
+    text-align: center;
+    font-size: 600%;
+  }
+
+  .home-header > p {
+    color: rgb(120,120,120);
+    text-shadow: 1px 1px rgba(0,0,0,0.3);
+    text-align: center;
+    font-size: 200%;
   }
 
 .jumbotron
-  .container
-    h1 Welcome Home
+  .container.home-header
+    h1 歡迎進入 Colorgy 平台
     p Colorgy is the hub of college life.
     p
-      a.btn.btn-primary.btn-lg href="#" role="button"  Learn more &raquo;
+      a.btn.btn-primary.btn-lg.home-btn href="#" role="button"  瞭解更多 &raquo;
+
 .container
   .row
-    .col-md-4
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-default href="#" role="button"  View details &raquo;
-    .col-md-4
-      h2 Heading
-      p Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui.
-      p
-        a.btn.btn-default href="#" role="button"  View details &raquo;
-    .col-md-4
-      h2 Heading
-      p Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.
-      p
-        a.btn.btn-default href="#" role="button"  View details &raquo;
+    .col-md-6.col-description
+      .icon-image = image_tag 'professor.png'
+      h2 教授
+      p 感謝您登入 Colorgy 平台，希望您願意支持我們的想法，進行上書的動作，幫助同學們能夠進行更方便的團購原文書的動作。
+      p.button
+        a.btn.btn-default.home-btn href="./login" role="button"  教授上書 &raquo;
+    .col-md-6.col-description
+      .icon-image = image_tag 'student.png'
+      h2 同學
+      p 您可以註冊，享受我們方便的服務，敬請關注原文書團訂的時間。
+      p.button
+        a.btn.btn-default.home-btn href="./login" role="button"  同學註冊 &raquo;
+
   hr/

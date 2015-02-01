@@ -18,5 +18,6 @@
 //= require chosen-jquery
 //= require select2
 //= require select2_locale_zh-TW
+//= require bootstrap-sprockets
 //= require_tree ./lib/
 //= require components
