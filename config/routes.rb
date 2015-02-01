@@ -32,13 +32,12 @@ Rails.application.routes.draw do
   ActiveAdmin.routes(self)
 
   resource :my_account do
-    resources :emails, controller: :user_emails
-    resources :identities, controller: :user_identities
+    resources :emails, controller: 'users/emails'
   end
 
-  get '/user_emails/confirmation' => 'user_emails#confirm'
-  get '/user_emails/query_departments' => 'user_emails#query_departments'
-  get '/user_emails/email_lookup' => 'user_emails#email_lookup'
+  get '/user_emails/confirmation' => 'users/emails#confirm'
+  get '/user_emails/query_departments' => 'users/emails#query_departments'
+  get '/user_emails/email_lookup' => 'users/emails#email_lookup'
 
   scope '/developers' do
     resources :applications, :controller => 'oauth/applications'

@@ -1,8 +1,8 @@
-class UserEmailsController < ApplicationController
+class Users::EmailsController < ApplicationController
   before_action :authenticate_user!, except: [:confirm]
 
   def index
-    @emails = current_user.all_emails
+    @emails = current_user.all_emails.includes(associated_user_identity: [:organization])
     @confirmed_emails = @emails.confirmed
     @unconfirmed_emails = @emails.unconfirmed
   end
@@ -10,6 +10,7 @@ class UserEmailsController < ApplicationController
   def new
     @email = current_user.emails.build
     @email_patterns = EmailPattern.includes(:organization).all.serialize_it.as_json
+    @email_patterns.each { |ep| ep[:corresponded_identity] = I18n.t(ep[:corresponded_identity], scope: :'user.identity') }
   end
 
   def create
@@ -58,12 +59,14 @@ class UserEmailsController < ApplicationController
 
   def email_lookup
     @user_identity = UserIdentity.includes(:organization)
-                     .select(:id, :organization_code, :department_code, :identity, :identity_detail, :email)
+                     .select(:id, :organization_code, :department_code, :identity, :identity_detail, :email, :uid, :permit_changing_department_in_group, :permit_changing_department_in_organization)
                      .find_by(email: params[:email], user_id: nil)
 
     if @user_identity
       @data = @user_identity.serializable_hash
       @data[:organization] = @user_identity.organization.slice(:name, :short_name, :code)
+      @data[:identity] = I18n.t(@user_identity.identity, scope: :'user.identity')
+      @data[:corresponded_identity] = @data[:identity]
     else
       @data = nil
     end

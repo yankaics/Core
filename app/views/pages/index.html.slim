@@ -63,21 +63,20 @@ css:
     h1 歡迎進入 Colorgy 平台
     p Colorgy is the hub of college life.
     p
-      a.btn.btn-primary.btn-lg.home-btn href="#" role="button"  瞭解更多 &raquo;
+      a.btn.btn-primary.btn-lg.home-btn href="#{ENV['APP_ABOUT_URL']}" role="button"  瞭解更多 &raquo;
 
 .container
   .row
     .col-md-6.col-description
-      .icon-image = image_tag 'professor.png'
+      .icon-image= image_tag 'professor.png'
       h2 教授
-      p 感謝您登入 Colorgy 平台，希望您願意支持我們的想法，進行上書的動作，幫助同學們能夠進行更方便的團購原文書的動作。
+      p 感謝您登入 Colorgy 平台，希望您願意支持我們的理念，至 Colorgy Books 惠予確認您開設之課程與用書，讓同學們能夠提早方便的團購您的指定用書。
       p.button
-        a.btn.btn-default.home-btn href="./login" role="button"  教授上書 &raquo;
+        a.btn.btn-default.home-btn href="http://books.colorgy.io/lecturer/" role="button"  教授上書 &raquo;
     .col-md-6.col-description
-      .icon-image = image_tag 'student.png'
+      .icon-image= image_tag 'student.png'
       h2 同學
       p 您可以註冊，享受我們方便的服務，敬請關注原文書團訂的時間。
       p.button
-        a.btn.btn-default.home-btn href="./login" role="button"  同學註冊 &raquo;
-
+        a.btn.btn-default.home-btn href="./login" role="button" 同學註冊 &raquo;
   hr/

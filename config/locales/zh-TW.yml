@@ -1,11 +1,13 @@
 zh-TW:
   user:
     identity:
+      student: 學生
       bachelor: 大學生
       master: 碩士生
       doctor: 博士生
-      professor: 教師
-      staff: 職員
+      professor: 教授
+      lecturer: 講師
+      staff: 教職員
       other: 其他
       guest: 校外訪客
     data:
@@ -18,6 +20,7 @@ zh-TW:
       male: 男
       female: 女
       other: 其他
+      null: 未指定
   date:
     abbr_day_names:
     - 日

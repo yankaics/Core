@@ -119,12 +119,17 @@ eod
     user_rigister_credentials = attributes_for(:user).slice(:name, :email, :password, :password_confirmation)
     user_login_credentials = user_rigister_credentials.slice(:email, :password)
     visit(new_user_session_path)
-    click_on('Sign up', match: :first)
-    fill_form_and_submit(:user, user_rigister_credentials)
+    # click_on('Sign up', match: :first)
+    within ".registration" do
+      fill_form_and_submit(:user, user_rigister_credentials)
+    end
 
     visit(new_user_session_path)
-    fill_form(:user, user_login_credentials)
-    find('form input[type=submit]').click
+
+    within ".login" do
+      fill_form(:user, user_login_credentials)
+      find('form input[type=submit]').click
+    end
     # expect(page).to fail...
 
     user = User.last
@@ -135,8 +140,10 @@ eod
     end.to change { user.confirmed? }.from(false).to(true)
 
     visit(new_user_session_path)
-    fill_form(:user, user_login_credentials)
-    find('form input[type=submit]').click
+    within ".login" do
+      fill_form(:user, user_login_credentials)
+      find('form input[type=submit]').click
+    end
 
     # expect(page).to ...
 

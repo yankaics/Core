@@ -23,7 +23,7 @@ var AutocompleteInput = React.createClass({
 
   render: function() {
     var className = React.addons.classSet(
-      'react-autocomplete-input-results',
+      'react-autocomplete-input',
       this.state.isResultsShown ? 'is-results-shown' : null
     );
 
@@ -46,7 +46,7 @@ var AutocompleteInput = React.createClass({
           onKeyDown={this.handleInputKeyDown} />
         {this.state.isResultsShown ?
           <AutocompleteInputResults
-            className="react-autocomplete-input-results"
+            className="react-autocomplete-input-results dropdown-menu"
             hoverCallBack={this.previewOption}
             selectCallBack={this.selectOption}
             options={this.state.matchedOptions}
@@ -183,7 +183,7 @@ var AutocompleteInput = React.createClass({
 
   updateResults: function() {
     inputValue = this.refs.input.getDOMNode().value;
-    opts = searchArray(inputValue, this.props.options);
+    opts = $.unique(searchArray(inputValue, this.props.options));
     if (opts.length > 0) {
       this.setState({matchedOptions: opts, isResultsShown: true});
       // if (inputValue.length > 0 && !diableAutoPreview)
@@ -244,7 +244,7 @@ var AutocompleteInputResults = React.createClass({
     return (
       <ul className={this.props.className} onClick={this.handleSelect} onMouseOver={this.handleMouseOver}>
         {this.props.options.map(function(opt) {
-          className = (opt == this.props.activeOption) ? 'is-active' : '';
+          className = (opt == this.props.activeOption) ? 'active' : '';
           return <li className={className} key={opt} data-value={opt}><a data-value={opt}>{opt}</a></li>;
         }.bind(this))}
       </ul>

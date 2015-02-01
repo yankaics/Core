@@ -8,18 +8,19 @@ h1.container
       tr
         th email
         th 學校
-        th 姓名
         th 身份
         th 建立時間
+        th 狀態
         th 動作
     tbody
       - @emails.each do |email|
         tr
           td= email.email
-          td= email.associated_user_identity.organization_code
-          td= email.associated_user_identity.name
-          td= email.associated_user_identity.identity
+          td= email.associated_user_identity_organization_name
+          td= email.associated_user_identity_identity ? t(email.associated_user_identity_identity, scope: :'user.identity') : nil
           td= email.confirmed_at
+          td= email.confirmed? ? '已認證' : '未認證'
           td
             => link_to '刪除', my_account_email_path(email), method: :delete, data: { confirm: 'Are you sure?' }
-            => link_to '重新送出驗證信', my_account_email_path(email), method: :patch, data: { confirm: 'Are you sure?' }
+            - unless email.confirmed?
+              => link_to '重新送出驗證信', my_account_email_path(email), method: :patch, data: { confirm: 'Are you sure?' }

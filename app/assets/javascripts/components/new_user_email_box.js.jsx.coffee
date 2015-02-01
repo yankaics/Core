@@ -7,14 +7,14 @@ NewUserEmailBox = React.createClass
     email: ''
     departments: {}
     cached_departments: {}
-    organization_name: null
+    organization_code: '?'
+    organization_name: '?'
     uid: null
     corresponded_identity: null
     identity_detail: null
-    organization_code: null
+    department_code: '?'
+    department_name: '?'
     department: null
-    department_code: null
-    department_name: null
     started_at: null
     permit_changing_department_in_group: null
     permit_changing_department_in_organization: null
@@ -204,26 +204,59 @@ NewUserEmailBox = React.createClass
       'btn btn-default',
       (if @state.submitActivate then '' else 'disabled'))
 
+    inputContainerClassName = React.addons.classSet(
+      'form-group has-feedback',
+      (if @state.submitActivate then 'has-success' else ''))
+
+    if @state.submitActivate
+      successIcon = `<span className="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>`
+    else
+      successIcon = ''
+
     `<div>
-      <div>{this.state.organization_name}</div>
-      <div>{this.state.uid}</div>
-      <div>{this.state.corresponded_identity}</div>
-      <div>{this.state.identity_detail}</div>
-      <div>{this.state.organization_code}</div>
-      <div>{this.state.department_code}</div>
-      <div key={this.state.i++}>{department_selector}</div>
-      <div>{this.state.started_at}</div>
-      <div>{this.state.permit_changing_department_in_group}</div>
-      <div>{this.state.permit_changing_department_in_organization}</div>
-      <div>{this.state.email}</div>
-      <AutocompleteInput
-        options={this.state.emailSelections}
-        onChange={this.handleEmailChange}
-        className="string email required form-control"
-        id="user_email_email"
-        name="user_email[email]"
-        autofocus="true" />
-      <input className={submitButtonClassName} name="commit" type="submit" value="驗證" />
+      <div className={inputContainerClassName}>
+        <div className="input-group">
+          <span className="input-group-addon"><i className="glyphicon glyphicon-envelope"></i></span>
+          <AutocompleteInput
+            options={this.state.emailSelections}
+            onChange={this.handleEmailChange}
+            className="string email required form-control"
+            id="user_email_email"
+            name="user_email[email]"
+            placeholder="請輸入您的學校 email"
+            autofocus="true" />
+        </div>
+        {successIcon}
+      </div>
+      <div className="action">
+        <input className={submitButtonClassName} name="commit" type="submit" value="驗證" />
+      </div>
+      <div className="row">
+        <div className="col-sm-6 col-md-4">
+          <div className="thumbnail">
+            <div className="caption">
+              <p>{this.state.organization_code}</p>
+              <h3>{this.state.organization_name}</h3>
+            </div>
+          </div>
+        </div>
+        <div className="col-sm-6 col-md-4">
+          <div className="thumbnail">
+            <div className="caption">
+              <h3 key={this.state.i++}>{department_selector}</h3>
+              <p>{this.state.corresponded_identity}</p>
+            </div>
+          </div>
+        </div>
+        <div className="col-sm-6 col-md-4 hidden-sm">
+          <div className="thumbnail">
+            <div className="caption">
+              <h3>{this.state.department_code}</h3>
+              <p>{this.state.uid}</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>`
 
   componentDidUpdate: ->
