@@ -109,6 +109,7 @@ group :development do
   gem 'binding_of_caller', '~> 0.7.2'
   gem 'meta_request'
   gem 'letter_opener'
+  gem 'bullet'
   # gem 'guard-livereload', require: false
   # gem 'growl_notify', require: false
 end

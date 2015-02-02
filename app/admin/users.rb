@@ -1,6 +1,12 @@
 ActiveAdmin.register User do
   menu priority: 10
 
+  controller do
+    def scoped_collection
+      super.includes(:data)
+    end
+  end
+
   actions :all, except: [:new, :create, :destroy]
 
   includes :data, :primary_identity

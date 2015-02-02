@@ -3,6 +3,12 @@ ActiveAdmin.register UserIdentity do
   config.sort_order = :organization_code_asc, :uid_asc
   config.per_page = 1000
 
+  controller do
+    def scoped_collection
+      super.includes(:user, :organization, :department, :original_department)
+    end
+  end
+
   scope_to(if: proc { current_admin.scoped? }) { current_admin.organization }
 
   scope :all
@@ -104,8 +110,8 @@ ActiveAdmin.register UserIdentity do
   index do
     selectable_column
     column(:organization) { |user_identity| link_to user_identity.organization_code, admin_organization_path(user_identity.organization) } if current_admin.root?
-    column(:department) { |user_identity| link_to user_identity.department.name, admin_department_path(user_identity.department) if user_identity.department }
-    column(:original_department) { |user_identity| link_to user_identity.original_department.name, admin_department_path(user_identity.original_department) if user_identity.original_department }
+    column(:department) { |user_identity| link_to user_identity.department_name, admin_department_path(user_identity.department) if user_identity.department }
+    column(:original_department) { |user_identity| link_to user_identity.original_department_name, admin_department_path(user_identity.original_department) if user_identity.original_department }
     column(:user) { |user_identity| link_to user_identity.user.name, admin_user_path(user_identity.user) if user_identity.user }
     column(:name) { |user_identity| link_to user_identity.name, admin_user_identity_path(user_identity) if user_identity.name }
     column(:email) { |user_identity| link_to user_identity.email, admin_user_identity_path(user_identity) }

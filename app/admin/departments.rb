@@ -2,6 +2,12 @@ ActiveAdmin.register Department do
   menu priority: 111, parent: "組織資料"
   config.sort_order = :organization_code_asc, :code_asc
 
+  controller do
+    def scoped_collection
+      super.includes(:organization, :parent)
+    end
+  end
+
   scope_to(if: proc { current_admin.scoped? }) { current_admin.organization }
 
   scope :all, :default => true

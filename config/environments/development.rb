@@ -49,4 +49,13 @@ Rails.application.configure do
     generate.view_specs false
     # generate.test_framework :rspec
   end
+
+  # Use bullet to kill N+1 queries and unused eager loading
+  config.after_initialize do
+    Bullet.enable = true
+    Bullet.bullet_logger = true
+    Bullet.console = true
+    Bullet.rails_logger = true
+    Bullet.add_footer = true
+  end
 end

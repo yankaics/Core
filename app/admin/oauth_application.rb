@@ -2,6 +2,12 @@ ActiveAdmin.register Doorkeeper::Application do
   menu priority: 50, label: "應用程式", if: proc { current_admin.root? }
   scope_to(if: proc { current_admin.scoped? }) { current_admin }
 
+  controller do
+    def scoped_collection
+      super.includes(:owner)
+    end
+  end
+
   scope :all
   scope :core_apps, :default => true
   scope :user_apps
