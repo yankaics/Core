@@ -14,37 +14,36 @@ ActiveAdmin.register_page "Dashboard" do
         panel "System Info" do
           div Rails::Info.to_s.gsub(/\n/, '<br>').html_safe
           hr
-          # if Preference['admin_web_transactions_chart_code'].to_s != ''
-          #   div Preference['admin_web_transactions_chart_code'].html_safe
-          #   hr
-          # end
-          # ul do
-          #   Setting.each do |key, value|
-          #     if key =~ /key$/ || key =~ /secret/ || key =~ /pepper$/
-          #       li "#{key}: #{value[0..5] + value.gsub(/./, '*')}"
-          #     elsif key =~ /logo$/ || key =~ /icon$/
-          #       value = value[0..50] + '...' if value.length > 50
-          #       li "#{key}: #{value}"
-          #     else
-          #       li "#{key}: #{value}"
-          #     end
-          #   end
-          # end
+          if Settings['admin_dashboard_l1_chart_code'].to_s != ''
+            div Settings['admin_dashboard_l1_chart_code'].html_safe
+            hr
+          end
+          ul do
+            ENV.each do |key, value|
+              if key =~ /key$/ || key =~ /secret/ || key =~ /pepper$/ ||
+                 key =~ /KEY$/ || key =~ /SECRET/ || key =~ /PEPPER$/
+                li "#{key}: #{value[0..7] + value.gsub(/./, '*')}"
+              else
+                value = value[0..50] + '...' if value.length > 50
+                li "#{key}: #{value}"
+              end
+            end
+          end
         end
-        # if Preference['admin_apdex_score_chart_code'].to_s != ''
-        #   panel "<a target=\"_blank\" href=\"#{Preference['admin_app_monitor_url']}\">System Apdex Score</a>".html_safe do
-        #     div Preference['admin_apdex_score_chart_code'].html_safe
-        #   end
-        # end
+        if Settings['admin_dashboard_l2_chart_code'].to_s != ''
+          panel "<a target=\"_blank\" href=\"#{Settings['admin_dashboard_l2_chart_title_url']}\">#{Settings['admin_dashboard_l2_chart_title']}</a>".html_safe do
+            div Settings['admin_dashboard_l2_chart_code'].html_safe
+          end
+        end
       end
       column do
-        # if Preference['admin_throughput_chart_code'].to_s != ''
-        #   panel "<a target=\"_blank\" href=\"#{Preference['admin_app_monitor_url']}\">Throughput</a>".html_safe do
-        #     div Preference['admin_throughput_chart_code'].html_safe
-        #   end
-        # end
+        if Settings['admin_dashboard_r1_chart_code'].to_s != ''
+          panel "<a target=\"_blank\" href=\"#{Settings['admin_dashboard_r1_chart_title_url']}\">#{Settings['admin_dashboard_r1_chart_title']}</a>".html_safe do
+            div Settings['admin_dashboard_r1_chart_code'].html_safe
+          end
+        end
         panel '<a href="/admin/users?q%5Bcurrent_sign_in_at_gteq%5D=1994-07-02&order=current_sign_in_at_desc&as=detailed_table">Recent Signed-In Users</a>'.html_safe do
-          table_for User.where('current_sign_in_at IS NOT NULL').order("current_sign_in_at DESC").limit(10) do
+          table_for User.includes(:primary_identity).where('current_sign_in_at IS NOT NULL').order("current_sign_in_at DESC").limit(10) do
             column("Name") { |user| link_to(user.name, admin_user_path(user)) }
             column("Fbid") { |user| link_to(truncate(user.fbid, length: 8), "https://facebook.com/#{user.fbid}", :target => "_blank") }
             column("UID") { |user| user.uid }
@@ -55,13 +54,13 @@ ActiveAdmin.register_page "Dashboard" do
           end
         end
         panel '<a href="/admin/users?order=created_at_desc&as=detailed_table">Recent Registered Users</a>'.html_safe do
-          table_for User.order("created_at DESC").limit(10) do
+          table_for User.includes(:primary_identity).order("created_at DESC").limit(10) do
             column("Name") { |user| link_to(user.name, admin_user_path(user)) }
             column("Fbid") { |user| link_to(truncate(user.fbid, length: 20), "https://facebook.com/#{user.fbid}", :target => "_blank") }
             column("UID") { |user| user.uid }
             column("Created At") { |user| user.created_at }
             column("Confirmed") do |user|
-              if !!user.confirmed_at
+              if user.confirmed?
                 status_tag('Yes', :class => 'yes')
               else
                 status_tag('No', :class => 'no')
@@ -70,11 +69,11 @@ ActiveAdmin.register_page "Dashboard" do
             column("IP") { |user| user.current_sign_in_ip }
           end
         end
-        # if Preference['admin_error_rate_chart_code'].to_s != ''
-        #   panel "<a target=\"_blank\" href=\"#{Preference['admin_app_monitor_url']}\">Error Rate</a>".html_safe do
-        #     div Preference['admin_error_rate_chart_code'].html_safe
-        #   end
-        # end
+        if Settings['admin_dashboard_r2_chart_code'].to_s != ''
+          panel "<a target=\"_blank\" href=\"#{Settings['admin_dashboard_r2_chart_title_url']}\">#{Settings['admin_dashboard_r2_chart_title']}</a>".html_safe do
+            div Settings['admin_dashboard_r2_chart_code'].html_safe
+          end
+        end
       end
     end
   end

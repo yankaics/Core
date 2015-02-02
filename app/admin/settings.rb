@@ -66,24 +66,52 @@ ActiveAdmin.register_page "Settings" do
           fieldset do
             ol do
 
+              # li do
+              #   f.input_setting 'Title of Left-1 Chart on Dashboard', :admin_dashboard_l1_chart_title
+              # end
+
+              # li do
+              #   f.input_setting 'Title URL of Left-1 Chart on Dashboard', :admin_dashboard_l1_chart_title_url
+              # end
+
               li do
-                f.input_setting 'App Monitor URL', :admin_app_monitor_url
+                f.input_setting 'Code of Left-1 Chart on Dashboard', :admin_dashboard_l1_chart_code
               end
 
               li do
-                f.input_setting 'Web Transactions Chart Code', :admin_web_transactions_chart_code
+                f.input_setting 'Title of Left-2 Chart on Dashboard', :admin_dashboard_l2_chart_title
               end
 
               li do
-                f.input_setting 'Apdex Score Chart Code', :admin_apdex_score_chart_code
+                f.input_setting 'Title URL of Left-2 Chart on Dashboard', :admin_dashboard_l2_chart_title_url
               end
 
               li do
-                f.input_setting 'Throughput Chart Code', :admin_throughput_chart_code
+                f.input_setting 'Code of Left-2 Chart on Dashboard', :admin_dashboard_l2_chart_code
               end
 
               li do
-                f.input_setting 'Error Rate Chart Code', :admin_error_rate_chart_code
+                f.input_setting 'Title of Right-1 Chart on Dashboard', :admin_dashboard_r1_chart_title
+              end
+
+              li do
+                f.input_setting 'Title URL of Right-1 Chart on Dashboard', :admin_dashboard_r1_chart_title_url
+              end
+
+              li do
+                f.input_setting 'Code of Right-1 Chart on Dashboard', :admin_dashboard_r1_chart_code
+              end
+
+              li do
+                f.input_setting 'Title of Right-2 Chart on Dashboard', :admin_dashboard_r2_chart_title
+              end
+
+              li do
+                f.input_setting 'Title URL of Right-2 Chart on Dashboard', :admin_dashboard_r2_chart_title_url
+              end
+
+              li do
+                f.input_setting 'Code of Right-2 Chart on Dashboard', :admin_dashboard_r2_chart_code
               end
 
             end
