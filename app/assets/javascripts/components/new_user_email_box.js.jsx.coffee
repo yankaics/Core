@@ -264,6 +264,12 @@ NewUserEmailBox = React.createClass
     $('#department-select').select2()
     $('.select2-choice').hover ->
       $('.select2-choice')[0].focus()
+    , ->
+      $('.select2-choice')[0].blur()
+    $('input[type="submit"]').hover ->
+      $('input[type="submit"]')[0].focus()
+    , ->
+      $('input[type="submit"]')[0].blur()
     $("form#new_user_email").submit (e) =>
       if not @state.submitActivate
         e.preventDefault()

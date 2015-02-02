@@ -76,12 +76,19 @@ eod
   end
 
   scenario "new User signs in with Facebook" do
+    # Go to the login page and click on 'Sign in with Facebook' button
     visit(new_user_session_path)
     click_on('Sign in with Facebook', match: :first)
+
+    # Get the newly created user, he/she should be confirmed
     user = User.last
+    expect(user).to be_confirmed
 
-    # expect(page).to ...
+    # Users should be redirected to the new email page after their first login
+    expect(current_path).to eq new_my_account_email_path
 
+    # On background: identity_token cookie should be set
+    # (ignoring the small time difference)
     if (page.driver.request.cookies['_identity_token'] !=
         SiteIdentityToken::MaintainService.generate_token(user))
       visit('/refresh_it')
@@ -89,19 +96,32 @@ eod
     expect(page.driver.request.cookies['_identity_token'][0..-4])
       .to eq SiteIdentityToken::MaintainService.generate_token(user)[0..-4]
 
+    # After logout
     visit('/logout')
 
+    # On background: identity_token cookie should be cleared
     expect(page.driver.request.cookies['_identity_token'])
       .to be_blank
   end
 
   scenario "returning User signs in with Facebook" do
-    user = create(:user, email: 'mock_user@facebook.com')
+    # An existing user with identity, but not linked with an FB account
+    user = create(:user, :with_identity, email: 'mock_user@facebook.com')
+
+    # Go to the login page and click on 'Sign in with Facebook' button
+    # this should login the user with that corresponding email,
+    # and links the user with his/her FB account
     visit(new_user_session_path)
     click_on('Sign in with Facebook', match: :first)
+    user.reload
+    expect(user.fbid).to eq '87654321'
 
     # expect(page).to ...
+    # Old users should not be redirected to the new email page after login
+    expect(current_path).not_to eq new_my_account_email_path
 
+    # On background: identity_token cookie should be set
+    # (ignoring the small time difference)
     if (page.driver.request.cookies['_identity_token'] !=
         SiteIdentityToken::MaintainService.generate_token(user))
       visit('/refresh_it')
@@ -109,44 +129,56 @@ eod
     expect(page.driver.request.cookies['_identity_token'][0..-4])
       .to eq SiteIdentityToken::MaintainService.generate_token(user)[0..-4]
 
+    # After logout
     visit('/logout')
 
+    # On background: identity_token cookie should be cleared
     expect(page.driver.request.cookies['_identity_token'])
       .to be_blank
   end
 
   scenario "new User signs up with email" do
+    # Prepare the new user's credentials
     user_rigister_credentials = attributes_for(:user).slice(:name, :email, :password, :password_confirmation)
     user_login_credentials = user_rigister_credentials.slice(:email, :password)
+
+    # Go to the login page and fill the registration form
     visit(new_user_session_path)
-    # click_on('Sign up', match: :first)
     within ".registration" do
       fill_form_and_submit(:user, user_rigister_credentials)
     end
 
-    visit(new_user_session_path)
+    # Get the newly created user
+    user = User.last
+    # And finds his/her account confirmation_path from his/her email inbox
+    confirmation_path = open_last_email.body.match(/confirmation\?confirmation_token=[^"]+/)
 
+    # Logging in without the account confirmed is illegal
+    visit(new_user_session_path)
     within ".login" do
       fill_form(:user, user_login_credentials)
       find('form input[type=submit]').click
     end
     # expect(page).to fail...
 
-    user = User.last
-    confirmation_path = open_last_email.body.match /confirmation\?confirmation_token=[^"]+/
+    # Confirm the account by visiting the confirmation path
     expect do
       visit "/#{confirmation_path}"
       user.reload
     end.to change { user.confirmed? }.from(false).to(true)
 
+    # Login with the confirmed account will success
     visit(new_user_session_path)
     within ".login" do
       fill_form(:user, user_login_credentials)
       find('form input[type=submit]').click
     end
 
+    # Users should be redirected to the new email page after their first login
+    expect(current_path).to eq new_my_account_email_path
     # expect(page).to ...
 
+    # On background: identity_token cookie should be maintained...
     if (page.driver.request.cookies['_identity_token'] !=
         SiteIdentityToken::MaintainService.generate_token(user))
       visit('/refresh_it')

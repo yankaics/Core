@@ -32,6 +32,10 @@ class User < ActiveRecord::Base
   delegate :organization, :organization_code,
            :department, :department_code, :uid, :identity,
            to: :primary_identity, prefix: false, allow_nil: true
+  delegate :name, :short_name,
+           to: :organization, prefix: true, allow_nil: true
+  delegate :name, :short_name,
+           to: :department, prefix: true, allow_nil: true
   accepts_nested_attributes_for :data, allow_destroy: false
   delegate :mobile,  :unconfirmed_mobile,  :mobile_confirmation_token,
            :mobile=, :unconfirmed_mobile=, :mobile_confirmation_token=,

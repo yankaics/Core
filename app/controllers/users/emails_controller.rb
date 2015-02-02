@@ -18,9 +18,9 @@ class Users::EmailsController < ApplicationController
 
     if @email.save
       @email.send_confirmation_instructions
-      flash[:notice] = "驗証信已送出"
+      flash[:notice] = "驗証信已送出！"
     else
-      flash[:error] = "無效的 Email"
+      flash[:error] = "無效的 Email，或該 Email 已經被使用。"
     end
 
     redirect_to :action => :index
