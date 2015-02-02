@@ -58,6 +58,10 @@ ActiveAdmin.register_page "Settings" do
                 f.input_setting '頁腳內容，可使用 HTML，例如： <a class="item" href="/">回首頁</a>', :page_footer
               end
 
+              li do
+                f.textarea_setting 'Site EULA (supports Markdown)', :site_eula
+              end
+
             end
           end
         end

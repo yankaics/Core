@@ -8,7 +8,8 @@
 
           <%= link_to "Sign in with Facebook", user_omniauth_authorize_path(:facebook) %>
         </div>
-        <a><p style="text-align: center;">沒有Facebook?<br>請使用下列手動註冊..</p></a>
+        <p style="text-align: center;">登入時視同您已同意本站之<a href=<%= eula_path %> target="_blank">用戶許可協議</a></p>
+        <p style="text-align: center;">沒有 Facebook 帳號？<br>您也可以使用慣用 Email 來登入...</p>
       </div>
     </div>
     <div class="row more-login-field" style="overflow: hidden; min-height: 500px; ">
