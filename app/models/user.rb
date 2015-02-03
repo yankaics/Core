@@ -58,11 +58,11 @@ class User < ActiveRecord::Base
   after_save :clear_association_cache
 
   def self.scoped(org_code)
-    if org_code
+    if org_code.blank?
+      all
+    else
       org = Organization.find_by(code: org_code)
       org ? org.users : none
-    else
-      all
     end
   end
 
