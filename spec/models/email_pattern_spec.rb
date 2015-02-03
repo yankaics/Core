@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe EmailPattern, :type => :model do
+  it_should_behave_like "a serializable model"
   it { should belong_to(:organization) }
   it { should validate_presence_of :organization }
   it { should validate_presence_of :priority }

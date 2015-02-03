@@ -16,7 +16,7 @@ feature "User Verificate", :type => :feature do
 
   scenario "User verifies an email matching an EmailPattern and changes the department", :js => true do
     # Login and go to the new email verification page
-    login_as @user_a1, scope: :user, run_callbacks: false
+    login_as @user_a1
     visit(new_my_account_email_path)
 
     # Try to enter an email and waites for the department select dropdown to appear
@@ -49,6 +49,10 @@ feature "User Verificate", :type => :feature do
     # Find the confirmation_path in identity confirmation email
     confirmation_path = open_last_email.body.match(/user_emails\/confirmation\?confirmation_token=[^"]+/)
 
+    # Record the original_identity_token
+    visit('/refresh_it')
+    original_identity_token = page.driver.cookies['_identity_token']
+
     # Visiting the confirmation_path should confirms that email
     expect do
       visit "/#{confirmation_path}"
@@ -71,6 +75,9 @@ feature "User Verificate", :type => :feature do
     expect(@user_a1.organization_name).to eq '國立臺灣科技大學'
     expect(@user_a1.department_name).to eq '工商業設計系'
 
+    # The identity_token is expected to bo refreshed by the way
+    expect(page.driver.cookies['_identity_token']).not_to eq(original_identity_token)
+
     logout(:user)
   end
 
@@ -79,7 +86,7 @@ feature "User Verificate", :type => :feature do
     user_identity = create(:user_identity)
 
     # Login to the new email verification page and creates it
-    login_as @user_b2, scope: :user, run_callbacks: false
+    login_as @user_b2
     visit(new_my_account_email_path)
     fill_in('user_email_email', with: user_identity.email)
 
@@ -92,6 +99,10 @@ feature "User Verificate", :type => :feature do
     # An new UserEmail should be created
     new_email = @user_b2.unconfirmed_emails.last
     expect(new_email.email).to eq user_identity.email
+
+    # Record the original_identity_token
+    visit('/refresh_it')
+    original_identity_token = page.driver.cookies['_identity_token']
 
     # Find the confirmation_path in identity confirmation email
     confirmation_path = open_last_email.body.match(/user_emails\/confirmation\?confirmation_token=[^"]+/)
@@ -107,6 +118,9 @@ feature "User Verificate", :type => :feature do
     # And links the corresponding identity
     expect(@user_b2.primary_identity).to eq user_identity
 
+    # The identity_token is expected to bo refreshed by the way
+    expect(page.driver.cookies['_identity_token']).not_to eq(original_identity_token)
+
     logout(:user)
   end
 
@@ -115,7 +129,7 @@ feature "User Verificate", :type => :feature do
     user_identity = create(:user_identity, organization: @ntust, department: @ntust.departments.find_by(name: '學務處'), permit_changing_department_in_organization: true, permit_changing_department_in_group: true)
 
     # Login and go to the new email verification page
-    login_as @user_b1, scope: :user, run_callbacks: false
+    login_as @user_b1
     visit(new_my_account_email_path)
 
     # Try to enter an email and waites for the department select dropdown to appear
@@ -147,6 +161,10 @@ feature "User Verificate", :type => :feature do
     # Find the confirmation_path in identity confirmation email
     confirmation_path = open_last_email.body.match(/user_emails\/confirmation\?confirmation_token=[^"]+/)
 
+    # Record the original_identity_token
+    visit('/refresh_it')
+    original_identity_token = page.driver.cookies['_identity_token']
+
     # Visiting the confirmation_path should confirms that email
     expect do
       visit "/#{confirmation_path}"
@@ -159,6 +177,9 @@ feature "User Verificate", :type => :feature do
     expect(@user_b1.primary_identity).to eq user_identity
     expect(@user_b1.organization_name).to eq '國立臺灣科技大學'
     expect(@user_b1.department_name).to eq '工商業設計系'
+
+    # The identity_token is expected to bo refreshed by the way
+    expect(page.driver.cookies['_identity_token']).not_to eq(original_identity_token)
 
     logout(:user)
   end

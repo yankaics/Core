@@ -2,13 +2,13 @@ ActiveAdmin.register EmailPattern do
   menu priority: 112, parent: "組織資料"
   config.sort_order = :organization_code_asc, :priority_asc
 
+  scope_to(if: proc { current_admin.scoped? }) { current_admin.organization }
+
   controller do
     def scoped_collection
       super.includes(:organization)
     end
   end
-
-  scope_to(if: proc { current_admin.scoped? }) { current_admin.organization }
 
   permit_params do
     params = [:priority, :corresponded_identity, :email_regexp, :uid_postparser, :department_code_postparser, :identity_detail_postparser, :started_at_postparser, :permit_changing_department_in_group, :permit_changing_department_in_organization]

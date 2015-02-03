@@ -17,8 +17,9 @@ class UserIdentity < ActiveRecord::Base
   has_one :primary_user, class_name: :User, foreign_key: :primary_identity_id
   belongs_to :email_pattern
   belongs_to :organization, primary_key: :code, foreign_key: :organization_code
-  belongs_to :department, ->(o) { o ? where(organization_code: o.organization_code) : all }, primary_key: :code, foreign_key: :department_code
-  belongs_to :original_department, ->(o) { o ? where(organization_code: o.organization_code) : all }, class_name: Department, primary_key: :code, foreign_key: :original_department_code
+  belongs_to :department, ->(o) { (o && o.respond_to?(:organization_code)) ? where(organization_code: o.organization_code) : all },
+             primary_key: :code, foreign_key: :department_code
+  belongs_to :original_department, ->(o) { (o && o.respond_to?(:organization_code)) ? where(organization_code: o.organization_code) : all }, class_name: Department, primary_key: :code, foreign_key: :original_department_code
 
   enum identity: IDENTITES
 

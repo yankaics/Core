@@ -77,6 +77,16 @@ RSpec.describe UserEmail, :type => :model do
         user.reload
         expect(user.organization).to eq ntust
       end
+
+      it "creates UserIdentity for the user and sets the department via option" do
+        user_email.department_code = 'D10'
+        user_email.save!
+        expect(user.organization).to eq nil
+        user_email.confirm
+        user.reload
+        expect(user.organization).to eq ntust
+        expect(user.department_code).to eq 'D10'
+      end
     end
 
     context "having matched predefined UserIdentity" do
@@ -90,6 +100,18 @@ RSpec.describe UserEmail, :type => :model do
         user.reload
         expect(user.organization).to eq ntust
       end
+
+      it "links the UserIdentity to the user and sets the department via option" do
+        user_identity.permit_changing_department_in_organization = true
+        user_identity.save!
+        user_email.department_code = 'D10'
+        user_email.save!
+        expect(user.organization).to eq nil
+        user_email.confirm
+        user.reload
+        expect(user.organization).to eq ntust
+        expect(user.department_code).to eq 'D10'
+      end
     end
   end
 
@@ -97,7 +119,9 @@ RSpec.describe UserEmail, :type => :model do
     context "with corresponding generated UserIdentity" do
       let!(:ntust) { create(:ntust_organization) }
       let!(:user_email) { user.emails.create(email: 'B10132023@mail.ntust.edu.tw') }
-      before { user_email.confirm }
+      before do
+        user_email.confirm!
+      end
 
       it "destroys the UserIdentity for the user" do
         user_identity = user.identities.first
@@ -112,7 +136,9 @@ RSpec.describe UserEmail, :type => :model do
       let!(:ntust) { create(:ntust_organization) }
       let!(:user_identity) { create(:user_identity, organization: ntust, email: 'me@ntust.edu.tw') }
       let!(:user_email) { user.emails.create(email: 'me@ntust.edu.tw') }
-      before { user_email.confirm }
+      before do
+        user_email.confirm!
+      end
 
       it "unlinks the UserIdentity with the user" do
         user_identity = user.identities.first
@@ -120,6 +146,8 @@ RSpec.describe UserEmail, :type => :model do
         user.reload
         expect(user.identities.count).to eq(0)
         expect(UserIdentity.exists?(user_identity)).to be true
+        user_identity.reload
+        expect(user_identity.user_id).to be nil
       end
     end
   end

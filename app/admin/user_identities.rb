@@ -3,13 +3,19 @@ ActiveAdmin.register UserIdentity do
   config.sort_order = :organization_code_asc, :uid_asc
   config.per_page = 1000
 
+  scope_to(if: proc { current_admin.scoped? }) { current_admin.organization }
+
   controller do
+    before_action :set_current_admin
+
     def scoped_collection
       super.includes(:user, :organization, :department, :original_department)
     end
-  end
 
-  scope_to(if: proc { current_admin.scoped? }) { current_admin.organization }
+    def set_current_admin
+      Admin.current_admin = current_admin
+    end
+  end
 
   scope :all
   scope :generated
@@ -23,51 +29,47 @@ ActiveAdmin.register UserIdentity do
     params
   end
 
-  if proc { current_admin.root? }
-    active_admin_import :validate => true,
-                        :template => 'admin/import',
-                        :template_object => ActiveAdminImport::Model.new(
-                          hint: "CSV 欄位順序：身份別代碼（訪客: guest, 學生: student, 職員: staff, 講師: lecturer, 教授: professor）、名稱、email、唯一識別碼、系所代碼、組織代碼、可切換同型部門（選填，true/false）、可切換部門（選填，true/false）、原系所代碼（選填）",
-                          csv_headers: %w(identity name email uid department_code organization_code permit_changing_department_in_group permit_changing_department_in_organization original_department_code)
-                        ),
-                        :before_batch_import => proc { |importer|
-                          importer_csv_lines = importer.instance_variable_get(:@csv_lines)
 
-                          # preprocess each line
-                          importer_csv_lines.each do |csv_line|
-                            # convert identity string to integer for batch import
-                            csv_line[0] = UserIdentity::IDENTITES[csv_line[0].to_sym]
+  active_admin_import :validate => true,
+                      :template => 'admin/import',
+                      :template_object => ActiveAdminImport::Model.new(
+                        hint: "CSV 欄位順序：身份別代碼（訪客: guest, 學生: student, 職員: staff, 講師: lecturer, 教授: professor）、名稱、email、唯一識別碼、系所代碼、組織代碼、可切換同型部門（選填，true/false）、可切換部門（選填，true/false）、原系所代碼（選填）",
+                        csv_headers: %w(identity name email uid department_code organization_code permit_changing_department_in_group permit_changing_department_in_organization original_department_code)
+                      ),
+                      :before_batch_import => proc { |importer|
+                        importer_csv_lines = importer.instance_variable_get(:@csv_lines)
 
-                            # set default value for unspecified columns
-                            unspecified_column_count = importer.headers.count - csv_line.count
-                            # permit_changing_department_in_group defaults to false
-                            if unspecified_column_count == 3
-                              csv_line.append(false)
-                              unspecified_column_count -= 1
-                            end
-                            # permit_changing_department_in_group defaults to false
-                            if unspecified_column_count == 2
-                              csv_line.append(false)
-                              unspecified_column_count -= 1
-                            end
-                            # original_department_code defaults to department_code
-                            if unspecified_column_count == 1
-                              csv_line.append(csv_line[4])
-                              unspecified_column_count -= 1
-                            end
+                        # delete this line if it is an out-scoped line
+                        # imported by a scoped Admin
+                        importer_csv_lines.delete_if { |csv_line| Admin.current_admin.scoped? && Admin.current_admin.scoped_organization_code != csv_line[5] }
+
+                        # preprocess each line
+                        importer_csv_lines.each do |csv_line|
+                          # convert identity string to integer for batch import
+                          csv_line[0] = UserIdentity::IDENTITES[csv_line[0].to_sym]
+
+                          # set default value for unspecified columns
+                          unspecified_column_count = importer.headers.count - csv_line.count
+                          # permit_changing_department_in_group defaults to false
+                          if unspecified_column_count == 3
+                            csv_line.append(false)
+                            unspecified_column_count -= 1
                           end
+                          # permit_changing_department_in_group defaults to false
+                          if unspecified_column_count == 2
+                            csv_line.append(false)
+                            unspecified_column_count -= 1
+                          end
+                          # original_department_code defaults to department_code
+                          if unspecified_column_count == 1
+                            csv_line.append(csv_line[4])
+                            unspecified_column_count -= 1
+                          end
+                        end
 
-                          # save the preprocessed lines
-                          importer.instance_variable_set(:@csv_lines, importer_csv_lines)
-                        }
-  else
-    # active_admin_import :validate => true,
-    #                     :template => 'admin/import',
-    #                     :template_object => ActiveAdminImport::Model.new(
-    #                       hint: "CSV 欄位：名稱,email,系所代碼,識別碼,身份別代碼 (訪客: guest, 學生: student, 職員: staff, 講師: lecturer, 教授: professor)",
-    #                       csv_headers: %w(name email department_code uid identity)
-    #                     )
-  end
+                        # save the preprocessed lines
+                        importer.instance_variable_set(:@csv_lines, importer_csv_lines)
+                      }
 
   filter :organization, if: proc { current_admin.root? }
   filter :department

@@ -1,5 +1,6 @@
 class Users::EmailsController < ApplicationController
   before_action :authenticate_user!, except: [:confirm]
+  after_action :refresh_site_identity_token, only: [:confirm, :destroy]
 
   def index
     @emails = current_user.all_emails.includes(associated_user_identity: [:organization])

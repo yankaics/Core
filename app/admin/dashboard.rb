@@ -28,7 +28,7 @@ ActiveAdmin.register_page "Dashboard" do
                 li "#{key}: #{value}"
               end
             end
-          end
+          end if current_admin.root?
         end
         if Settings['admin_dashboard_l2_chart_code'].to_s != ''
           panel "<a target=\"_blank\" href=\"#{Settings['admin_dashboard_l2_chart_title_url']}\">#{Settings['admin_dashboard_l2_chart_title']}</a>".html_safe do
@@ -43,7 +43,7 @@ ActiveAdmin.register_page "Dashboard" do
           end
         end
         panel '<a href="/admin/users?q%5Bcurrent_sign_in_at_gteq%5D=1994-07-02&order=current_sign_in_at_desc&as=detailed_table">Recent Signed-In Users</a>'.html_safe do
-          table_for User.includes(:primary_identity).where('current_sign_in_at IS NOT NULL').order("current_sign_in_at DESC").limit(10) do
+          table_for User.scoped(current_admin.scoped_organization_code).includes(:primary_identity).where('current_sign_in_at IS NOT NULL').order("current_sign_in_at DESC").limit(10) do
             column("Name") { |user| link_to(user.name, admin_user_path(user)) }
             column("Fbid") { |user| link_to(truncate(user.fbid, length: 8), "https://facebook.com/#{user.fbid}", :target => "_blank") }
             column("UID") { |user| user.uid }
@@ -54,7 +54,7 @@ ActiveAdmin.register_page "Dashboard" do
           end
         end
         panel '<a href="/admin/users?order=created_at_desc&as=detailed_table">Recent Registered Users</a>'.html_safe do
-          table_for User.includes(:primary_identity).order("created_at DESC").limit(10) do
+          table_for User.scoped(current_admin.scoped_organization_code).includes(:primary_identity).order("created_at DESC").limit(10) do
             column("Name") { |user| link_to(user.name, admin_user_path(user)) }
             column("Fbid") { |user| link_to(truncate(user.fbid, length: 20), "https://facebook.com/#{user.fbid}", :target => "_blank") }
             column("UID") { |user| user.uid }

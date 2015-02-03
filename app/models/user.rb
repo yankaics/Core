@@ -57,6 +57,15 @@ class User < ActiveRecord::Base
   after_touch :save!
   after_save :clear_association_cache
 
+  def self.scoped(org_code)
+    if org_code
+      org = Organization.find_by(code: org_code)
+      org ? org.users : none
+    else
+      all
+    end
+  end
+
   def initialize(*args, &block)
     super
     @skip_confirmation_notification = true
@@ -75,6 +84,7 @@ class User < ActiveRecord::Base
   def ensure_user_has_valid_primary_identity
     if identities.count > 0
       self.primary_identity = identities.first if primary_identity.nil?
+      self.primary_identity = identities.first if primary_identity.user_id != self.id
     else
       self.primary_identity = nil
     end

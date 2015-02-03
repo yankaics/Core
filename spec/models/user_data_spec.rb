@@ -17,5 +17,17 @@ RSpec.describe UserData, :type => :model do
       before { user.destroy }
       it { is_expected.not_to be_persisted }
     end
+
+    context "when updated" do
+      before do
+        Timecop.travel(10.years.from_now)
+        user_data.birth_date = 30.years.ago
+        user_data.save
+      end
+      it "updates the user's update time" do
+        user.reload
+        expect(user.updated_at.to_date).to eq(user_data.updated_at.to_date)
+      end
+    end
   end
 end

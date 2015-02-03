@@ -1,6 +1,8 @@
 ActiveAdmin.register User do
   menu priority: 10
 
+  scope_to(if: proc { current_admin.scoped? }) { current_admin.organization }
+
   controller do
     def scoped_collection
       super.includes(:data)
@@ -10,8 +12,6 @@ ActiveAdmin.register User do
   actions :all, except: [:new, :create, :destroy]
 
   includes :data, :primary_identity
-
-  scope_to(if: proc { current_admin.scoped? }) { current_admin.organization }
 
   permit_params do
     params = [:name, :avatar_url, :cover_photo_url, :gender, :birth_date, :birth_year, :birth_month, :birth_day, :url, :brief, :motto]

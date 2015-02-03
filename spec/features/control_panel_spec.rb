@@ -376,6 +376,31 @@ feature "Control Panel", :type => :feature do
         end
         expect(page).to have_content('someone2@example.com.tw')
       end
+
+      scenario "Admin imports user_identities", :js => false do
+        UserIdentity.delete_all
+
+        visit(import_admin_user_identities_path)
+        attach_file('active_admin_import_model_file', user_identity_csv_file)
+        find('input[type=submit]').click
+
+        imported_user_identities = UserIdentity.last(9)
+
+        expect(imported_user_identities.count).to eq(9)
+      end
+
+      scenario "Admin imports out-scoped user_identities", :js => false do
+        UserIdentity.delete_all
+        @admin.update_attribute(:scoped_organization_code, 'NTHU')
+
+        visit(import_admin_user_identities_path)
+        attach_file('active_admin_import_model_file', user_identity_csv_file)
+        find('input[type=submit]').click
+
+        imported_user_identities = UserIdentity.last(9)
+
+        expect(imported_user_identities.count).to eq(0)
+      end
     end
   end
 
@@ -502,6 +527,47 @@ feature "Control Panel", :type => :feature do
       scenario "Admin can't manage applications", :js => false do
         expect { visit(admin_doorkeeper_applications_path) }.to raise_error
       end
+    end
+  end
+
+  describe "Admins" do
+    before(:all) { DatabaseCleaner.clean_with(:deletion) }
+    before :each do
+      login_as @admin, scope: :admin
+      visit(admin_root_path)
+    end
+
+    context "signed in as a root admin" do
+      before(:all) do
+        @admin = create(:admin)
+      end
+
+      scenario "Admin views Admins", :js => false do
+        find('#admins a').click
+        expect(page).to have_content(@admin.username)
+      end
+
+      scenario "Admin creates Admin", :js => false do
+        visit(new_admin_admin_path)
+        within("#main_content") do
+          fill_in 'admin_username', with: Faker::Internet.user_name
+          fill_in 'admin_email', with: Faker::Internet.email
+          fill_in 'admin_password', with: 'abc123'
+          fill_in 'admin_password_confirmation', with: 'abc123'
+          find('input[type=submit]').click
+        end
+        expect(page).to have_content(Admin.last.username)
+      end
+    end
+
+    context "signed in as a scoped admin" do
+      before(:all) do
+        @org = create(:organization, code: 'ORG')
+        @admin = create(:admin, scoped_organization_code: 'ORG')
+      end
+
+      # scenario "", :js => false do
+      # end
     end
   end
 end

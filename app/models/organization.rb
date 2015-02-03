@@ -14,4 +14,9 @@ class Organization < ActiveRecord::Base
   validates :code, uniqueness: true
   validates :code, :name, :short_name, presence: true
   validates_associated :departments, :email_patterns
+
+  # UserIdentity::IDENTITES.keys.each do |identity|
+  #   define_method identity.to_s.pluralize do
+  #   end
+  # end
 end

@@ -54,11 +54,21 @@ RSpec.describe User, :type => :model do
     subject(:user) { create(:user) }
     before do
       3.times do
-        create(:user_identity, :with_department, user_id: user.id)
+        user_identity = create(:user_identity, :with_department)
+        email = user.emails.create(email: user_identity.email)
+        email.confirm!
       end
     end
+
     it "sets the first remaining identity as primary_identity automatically" do
-      user
+      user.reload
+      first_user_identity = user.identities.first
+      second_user_identity = user.identities.second
+      expect(user.primary_identity).to eq(first_user_identity)
+
+      user.emails.first.destroy
+      user.reload
+      expect(user.primary_identity).to eq(second_user_identity)
     end
   end
 

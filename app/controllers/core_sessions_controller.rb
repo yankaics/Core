@@ -1,6 +1,5 @@
 class CoreSessionsController < Devise::SessionsController
-  after_filter :after_login, only: :create
-  after_filter :after_logout, only: [:destroy, :new]
+  after_filter :refresh_site_identity_token, only: [:destroy, :new, :create]
 
   def create
     # https://github.com/plataformatec/devise/blob/master/app/controllers/devise/sessions_controller.rb
@@ -17,20 +16,8 @@ class CoreSessionsController < Devise::SessionsController
     respond_with resource, location: after_sign_in_path_for(resource)
   end
 
-  def after_login
-    SiteIdentityToken::MaintainService.create_cookie_token(cookies, current_user)
-  end
-
-  def after_logout
-    SiteIdentityToken::MaintainService.destroy_cookie_token(cookies)
-  end
-
   def refresh_it
-    if user_signed_in?
-      SiteIdentityToken::MaintainService.create_cookie_token(cookies, current_user)
-    else
-      SiteIdentityToken::MaintainService.destroy_cookie_token(cookies)
-    end
+    refresh_site_identity_token
 
     core_domain = SiteIdentityToken::MaintainService.domain
     redirect_url = params[:redirect_to] || request.env["HTTP_REFERER"]

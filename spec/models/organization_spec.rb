@@ -36,17 +36,27 @@ RSpec.describe Organization, :type => :model do
       @dep_1_2 = create(:department, organization: @org, parent: @dep_1)
       @dep_1_3 = create(:department, organization: @org, parent: @dep_1)
       @dep_1_1_1 = create(:department, organization: @org, parent: @dep_1_1)
+      @ep = create(:email_pattern, organization: @org)
+      @ui = create(:user_identity, organization: @org)
       @org.destroy
     end
 
     it "deletes its departments while destroyed" do
-      expect(Organization.exists?(@org)).to eq false
-      expect(Department.exists?(@dep_1)).to eq false
-      expect(Department.exists?(@dep_2)).to eq false
-      expect(Department.exists?(@dep_1_1)).to eq false
-      expect(Department.exists?(@dep_1_2)).to eq false
-      expect(Department.exists?(@dep_1_3)).to eq false
-      expect(Department.exists?(@dep_1_1_1)).to eq false
+      expect(Organization.exists?(@org)).to be false
+      expect(Department.exists?(@dep_1)).to be false
+      expect(Department.exists?(@dep_2)).to be false
+      expect(Department.exists?(@dep_1_1)).to be false
+      expect(Department.exists?(@dep_1_2)).to be false
+      expect(Department.exists?(@dep_1_3)).to be false
+      expect(Department.exists?(@dep_1_1_1)).to be false
     end
+
+    it "deletes its email_patterns while destroyed" do
+      expect(EmailPattern.exists?(@ep)).to be false
+    end
+
+    # it "deletes its user_identities while destroyed" do
+    #   expect(UserIdentity.exists?(@ui)).to be false
+    # end
   end
 end
