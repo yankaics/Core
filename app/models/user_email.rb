@@ -49,7 +49,7 @@ class UserEmail < ActiveRecord::Base
 
   def confirm
     return false unless valid?
-    update(confirmed_at: Time.now)
+    update(confirmed_at: Time.now, confirmation_token: nil)
     # find if there is a predefined identity with this email
     identity = UserIdentity.find_by(user_id: nil, email: email)
     if identity

@@ -20,6 +20,7 @@ RSpec.describe UserEmail, :type => :model do
   context "when created" do
     subject { user_email }
     it { is_expected.not_to be_confirmed }
+    its(:confirmation_token) { is_expected.not_to be_blank }
   end
 
   context "when the user has a same email" do
@@ -66,6 +67,7 @@ RSpec.describe UserEmail, :type => :model do
   context "when confirmed" do
     subject { user_email.confirm! }
     it { is_expected.to be_confirmed }
+    its(:confirmation_token) { is_expected.to be_blank }
 
     context "having matched EmailPattern" do
       let!(:ntust) { create(:ntust_organization) }
