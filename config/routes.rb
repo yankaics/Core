@@ -25,6 +25,7 @@ Rails.application.routes.draw do
   end
 
   use_doorkeeper do
+    controllers :authorizations => 'oauth/authorizations'
     controllers :applications => 'oauth/applications'
   end
 

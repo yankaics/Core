@@ -9,6 +9,7 @@ RSpec.describe CoreSessionsController, :type => :controller do
         @user.confirm!
         sign_in @user
       end
+
       it "sets the identity_token in cookie" do
         @request.env["devise.mapping"] = Devise.mappings[:user]
         get :refresh_it
@@ -26,6 +27,7 @@ RSpec.describe CoreSessionsController, :type => :controller do
         expect(response.cookies).to have_key '_identity_token'
         sign_out @user
       end
+
       it "clears the identity_token in cookie" do
         @request.env["devise.mapping"] = Devise.mappings[:user]
         get :refresh_it
