@@ -4,10 +4,7 @@
     <h2 style="text-align:center; color:#5E5E5E;">登入 / 註冊</h2>
     <div class="row">
       <div class="col-md-12">
-        <div class="form-actions fb-login-btn" style="margin-left: auto;margin-right: auto; margin-top:40px; margin-bottom:40px; max-width:300px;">
-
-          <%= link_to "Sign in with Facebook", user_omniauth_authorize_path(:facebook) %>
-        </div>
+        <%= link_to raw('<div class="form-actions fb-login-btn" style="margin-left: auto; margin-right: auto; margin-top:40px; margin-bottom:40px; max-width:300px; text-align: center;">Sign in with Facebook</div>'), user_omniauth_authorize_path(:facebook) %>
         <p style="text-align: center;">登入時視同您已同意本站之<a href=<%= eula_path %> target="_blank">用戶許可協議</a></p>
         <p style="text-align: center;">沒有 Facebook 帳號？<br>您也可以使用慣用 Email 來登入...</p>
       </div>
