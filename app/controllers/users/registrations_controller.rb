@@ -1,4 +1,4 @@
-class RegistrationsController < Devise::RegistrationsController
+class Users::RegistrationsController < Devise::RegistrationsController
   def new
     super
   end
@@ -10,6 +10,10 @@ class RegistrationsController < Devise::RegistrationsController
 
   def update
     super
+  end
+
+  def destroy
+    redirect_to root_path
   end
 
   private

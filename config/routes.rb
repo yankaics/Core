@@ -11,7 +11,8 @@ Rails.application.routes.draw do
              :controllers => {
                :sessions => "core_sessions",
                :omniauth_callbacks => "users/omniauth_callbacks",
-               :registrations => "registrations"
+               :registrations => "users/registrations",
+               :confirmations => "users/confirmations"
              },
              :path => '',
              :path_names => {

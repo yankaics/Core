@@ -167,15 +167,10 @@ eod
       user.reload
     end.to change { user.confirmed? }.from(false).to(true)
 
-    # Login with the confirmed account will success
-    visit(new_user_session_path)
-    within ".login" do
-      fill_form(:user, user_login_credentials)
-      find('form input[type=submit]').click
-    end
+    # New users are signed in automatically and redirected to
+    # new_my_account_email_path after clicking the confirmation link
+    expect(current_path).to eq(new_my_account_email_path)
 
-    # Users should be redirected to the new email page after their first login
-    expect(current_path).to eq new_my_account_email_path
     # expect(page).to ...
 
     # On background: identity_token cookie should be maintained...
@@ -188,7 +183,18 @@ eod
 
     visit('/logout')
 
+    # On background: identity_token cookie should be maintained...
     expect(page.driver.request.cookies['_identity_token'])
       .to be_blank
+
+    # Login with the confirmed account will success
+    visit(new_user_session_path)
+    within ".login" do
+      fill_form(:user, user_login_credentials)
+      find('form input[type=submit]').click
+    end
+
+    # New users that didn't have an identity should be redirected to the new email page
+    expect(current_path).to eq new_my_account_email_path
   end
 end
