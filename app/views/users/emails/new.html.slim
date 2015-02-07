@@ -3,7 +3,7 @@
   h1 認證身份
 
   = simple_form_for @email, url: my_account_emails_path do |f|
-    = react_component(:NewUserEmailBox, emailPatterns: @email_patterns)
+    = react_component(:NewUserEmailBox, emailPatterns: @email_patterns, email: @email)
 
 css:
   .row h3 {

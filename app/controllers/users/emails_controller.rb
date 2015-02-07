@@ -12,14 +12,29 @@ class Users::EmailsController < ApplicationController
     @email = current_user.emails.build
     @email_patterns = EmailPattern.includes(:organization).all.serialize_it.as_json
     @email_patterns.each { |ep| ep[:corresponded_identity] = I18n.t(ep[:corresponded_identity], scope: :'user.identity') }
+
+    # if a new user
+    if current_user.primary_identity_id.blank? && current_user.created_at > 2.hours.ago
+      # find if there is a predefined identity with this email
+      # or matching email patterns
+      if UserIdentity.find_by(user_id: nil, email: current_user.email) ||
+         EmailPattern.identify(current_user.email)
+         @email.email = current_user.email
+      end
+    end
   end
 
   def create
     @email = current_user.emails.build(user_email_params)
 
     if @email.save
-      @email.send_confirmation_instructions
-      flash[:notice] = "驗証信已送出！"
+      if @email.email == current_user.email
+        @email.confirm!
+        flash[:notice] = "Email 經驗證，已開通對應身份！"
+      else
+        @email.send_confirmation_instructions
+        flash[:notice] = "驗証信已送出！"
+      end
     else
       flash[:error] = "無效的 Email，或該 Email 已經被使用。"
     end

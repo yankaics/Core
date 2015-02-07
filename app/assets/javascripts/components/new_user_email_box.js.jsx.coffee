@@ -30,6 +30,12 @@ NewUserEmailBox = React.createClass
       emailPattern.email_account_regexp = sp[0]
       emailPattern.email_domain_regexp = sp[1]
 
+  componentDidMount: ->
+    if @props.email?.email
+      @setState
+        email: @props.email?.email
+      @handleEmailChange(@props.email?.email)
+
   _fetchDepartments: (organization_code) ->
     if @state.cached_departments[organization_code]
       @setState
@@ -213,6 +219,8 @@ NewUserEmailBox = React.createClass
     else
       successIcon = ''
 
+    defaultValue = @props.email?.email
+
     `<div>
       <div className={inputContainerClassName}>
         <div className="input-group">
@@ -224,6 +232,7 @@ NewUserEmailBox = React.createClass
             id="user_email_email"
             name="user_email[email]"
             placeholder="請輸入您的學校 email"
+            value={defaultValue}
             autofocus="true" />
         </div>
         {successIcon}
