@@ -45,8 +45,8 @@ ActiveAdmin.register_page "Dashboard" do
         panel '<a href="/admin/users?q%5Bcurrent_sign_in_at_gteq%5D=1994-07-02&order=current_sign_in_at_desc&as=detailed_table">Recent Signed-In Users</a>'.html_safe do
           table_for User.scoped(current_admin.scoped_organization_code).includes(:primary_identity).where('current_sign_in_at IS NOT NULL').order("current_sign_in_at DESC").limit(10) do
             column("Name") { |user| link_to(user.name, admin_user_path(user)) }
-            column("Fbid") { |user| link_to(truncate(user.fbid, length: 8), "https://facebook.com/#{user.fbid}", :target => "_blank") }
-            column("UID") { |user| user.uid }
+            column("Fbid") { |user| link_to(truncate(user.fbid, length: 8), "https://facebook.com/#{user.fbid}", :target => "_blank") if user.fbid }
+            column("UID") { |user| truncate(user.uid, length: 12) }
             column("Sign In Time") { |user| user.current_sign_in_at && distance_of_time_in_words_to_now(user.current_sign_in_at) }
             column("Sign In Count") { |user| "#{user.sign_in_count} (#{'%.3f' % (user.sign_in_count.to_f / ((Time.now - user.created_at) / 1.day)+0.5)}/day)" }
             column("IP") { |user| (user.current_sign_in_ip == user.last_sign_in_ip) ? status_tag(user.current_sign_in_ip, :class => 'yes') : status_tag(user.current_sign_in_ip) }
@@ -56,8 +56,8 @@ ActiveAdmin.register_page "Dashboard" do
         panel '<a href="/admin/users?order=created_at_desc&as=detailed_table">Recent Registered Users</a>'.html_safe do
           table_for User.scoped(current_admin.scoped_organization_code).includes(:primary_identity).order("created_at DESC").limit(10) do
             column("Name") { |user| link_to(user.name, admin_user_path(user)) }
-            column("Fbid") { |user| link_to(truncate(user.fbid, length: 20), "https://facebook.com/#{user.fbid}", :target => "_blank") }
-            column("UID") { |user| user.uid }
+            column("Fbid") { |user| link_to(truncate(user.fbid, length: 16), "https://facebook.com/#{user.fbid}", :target => "_blank") if user.fbid }
+            column("UID") { |user| truncate(user.uid, length: 12) }
             column("Created At") { |user| user.created_at }
             column("Confirmed") do |user|
               if user.confirmed?
