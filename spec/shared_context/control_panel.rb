@@ -20,4 +20,12 @@ RSpec.shared_context "create two organizations and four users" do
     @org_gro_usr = create(:user, :in_organization, organization: @org)
     create(:user_identity_link, :in_organization, user: @org_gro_usr, organization: @gro)
   end
+  before :each do
+    @org.reload
+    @gro.reload
+    @usr.reload
+    @org_usr.reload
+    @gro_usr.reload
+    @org_gro_usr.reload
+  end
 end

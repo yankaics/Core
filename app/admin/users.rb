@@ -1,5 +1,6 @@
 ActiveAdmin.register User do
   menu priority: 10
+  config.per_page = 100
 
   scope_to(if: proc { current_admin.scoped? }) { current_admin.organization }
 
@@ -25,7 +26,20 @@ ActiveAdmin.register User do
   scope :identified
   scope :unidentified
 
-  config.per_page = 100
+  filter :id
+  filter :email
+  filter :name
+  filter :username
+  filter :fbid
+  filter :created_at
+  filter :confirmed_at
+  filter :updated_at
+  filter :last_sign_in_at
+  filter :last_sign_in_ip
+  filter :locked_at
+  filter :unconfirmed_email
+  filter :mobile
+  filter :unconfirmed_mobile
 
   index do
     selectable_column
@@ -39,6 +53,9 @@ ActiveAdmin.register User do
     end
     column :confirmed_at
     column :sign_in_count
+    column :testing do |user|
+      link_to '登入', testing_user_sessions_path(id: user.id), method: :post, class: :login, data: { confirm: "確定要用 #{user.name} 的帳號登入嗎？" }
+    end if current_admin.root?
     actions
   end
 
@@ -86,6 +103,9 @@ ActiveAdmin.register User do
     column :mobile_confirmation_token
     column :mobile_confirmation_sent_at
     column :mobile_confirm_tries
+    column :testing do |user|
+      link_to '登入', testing_user_sessions_path(id: user.id), method: :post, class: :login, data: { confirm: "確定要用 #{user.name} 的帳號登入嗎？" }
+    end if current_admin.root?
     actions
   end
 

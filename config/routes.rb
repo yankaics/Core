@@ -32,8 +32,11 @@ Rails.application.routes.draw do
 
   devise_for :admins, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
+  scope '/admin' do
+    resources :testing_user_sessions, :controller => 'admin/testing_user_sessions'
+  end
 
-  resource :my_account do
+  resource :my_account, controller: 'users/my_account' do
     resources :emails, controller: 'users/emails'
   end
 

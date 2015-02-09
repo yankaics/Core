@@ -53,6 +53,31 @@ feature "Control Panel", :type => :feature do
         first('tbody a.edit_link').click
         first("input[type=submit]").click
       end
+
+      scenario "Admin test login as a unconfirmed user" do
+        @usr.confirmed_at = nil
+        @usr.save!
+        visit(admin_users_path('q[id_equals]' => "#{@usr.id}"))
+        first('.col-testing .login').click
+        cookies = page.driver.request.cookies
+        page.driver.post(testing_user_sessions_path(id: @usr.id))
+        expect(cookies['_identity_token']).to be_blank
+        visit(my_account_path)
+        expect(page).not_to have_content(@usr.name)
+        expect(page).not_to have_content(@usr.email)
+      end
+
+      scenario "Admin test login as a confirmed user" do
+        @usr.confirm!
+        visit(admin_users_path('q[id_equals]' => "#{@usr.id}"))
+        first('.col-testing .login').click
+        cookies = page.driver.request.cookies
+        page.driver.post(testing_user_sessions_path(id: @usr.id))
+        expect(cookies['_identity_token']).not_to be_blank
+        visit(my_account_path)
+        expect(page).to have_content(@usr.name)
+        expect(page).to have_content(@usr.email)
+      end
     end
 
     context "signed in as a scoped admin" do
@@ -82,6 +107,19 @@ feature "Control Panel", :type => :feature do
 
       scenario "Admin views a user out of scope" do
         expect { visit(admin_user_path(@gro_usr)) }.to raise_error
+      end
+
+      scenario "Admin can't test login as a user" do
+        @usr.confirm!
+        expect do
+          page.driver.post(testing_user_sessions_path(id: @usr.id))
+        end.to raise_error
+
+        cookies = page.driver.request.cookies
+        expect(cookies['_identity_token']).to be_blank
+        visit(my_account_path)
+        expect(page).not_to have_content(@usr.name)
+        expect(page).not_to have_content(@usr.email)
       end
     end
   end

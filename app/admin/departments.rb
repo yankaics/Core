@@ -1,6 +1,7 @@
 ActiveAdmin.register Department do
   menu priority: 111, parent: "組織資料"
   config.sort_order = :organization_code_asc, :code_asc
+  config.per_page = 100
 
   scope_to(if: proc { current_admin.scoped? }) { current_admin.organization }
 
@@ -28,8 +29,6 @@ ActiveAdmin.register Department do
   filter :group
   filter :created_at
   filter :updated_at
-
-  config.per_page = 100
 
   sidebar "部門資料" do
     para '組織下的各部門資料，可指定一個部門的「父部門」來製作巢狀結構。'

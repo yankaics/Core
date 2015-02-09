@@ -1,4 +1,4 @@
-class MyAccountController < ApplicationController
+class Users::MyAccountController < ApplicationController
   before_action :authenticate_user!
 
   def show
