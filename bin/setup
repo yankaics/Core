@@ -9,9 +9,7 @@ set -e
 # Set up Ruby dependencies via Bundler
 gem list bundler --installed > /dev/null || gem install bundler
 
-env LDFLAGS=-L/usr/local/opt/qt5/lib \
-    CPPFLAGS=-I/usr/local/opt/qt5/include \
-  bundle install
+bundle install -j4 -r3
 
 # Set up configurable environment variables
 if [ ! -f .env ]; then
