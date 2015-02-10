@@ -17,7 +17,14 @@ zh-TW:
         password_confirmation: "密碼確認"
         name: "姓名"
         sign_in_count: "登入次數"
+        identity: "身份"
         testing: "測試"
+        identities:
+          guest: "訪客"
+          student: "學生"
+          staff: "教職員"
+          lecturer: "講師"
+          professor: "教授"
       organization:
         code: "代碼"
         code_cont: "代碼"
@@ -59,6 +66,12 @@ zh-TW:
         original_department_code: "原所屬部門代碼"
         permit_changing_department_in_group: "可切換同型部門"
         permit_changing_department_in_organization: "可切換部門"
+        identities:
+          guest: "訪客"
+          student: "學生"
+          staff: "教職員"
+          lecturer: "講師"
+          professor: "教授"
       admin:
         username: "帳號"
         password: "密碼"

@@ -117,7 +117,7 @@ ActiveAdmin.register UserIdentity do
     column(:user) { |user_identity| link_to user_identity.user.name, admin_user_path(user_identity.user) if user_identity.user }
     column(:name) { |user_identity| link_to user_identity.name, admin_user_identity_path(user_identity) if user_identity.name }
     column(:email) { |user_identity| link_to user_identity.email, admin_user_identity_path(user_identity) }
-    column(:identity)
+    column(:identity) { |user_identity| UserIdentity.human_enum_value(:identity, user_identity.identity) }
     column(:uid)
     column(:permit_changing_department_in_group)
     column(:permit_changing_department_in_organization)
@@ -134,7 +134,7 @@ ActiveAdmin.register UserIdentity do
       f.input :original_department, as: :select, collection: options_for_select(current_admin.organization.departments.all.map { |d| [d.name, d.code] }, user_identity.original_department_code) unless current_admin.root?
       f.input :name
       f.input :email
-      f.input :identity, as: :select, collection: options_for_select(UserIdentity::IDENTITES.map { |k, v| [k, k] }, user_identity.identity)
+      f.input :identity, as: :select, collection: options_for_select(UserIdentity.identity_attributes_for_select, user_identity.identity)
       f.input :uid
       f.input :permit_changing_department_in_group
       f.input :permit_changing_department_in_organization

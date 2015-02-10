@@ -1,4 +1,6 @@
 class UserIdentity < ActiveRecord::Base
+  include EnumHumanizable
+
   IDENTITES = {
     guest: 0,
     student: 1,
@@ -37,6 +39,10 @@ class UserIdentity < ActiveRecord::Base
 
   after_validation :ensure_user_identity_has_valid_original_department
   before_save :link_to_user
+
+  def self.identity_attributes_for_select
+    IDENTITES.map { |k, v| [I18n.t(k, scope: :'activerecord.attributes.user_identity.identities'), k] }
+  end
 
   def ensure_user_identity_has_valid_original_department
     return unless department.presence && !original_department.presence

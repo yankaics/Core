@@ -6,7 +6,7 @@ ActiveAdmin.register User do
 
   controller do
     def scoped_collection
-      super.includes(:data)
+      super.includes(:data, primary_identity: [:organization, :department])
     end
   end
 
@@ -49,7 +49,10 @@ ActiveAdmin.register User do
     end
     column :email
     column :fbid do |user|
-      link_to user.fbid, "https://facebook.com/#{user.fbid}", :target => "_blank" if user.fbid
+      link_to truncate(user.fbid, length: 8), "https://facebook.com/#{user.fbid}", :target => "_blank" if user.fbid
+    end
+    column :identity do |user|
+      link_to "#{truncate(user.organization_short_name, length: 5)} #{truncate(user.department_short_name, length: 5)} #{UserIdentity.human_enum_value(:identity, user.identity)}", admin_user_identity_path(user.primary_identity) if user.primary_identity
     end
     column :confirmed_at
     column :sign_in_count
