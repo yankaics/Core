@@ -79,6 +79,10 @@ class User < ActiveRecord::Base
     identities.map(&:department_code)
   end
 
+  def verified?
+    !primary_identity_id.blank?
+  end
+
   private
 
   def ensure_user_has_valid_primary_identity

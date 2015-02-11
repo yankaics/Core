@@ -54,13 +54,19 @@ ActiveAdmin.register_page "Dashboard" do
           end
         end
         panel '<a href="/admin/users?order=created_at_desc&as=detailed_table">Recent Registered Users</a>'.html_safe do
-          table_for User.scoped(current_admin.scoped_organization_code).includes(:primary_identity).order("created_at DESC").limit(10) do
+          table_for User.scoped(current_admin.scoped_organization_code).includes(:primary_identity, :organizations).order("created_at DESC").limit(10) do
             column("Name") { |user| link_to(user.name, admin_user_path(user)) }
             column("Fbid") { |user| link_to(truncate(user.fbid, length: 16), "https://facebook.com/#{user.fbid}", :target => "_blank") if user.fbid }
+            column("Org") { |user| truncate(user.organization_short_name, length: 5) }
             column("UID") { |user| truncate(user.uid, length: 12) }
-            column("Created At") { |user| user.created_at }
-            column("Confirmed") do |user|
+            column("Created At") { |user| user.created_at.to_s.gsub(/\+\d{2}00/, '') }
+            column("C/V?") do |user|
               if user.confirmed?
+                status_tag('Yes', :class => 'yes')
+              else
+                status_tag('No', :class => 'no')
+              end
+              if user.verified?
                 status_tag('Yes', :class => 'yes')
               else
                 status_tag('No', :class => 'no')

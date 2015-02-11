@@ -43,6 +43,7 @@ FactoryGirl.define do
         user.confirm!
         user.emails.create(email: evaluator.user_identity.email)
         user.unconfirmed_emails.last.confirm!
+        user.reload
       end
     end
 
@@ -56,6 +57,7 @@ FactoryGirl.define do
         user_identity = create(:user_identity, organization: evaluator.organization, identity: evaluator.identity)
         user.emails.create(email: user_identity.email)
         user.unconfirmed_emails.last.confirm!
+        user.reload
       end
     end
 
@@ -69,6 +71,7 @@ FactoryGirl.define do
         user_identity = create(:user_identity, organization: evaluator.department.organization, department: evaluator.department, identity: evaluator.identity)
         user.emails.create(email: user_identity.email)
         user.unconfirmed_emails.last.confirm!
+        user.reload
       end
     end
   end

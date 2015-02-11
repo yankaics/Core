@@ -86,4 +86,14 @@ RSpec.describe User, :type => :model do
       it { is_expected.to be_confirmed }
     end
   end
+
+  describe "#verified?" do
+    it "returns whether the user has an identity" do
+      @user_with_no_identity = create(:user)
+      @user_with_identity = create(:user, :with_identity)
+
+      expect(@user_with_no_identity.verified?).to be(false)
+      expect(@user_with_identity.verified?).to be(true)
+    end
+  end
 end
