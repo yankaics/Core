@@ -119,6 +119,8 @@ GEM
       railties (>= 3.0)
       sass-rails (>= 3.2)
     chunky_png (1.3.3)
+    codeclimate-test-reporter (0.4.6)
+      simplecov (>= 0.7.1, < 1.0.0)
     coderay (1.1.0)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
@@ -521,6 +523,7 @@ DEPENDENCIES
   capybara-screenshot
   capybara-webkit (>= 1.2.0)
   chosen-rails
+  codeclimate-test-reporter
   coffee-rails (~> 4.1.0)
   compass-rails (~> 2.0.0)
   coveralls
