@@ -25,6 +25,12 @@ zh-TW:
           staff: "教職員"
           lecturer: "講師"
           professor: "教授"
+      user_data:
+        genders:
+          male: "男"
+          female: "女"
+          other: "其他"
+          unspecified: "未指定"
       organization:
         code: "代碼"
         code_cont: "代碼"

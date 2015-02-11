@@ -78,7 +78,7 @@ RSpec.describe User, :type => :model do
     context "when created" do
       it { is_expected.not_to be_confirmed }
       its(:data) { is_expected.to be_an(Object) }
-      its(:gender) { is_expected.to eq('null') }
+      its(:gender) { is_expected.to eq('unspecified') }
     end
 
     context "after confirmed" do

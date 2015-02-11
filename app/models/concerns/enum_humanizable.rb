@@ -28,5 +28,10 @@ module EnumHumanizable
       options[:default] = defaults
       I18n.translate(defaults.shift, options)
     end
+
+    def enum_for_select(attribute)
+      selections = const_get(attribute.to_s.pluralize.upcase)
+      selections.map { |k, v| [human_enum_value(attribute, k), k] }
+    end
   end
 end

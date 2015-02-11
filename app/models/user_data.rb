@@ -1,9 +1,11 @@
 class UserData < ActiveRecord::Base
+  include EnumHumanizable
+
   GENDERS = {
     male: 1,
     female: 2,
     other: 3,
-    null: 0
+    unspecified: 0
   }
 
   belongs_to :user, touch: true

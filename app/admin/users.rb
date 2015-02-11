@@ -145,7 +145,7 @@ ActiveAdmin.register User do
       f.input :avatar_url
       f.input :cover_photo_url
       f.input :fbtoken if current_admin.root?
-      f.input :gender, as: :select, collection: options_for_select(UserData::GENDERS.map { |k, v| [k, k] }, user.gender)
+      f.input :gender, as: :select, collection: options_for_select(UserData.enum_for_select(:gender), user.gender)
       f.input :birth_date, as: :datepicker
       f.input :url
       f.input :brief

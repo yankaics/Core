@@ -17,7 +17,7 @@ class Department < ActiveRecord::Base
   validates :code, uniqueness: { scope: :organization_code }
   validates :organization, :code, :name, :short_name, presence: true
 
-  # UserIdentity::IDENTITES.keys.each do |identity|
+  # UserIdentity::IDENTITIES.keys.each do |identity|
   #   define_method identity.to_s.pluralize do
   #   end
   # end

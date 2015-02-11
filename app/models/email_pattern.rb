@@ -6,7 +6,7 @@ class EmailPattern < ActiveRecord::Base
   belongs_to :organization, primary_key: :code, foreign_key: :organization_code
   has_many :user_identifies
 
-  enum corresponded_identity: UserIdentity::IDENTITES
+  enum corresponded_identity: UserIdentity::IDENTITIES
 
   validates :priority, :organization, :corresponded_identity, :email_regexp, presence: true
   validates_with EmailPatternValidator

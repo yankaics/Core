@@ -16,11 +16,11 @@ namespace :dev do
       nthu.reload
 
       12.times do
-        u = create(:user, :in_department, department: ntust.departments.sample, identity: UserIdentity::IDENTITES.keys.sample)
+        u = create(:user, :in_department, department: ntust.departments.sample, identity: UserIdentity::IDENTITIES.keys.sample)
         u.confirm!
       end
       12.times do
-        u = create(:user, :in_department, department: nthu.departments.sample, identity: UserIdentity::IDENTITES.keys.sample)
+        u = create(:user, :in_department, department: nthu.departments.sample, identity: UserIdentity::IDENTITIES.keys.sample)
         u.confirm!
       end
     end

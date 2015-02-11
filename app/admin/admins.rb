@@ -33,7 +33,7 @@ ActiveAdmin.register Admin do
       f.input :email
       f.input :password
       f.input :password_confirmation
-      f.input :scoped_organization_code, as: :select, collection: options_for_select(Organization.all.map { |u| [u.name, u.code] }, admin.scoped_organization_code) if current_admin.root?
+      f.input :scoped_organization_code, as: :select, collection: options_for_select(Organization.all_for_select, admin.scoped_organization_code) if current_admin.root?
     end
     f.actions
   end

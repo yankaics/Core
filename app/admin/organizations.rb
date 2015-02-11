@@ -120,7 +120,7 @@ ActiveAdmin.register Organization do
             ep.input :priority, hint: "數字越小優先級越高，較嚴謹的規則應被排在較高的優先級"
             ep.input :email_regexp, hint: "可使用 named capturing groups 抓取資料，有效的 group name 有：uid (學號)、identity_detail (身份細節)、department_code (系所代碼)、unit_code (所屬單位代碼)、started_at (身份開始日期)，例如：`^(?<uid>(?<identity_detail>[aAbmdBMD])(?<started_at>\d*)(?<department_code>\d{2})\d{3})@mail\.ntust\.edu\.tw$`"
 
-            ep.input :corresponded_identity, as: :select, collection: UserIdentity::IDENTITES.keys, hint: "符合此規則的使用者該被賦予的身份"
+            ep.input :corresponded_identity, as: :select, collection: UserIdentity::IDENTITIES.keys, hint: "符合此規則的使用者該被賦予的身份"
 
             ep.input :uid_postparser, hint: "將抓取出的 <uid> 字串轉換成正確學號資料的 JavaScript 程式碼，可用變數 n 取得原始資料，空白表示不處理，例如：`n.toLowerCase()`"
             ep.input :identity_detail_postparser, hint: "將抓取出的 <identity_detail> 字串轉換成正確詳細身份資料的 JavaScript 程式碼，可用變數 n 取得原始資料，空白表示不處理，例如：`switch (n.toLowerCase()) { case 'a': 'a'; break; case 'b': 'bachelor'; break; case 'm': 'master'; break; case 'd': 'doctor'; break; }`"

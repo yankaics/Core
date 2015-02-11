@@ -15,8 +15,16 @@ class Organization < ActiveRecord::Base
   validates :code, :name, :short_name, presence: true
   validates_associated :departments, :email_patterns
 
-  # UserIdentity::IDENTITES.keys.each do |identity|
+  # UserIdentity::IDENTITIES.keys.each do |identity|
   #   define_method identity.to_s.pluralize do
   #   end
   # end
+
+  def self.all_for_select
+    all.map { |u| [u.name, u.code] }
+  end
+
+  def departments_for_select
+    departments.all.map { |d| [d.name, d.code] }
+  end
 end

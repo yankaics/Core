@@ -46,7 +46,7 @@ ActiveAdmin.register UserIdentity do
                         # preprocess each line
                         importer_csv_lines.each do |csv_line|
                           # convert identity string to integer for batch import
-                          csv_line[0] = UserIdentity::IDENTITES[csv_line[0].to_sym]
+                          csv_line[0] = UserIdentity::IDENTITIES[csv_line[0].to_sym]
 
                           # set default value for unspecified columns
                           unspecified_column_count = importer.headers.count - csv_line.count
@@ -127,11 +127,11 @@ ActiveAdmin.register UserIdentity do
 
   form do |f|
     f.inputs do
-      f.input :organization_code, as: :select, collection: options_for_select(Organization.all.map { |u| [u.name, u.code] }, user_identity.organization_code) if current_admin.root?
+      f.input :organization_code, as: :select, collection: options_for_select(Organization.all_for_select, user_identity.organization_code) if current_admin.root?
       f.input :department_code if current_admin.root?
       f.input :original_department_code if current_admin.root?
-      f.input :department, as: :select, collection: options_for_select(current_admin.organization.departments.all.map { |d| [d.name, d.code] }, user_identity.department_code) unless current_admin.root?
-      f.input :original_department, as: :select, collection: options_for_select(current_admin.organization.departments.all.map { |d| [d.name, d.code] }, user_identity.original_department_code) unless current_admin.root?
+      f.input :department, as: :select, collection: options_for_select(current_admin.organization.departments_for_select, user_identity.department_code) unless current_admin.root?
+      f.input :original_department, as: :select, collection: options_for_select(current_admin.organization.departments_for_select, user_identity.original_department_code) unless current_admin.root?
       f.input :name
       f.input :email
       f.input :identity, as: :select, collection: options_for_select(UserIdentity.identity_attributes_for_select, user_identity.identity)

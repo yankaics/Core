@@ -270,7 +270,7 @@ feature "Control Panel", :type => :feature do
         visit(new_admin_email_pattern_path)
         within("#main_content") do
           select "國立清華大學", from: 'email_pattern_organization_code'
-          select "staff", from: 'email_pattern_corresponded_identity'
+          select UserIdentity.human_enum_value('identity', 'staff'), from: 'email_pattern_corresponded_identity'
           fill_in 'email_pattern_email_regexp', with: "[a-z]+"
           find('input[type=submit]').click
         end
@@ -297,7 +297,7 @@ feature "Control Panel", :type => :feature do
       scenario "Admin creates email_pattern", :js => false do
         visit(new_admin_email_pattern_path)
         within("#main_content") do
-          select "staff", from: 'email_pattern_corresponded_identity'
+          select UserIdentity.human_enum_value('identity', 'staff'), from: 'email_pattern_corresponded_identity'
           fill_in 'email_pattern_email_regexp', with: "someone@example.com.tw"
           find('input[type=submit]').click
         end

@@ -224,7 +224,7 @@ FactoryGirl.define do
   factory :nthu_student_email_pattern_1, parent: :email_pattern do
     priority 10
     organization { Organization.find_by(code: 'NTHU') || create(:nthu_organization) }
-    corresponded_identity UserIdentity::IDENTITES[:student]
+    corresponded_identity UserIdentity::IDENTITIES[:student]
     email_regexp '^[a-z]?(?<uid>(?<started_at>\\d{3})(?<department_code>\\d{3}(?<identity_detail>\\d))\\d{2})@(?:[a-z0-9]{1,5}\\.)?nthu\\.edu\\.tw$'
     uid_postparser "n.toLowerCase()"
     department_code_postparser ""
@@ -236,7 +236,7 @@ FactoryGirl.define do
   factory :nthu_student_email_pattern_2, parent: :email_pattern do
     priority 10
     organization { Organization.find_by(code: 'NTHU') || create(:nthu_organization) }
-    corresponded_identity UserIdentity::IDENTITES[:student]
+    corresponded_identity UserIdentity::IDENTITIES[:student]
     email_regexp '^[a-z]?(?<uid>(?<started_at>\\d{2})(?<department_code>\\d{2}(?<identity_detail>\\d))\\d{2})@(?:[a-z0-9]{1,5}\\.)?nthu\\.edu\\.tw$'
     uid_postparser "n.toLowerCase()"
     department_code_postparser "'0' + n"
@@ -248,7 +248,7 @@ FactoryGirl.define do
   factory :nthu_staff_email_pattern, parent: :email_pattern do
     priority 100
     organization { Organization.find_by(code: 'NTHU') || create(:nthu_organization) }
-    corresponded_identity UserIdentity::IDENTITES[:staff]
+    corresponded_identity UserIdentity::IDENTITIES[:staff]
     email_regexp '^(?<uid>.+)@(?:[a-z0-9]{1,5}\\.)?nthu\\.edu\\.tw$'
     uid_postparser "n.toLowerCase()"
     department_code_postparser ""

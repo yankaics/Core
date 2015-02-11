@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :user do
     transient do
-      gender 'null'
+      gender 'unspecified'
       birth_date nil
     end
 

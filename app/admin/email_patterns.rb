@@ -74,9 +74,9 @@ ActiveAdmin.register EmailPattern do
 
   form do |f|
     f.inputs do
-      f.input :organization_code, as: :select, collection: options_for_select(Organization.all.map { |u| [u.name, u.code] }, email_pattern.organization_code) if current_admin.root?
+      f.input :organization_code, as: :select, collection: options_for_select(Organization.all_for_select, email_pattern.organization_code) if current_admin.root?
       f.input :priority, hint: "數字越小優先級越高，較嚴謹的規則應被排在較高的優先級"
-      f.input :corresponded_identity, as: :select, collection: options_for_select(UserIdentity::IDENTITES.map { |k, v| [k, k] }, email_pattern.corresponded_identity)
+      f.input :corresponded_identity, as: :select, collection: options_for_select(UserIdentity.enum_for_select(:identity), email_pattern.corresponded_identity)
       f.input :email_regexp
       f.input :uid_postparser, hint: "JavaScript 程式碼，可用變數 n 取得原始資料，必須返回一個字串，留白表示不處理，例如：`n.toLowerCase()`"
       f.input :department_code_postparser, hint: "JavaScript 程式碼，可用變數 n 取得原始資料，必須返回一個字串，留白表示不處理，例如：`'0' + n`"

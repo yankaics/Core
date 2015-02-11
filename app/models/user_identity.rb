@@ -1,7 +1,7 @@
 class UserIdentity < ActiveRecord::Base
   include EnumHumanizable
 
-  IDENTITES = {
+  IDENTITIES = {
     guest: 0,
     student: 1,
     staff: 2,
@@ -23,7 +23,7 @@ class UserIdentity < ActiveRecord::Base
              primary_key: :code, foreign_key: :department_code
   belongs_to :original_department, ->(o) { (o && o.respond_to?(:organization_code)) ? where(organization_code: o.organization_code) : all }, class_name: Department, primary_key: :code, foreign_key: :original_department_code
 
-  enum identity: IDENTITES
+  enum identity: IDENTITIES
 
   delegate :name, :short_name,
            to: :organization, prefix: true, allow_nil: true
@@ -41,7 +41,7 @@ class UserIdentity < ActiveRecord::Base
   before_save :link_to_user
 
   def self.identity_attributes_for_select
-    IDENTITES.map { |k, v| [I18n.t(k, scope: :'activerecord.attributes.user_identity.identities'), k] }
+    IDENTITIES.map { |k, v| [I18n.t(k, scope: :'activerecord.attributes.user_identity.identities'), k] }
   end
 
   def ensure_user_identity_has_valid_original_department

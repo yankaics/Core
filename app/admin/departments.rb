@@ -60,12 +60,12 @@ ActiveAdmin.register Department do
 
   form do |f|
     f.inputs do
-      f.input :organization_code, as: :select, collection: options_for_select(Organization.all.map { |o| [o.name, o.code] }, department.organization_code) if current_admin.root?
+      f.input :organization_code, as: :select, collection: options_for_select(Organization.all_for_select, department.organization_code) if current_admin.root?
       f.input :code
       f.input :name
       f.input :short_name
       f.input :parent_code if current_admin.root?
-      f.input :parent, as: :select, collection: options_for_select(current_admin.organization.departments.all.map { |d| [d.name, d.code] }, department.parent_code) if !current_admin.root?
+      f.input :parent, as: :select, collection: options_for_select(current_admin.organization.departments_for_select, department.parent_code) if !current_admin.root?
       f.input :group
     end
     f.actions
