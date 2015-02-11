@@ -1,6 +1,6 @@
-set_fieldset :organization, default_fields: [:code, :name],
-                            permitted_fields: [:code, :name]
-set_include(:organization)
+set_fieldset :organization, default_fields: [:code, :name, :short_name],
+                            permitted_fields: [:code, :name, :short_name]
+set_inclusion :organization
 
 object @organization
 attributes(*fieldset[:organization])
