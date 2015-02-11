@@ -7,7 +7,7 @@ ActiveAdmin.register Department do
 
   controller do
     def scoped_collection
-      super.includes(:organization, :parent)
+      super#.includes(:organization, :parent)
     end
   end
 

@@ -9,7 +9,7 @@ ActiveAdmin.register UserIdentity do
     before_action :set_current_admin
 
     def scoped_collection
-      super.includes(:user, :organization, :department, :original_department)
+      super#.includes(:user, :organization, :department, :original_department)
     end
 
     def set_current_admin
