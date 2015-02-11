@@ -5,10 +5,9 @@ class Department < ActiveRecord::Base
   scope :not_root, -> { where.not(parent: nil) }
 
   belongs_to :organization, primary_key: :code, foreign_key: :organization_code
-  has_many :departments, ->(o) { (o && o.respond_to?(:organization_code)) ? where(:'departments.organization_code' => o.organization_code) : all },
-           class_name: :Department, primary_key: :code, foreign_key: :parent_code, dependent: :destroy
-  belongs_to :parent, ->(o) { (o && o.respond_to?(:organization_code)) ? where(:'departments.organization_code' => o.organization_code) : all },
-             class_name: :Department, primary_key: :code, foreign_key: :parent_code
+  has_many :departments, class_name: :Department, primary_key: :key, foreign_key: :parent_key,
+                         dependent: :destroy
+  belongs_to :parent, class_name: :Department, primary_key: :key, foreign_key: :parent_key
   has_many :user_identities, primary_key: :code, foreign_key: :department_code
   has_many :users, through: :user_identities
 
@@ -17,8 +16,19 @@ class Department < ActiveRecord::Base
   validates :code, uniqueness: { scope: :organization_code }
   validates :organization, :code, :name, :short_name, presence: true
 
+  before_validation :update_keys
+
   # UserIdentity::IDENTITES.keys.each do |identity|
   #   define_method identity.to_s.pluralize do
   #   end
   # end
+
+  def update_keys
+    self.key = "#{organization_code}-#{code}"
+    if parent_code
+      self.parent_key = "#{organization_code}-#{parent_code}"
+    else
+      self.parent_key = nil
+    end
+  end
 end

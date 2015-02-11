@@ -19,9 +19,9 @@ class UserIdentity < ActiveRecord::Base
   has_one :primary_user, class_name: :User, foreign_key: :primary_identity_id
   belongs_to :email_pattern
   belongs_to :organization, primary_key: :code, foreign_key: :organization_code
-  belongs_to :department, ->(o) { (o && o.respond_to?(:organization_code)) ? where(organization_code: o.organization_code) : all },
-             primary_key: :code, foreign_key: :department_code
-  belongs_to :original_department, ->(o) { (o && o.respond_to?(:organization_code)) ? where(organization_code: o.organization_code) : all }, class_name: Department, primary_key: :code, foreign_key: :original_department_code
+  belongs_to :department, primary_key: :key, foreign_key: :department_key
+  belongs_to :original_department, class_name: Department,
+                                   primary_key: :key, foreign_key: :original_department_key
 
   enum identity: IDENTITES
 
@@ -37,6 +37,7 @@ class UserIdentity < ActiveRecord::Base
   validates :organization, presence: true
   validates_with UserIdentityValidator
 
+  before_validation :update_keys
   after_validation :ensure_user_identity_has_valid_original_department
   before_save :link_to_user
 
@@ -47,6 +48,7 @@ class UserIdentity < ActiveRecord::Base
   def ensure_user_identity_has_valid_original_department
     return unless department.presence && !original_department.presence
     self.original_department = department
+    update_keys
   end
 
   def link_to_user
@@ -56,6 +58,22 @@ class UserIdentity < ActiveRecord::Base
       self.user = user_email.user
     else
       self.user = nil
+    end
+  end
+
+  def update_keys
+    self.key = "#{organization_code}-#{uid}"
+
+    if department_code
+      self.department_key = "#{organization_code}-#{department_code}"
+    else
+      self.department_key = nil
+    end
+
+    if original_department_code
+      self.original_department_key = "#{organization_code}-#{original_department_code}"
+    else
+      self.original_department_key = nil
     end
   end
 end
