@@ -83,7 +83,7 @@ zh-TW:
           student: "同學"
           staff: "老師"
           lecturer: "老師"
-          professor: "教授"
+          professor: "老師"
       admin:
         username: "帳號"
         password: "密碼"
