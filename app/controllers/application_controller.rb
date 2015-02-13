@@ -5,9 +5,9 @@ class ApplicationController < ActionController::Base
 
   def refresh_site_identity_token
     if current_user
-      SiteIdentityToken::MaintainService.create_cookie_token(cookies, current_user)
+      SiteIdentityTokenService.create(cookies, current_user)
     else
-      SiteIdentityToken::MaintainService.destroy_cookie_token(cookies)
+      SiteIdentityTokenService.destroy(cookies)
     end
   end
 end

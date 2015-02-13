@@ -13,7 +13,7 @@ RSpec.describe CoreSessionsController, :type => :controller do
       it "sets the identity_token in cookie" do
         @request.env["devise.mapping"] = Devise.mappings[:user]
         get :refresh_it
-        expect(response.cookies['_identity_token']).to eq SiteIdentityToken::MaintainService.generate_token(@user)
+        expect(response.cookies['_identity_token']).to eq SiteIdentityTokenService.generate(@user)
       end
     end
 

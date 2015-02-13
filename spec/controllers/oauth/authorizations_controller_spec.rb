@@ -20,7 +20,7 @@ RSpec.describe OAuth::AuthorizationsController, :type => :controller do
       end
 
       it "sets the identity_token in cookie" do
-        expect(response.cookies['_identity_token']).to eq SiteIdentityToken::MaintainService.generate_token(user)
+        expect(response.cookies['_identity_token']).to eq SiteIdentityTokenService.generate(user)
       end
     end
 
@@ -30,7 +30,7 @@ RSpec.describe OAuth::AuthorizationsController, :type => :controller do
       end
 
       it "sets the identity_token in cookie" do
-        expect(response.cookies['_identity_token']).to eq SiteIdentityToken::MaintainService.generate_token(user)
+        expect(response.cookies['_identity_token']).to eq SiteIdentityTokenService.generate(user)
       end
     end
   end

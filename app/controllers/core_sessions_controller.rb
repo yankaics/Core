@@ -49,7 +49,7 @@ class CoreSessionsController < Devise::SessionsController
   private
 
   def check_redirect_to
-    core_domain = SiteIdentityToken::MaintainService.domain
+    core_domain = SiteIdentityTokenService.domain
     self.redirect_url = params[:redirect_to] || request.env["HTTP_REFERER"]
 
     return unless redirect_url

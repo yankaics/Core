@@ -3,7 +3,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
     @user = User.from_facebook(request.env["omniauth.auth"])
 
     # if @user...
-      SiteIdentityToken::MaintainService.create_cookie_token(cookies, @user)
+      SiteIdentityTokenService.create(cookies, @user)
 
       # redirect new users to verify their email
       if @user.primary_identity_id.blank? && @user.created_at > 2.hours.ago

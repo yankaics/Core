@@ -90,11 +90,11 @@ eod
     # On background: identity_token cookie should be set
     # (ignoring the small time difference)
     if (page.driver.request.cookies['_identity_token'] !=
-        SiteIdentityToken::MaintainService.generate_token(user))
+        SiteIdentityTokenService.generate(user))
       visit('/refresh_it')
     end
     expect(page.driver.request.cookies['_identity_token'][0..-4])
-      .to eq SiteIdentityToken::MaintainService.generate_token(user)[0..-4]
+      .to eq SiteIdentityTokenService.generate(user)[0..-4]
 
     # After logout
     visit('/logout')
@@ -123,11 +123,11 @@ eod
     # On background: identity_token cookie should be set
     # (ignoring the small time difference)
     if (page.driver.request.cookies['_identity_token'] !=
-        SiteIdentityToken::MaintainService.generate_token(user))
+        SiteIdentityTokenService.generate(user))
       visit('/refresh_it')
     end
     expect(page.driver.request.cookies['_identity_token'][0..-4])
-      .to eq SiteIdentityToken::MaintainService.generate_token(user)[0..-4]
+      .to eq SiteIdentityTokenService.generate(user)[0..-4]
 
     # After logout
     visit('/logout')
@@ -175,11 +175,11 @@ eod
 
     # On background: identity_token cookie should be maintained...
     if (page.driver.request.cookies['_identity_token'] !=
-        SiteIdentityToken::MaintainService.generate_token(user))
+        SiteIdentityTokenService.generate(user))
       visit('/refresh_it')
     end
     expect(page.driver.request.cookies['_identity_token'][0..-4])
-      .to eq SiteIdentityToken::MaintainService.generate_token(user)[0..-4]
+      .to eq SiteIdentityTokenService.generate(user)[0..-4]
 
     visit('/logout')
 
