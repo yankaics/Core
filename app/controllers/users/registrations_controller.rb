@@ -18,6 +18,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
         end
         if resource.confirmed?
           sign_in resource
+          SiteIdentityTokenService.update(cookies, current_user)
           redirect_to @redirect_url and return if @redirect_url
         else
           set_flash_message :notice, :"signed_up_but_#{resource.inactive_message}" if is_flashing_format?

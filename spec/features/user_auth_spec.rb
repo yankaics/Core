@@ -214,6 +214,9 @@ eod
 
     # The user should be redirected to the given path
     expect(current_path).to eq('/my_account/emails')
+
+    expect(page.driver.request.cookies['_identity_token'])
+      .not_to be_blank
   end
 
   scenario "returning User signs in using an invitation code with Facebook" do
@@ -236,6 +239,9 @@ eod
 
     # The user should be redirected to the given path
     expect(current_path).to eq('/my_account/emails')
+
+    expect(page.driver.request.cookies['_identity_token'])
+      .not_to be_blank
   end
 
   scenario "new User signs up using an invitation code with email" do
@@ -298,6 +304,9 @@ eod
 
     # The user should be redirected to the given path
     expect(current_path).to eq('/my_account/emails')
+
+    expect(page.driver.request.cookies['_identity_token'])
+      .not_to be_blank
   end
 
   scenario "User cancels using an invitation code" do
