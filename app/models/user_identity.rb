@@ -44,6 +44,14 @@ class UserIdentity < ActiveRecord::Base
     IDENTITIES.map { |k, v| [I18n.t(k, scope: :'activerecord.attributes.user_identity.identities'), k] }
   end
 
+  def self.human_identity_title(identity)
+    defaults = [:"activerecord.attributes.user_identity.identity_titles.#{identity}"]
+    defaults << identity.to_s.humanize
+    options = {}
+    options[:default] = defaults
+    I18n.translate(defaults.shift, options)
+  end
+
   def ensure_user_identity_has_valid_original_department
     return unless department.presence && !original_department.presence
     self.original_department = department

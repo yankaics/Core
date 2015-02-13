@@ -3,7 +3,17 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
     @user = User.from_facebook(request.env["omniauth.auth"])
 
     # if @user...
-      SiteIdentityToken::MaintainService.create_cookie_token(cookies, @user)
+      SiteIdentityTokenService.create(cookies, @user)
+
+      # if an invitation_code exists, activate the email for that user
+      if session[:invitation_code].present?
+        InvitationCodeService.invite(resource, session[:invitation_code])
+        @redirect_url = session[:invitation_redirect_url] || root_path
+        session[:invitation_code] = nil
+        session[:invitation_redirect_url] = nil
+        sign_in @user
+        redirect_to @redirect_url and return if @redirect_url
+      end
 
       # redirect new users to verify their email
       if @user.primary_identity_id.blank? && @user.created_at > 2.hours.ago

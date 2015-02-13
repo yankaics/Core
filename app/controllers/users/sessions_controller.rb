@@ -1,6 +1,18 @@
-class CoreSessionsController < Devise::SessionsController
+class Users::SessionsController < Devise::SessionsController
   after_filter :refresh_site_identity_token, only: [:destroy, :new, :create]
   attr_accessor :can_redirect, :redirect_url, :redirect_url_query, :redirect_url_uri
+
+  def new
+    if session[:invitation_code].present?
+      invited_guest_email = InvitationCodeService.verify(session[:invitation_code])
+      @invited_guest_identity = UserIdentity.unlinked.find_by(email: invited_guest_email)
+      if @invited_guest_identity.present?
+        @invited_guest_identity.name = @invited_guest_identity.email if @invited_guest_identity.name.blank?
+      end
+    end
+
+    super
+  end
 
   # Sign in
   def create
@@ -9,6 +21,17 @@ class CoreSessionsController < Devise::SessionsController
     set_flash_message(:notice, :signed_in) if is_flashing_format?
     sign_in(resource_name, resource)
     yield resource if block_given?
+
+    # if an invitation_code exists, activate the email for that user
+    if session[:invitation_code].present?
+      InvitationCodeService.invite(current_user, session[:invitation_code])
+      redirect_url = session[:invitation_redirect_url] || root_path
+
+      session[:invitation_code] = nil
+      session[:invitation_redirect_url] = nil
+
+      redirect_to redirect_url and return
+    end
 
     # redirect new users to verify their email
     if current_user.primary_identity_id.blank? && current_user.created_at > 2.hours.ago
@@ -49,7 +72,7 @@ class CoreSessionsController < Devise::SessionsController
   private
 
   def check_redirect_to
-    core_domain = SiteIdentityToken::MaintainService.domain
+    core_domain = SiteIdentityTokenService.domain
     self.redirect_url = params[:redirect_to] || request.env["HTTP_REFERER"]
 
     return unless redirect_url

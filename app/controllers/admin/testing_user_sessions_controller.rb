@@ -5,7 +5,7 @@ class Admin::TestingUserSessionsController < ApplicationController
     return unless current_admin.root?
     @user = User.find(params[:id])
     logger.info "Admin #{current_admin.id} is logging in as user #{@user.id}"
-    SiteIdentityToken::MaintainService.create_cookie_token(cookies, @user) if @user.confirmed?
+    SiteIdentityTokenService.create(cookies, @user) if @user.confirmed?
     sign_in_and_redirect @user, event: :authentication
   end
 end
