@@ -1,7 +1,13 @@
 <div style="background-color: #DDD; background-repeat: no-repeat; background-size:cover;overflow: hidden; padding-bottom: 100px;min-height: 100vh;">
 
   <div style=" max-width:800px; margin-top: 50px; margin-bottom: 50px; margin-right:auto; margin-left: auto; background-color: #fff; padding: 30px;top: 50px; position: relative; ">
-    <h2 style="text-align:center; color:#5E5E5E;">登入 / 註冊</h2>
+    <% if @invited_guest_identity %>
+      <h2 style="text-align:center; color:#5E5E5E;">嗨，<%= "#{@invited_guest_identity.name} #{UserIdentity.human_identity_title(@invited_guest_identity.identity)}" %></h2>
+      <p style="text-align: center;">您可以建立一個新的帳號，或使用現有帳號登入...</p>
+      <p style="text-align: center;"><%= link_to "不是 #{@invited_guest_identity.name} 嗎？", invitations_reject_path %></p>
+    <% else %>
+      <h2 style="text-align:center; color:#5E5E5E;">登入 / 註冊</h2>
+    <% end %>
     <div class="row">
       <div class="col-md-12">
         <%= link_to raw('<div class="form-actions fb-login-btn" style="margin-left: auto; margin-right: auto; margin-top:40px; margin-bottom:40px; max-width:300px; text-align: center;">Sign in with Facebook</div>'), user_omniauth_authorize_path(:facebook) %>

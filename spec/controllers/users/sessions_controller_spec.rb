@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe CoreSessionsController, :type => :controller do
+RSpec.describe Users::SessionsController, :type => :controller do
   describe "GET refresh_it" do
     context "user currently signed in" do
       before do

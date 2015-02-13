@@ -49,16 +49,18 @@ class UserEmail < ActiveRecord::Base
 
   def confirm
     return false unless valid?
-    update(confirmed_at: Time.now, confirmation_token: nil)
-    # find if there is a predefined identity with this email
-    identity = UserIdentity.find_by(user_id: nil, email: email)
-    if identity
-      identity.update(user: user)
-      identity.update(department_code: department_code) unless department_code.blank?
-    # or matching email patterns
-    elsif (pattern_identity = EmailPattern.identify(email))
-      identity = user.identities.create!(pattern_identity)
-      identity.update(department_code: department_code) unless department_code.blank?
+    ActiveRecord::Base.transaction do
+      update(confirmed_at: Time.now, confirmation_token: nil)
+      # find if there is a predefined identity with this email
+      identity = UserIdentity.find_by(user_id: nil, email: email)
+      if identity
+        identity.update(user: user)
+        identity.update(department_code: department_code) unless department_code.blank?
+      # or matching email patterns
+      elsif (pattern_identity = EmailPattern.identify(email))
+        identity = user.identities.create!(pattern_identity)
+        identity.update(department_code: department_code) unless department_code.blank?
+      end
     end
     return false unless user.reload.valid?
     self

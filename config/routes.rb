@@ -9,7 +9,7 @@ Rails.application.routes.draw do
 
   devise_for :users,
              :controllers => {
-               :sessions => "core_sessions",
+               :sessions => "users/sessions",
                :omniauth_callbacks => "users/omniauth_callbacks",
                :registrations => "users/registrations",
                :confirmations => "users/confirmations"
@@ -22,7 +22,7 @@ Rails.application.routes.draw do
              }
 
   devise_scope :user do
-    get '/refresh_it' => 'core_sessions#refresh_it'
+    get '/refresh_it' => 'users/sessions#refresh_it'
   end
 
   use_doorkeeper do
@@ -49,6 +49,9 @@ Rails.application.routes.draw do
   end
 
   get '/eula' => 'pages#eula'
+
+  get '/invitations' => 'users/invitations#receive'
+  get '/invitations/reject' => 'users/invitations#reject'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

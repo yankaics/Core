@@ -78,6 +78,12 @@ zh-TW:
           staff: "教職員"
           lecturer: "講師"
           professor: "教授"
+        identity_titles:
+          guest: "貴賓"
+          student: "同學"
+          staff: "老師"
+          lecturer: "老師"
+          professor: "教授"
       admin:
         username: "帳號"
         password: "密碼"

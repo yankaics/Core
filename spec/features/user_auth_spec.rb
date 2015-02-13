@@ -197,4 +197,118 @@ eod
     # New users that didn't have an identity should be redirected to the new email page
     expect(current_path).to eq new_my_account_email_path
   end
+
+  scenario "new User signs in using an invitation code with Facebook" do
+    @identity = create(:user_identity)
+    @invitation_code = InvitationCodeService.generate(@identity.email)
+
+    # Go to the invitation URL and click on 'Sign in with Facebook' button
+    visit invitations_path(code: @invitation_code, redirect_to: '/my_account/emails')
+    expect(page).to have_content(@identity.name)
+    click_on('Sign in with Facebook', match: :first)
+
+    # Get the newly created user, he/she should be confirmed and have the corresponding identity
+    @user = User.last
+    expect(@user).to be_confirmed
+    expect(@user.organization_code).to eq(@identity.organization_code)
+
+    # The user should be redirected to the given path
+    expect(current_path).to eq('/my_account/emails')
+  end
+
+  scenario "returning User signs in using an invitation code with Facebook" do
+    @identity = create(:user_identity)
+    @invitation_code = InvitationCodeService.generate(@identity.email)
+
+    # An existing user with identity, but not linked with an FB account
+    @user = create(:user, :with_identity, email: 'mock_user@facebook.com')
+    expect(@user.identities).not_to include(@identity)
+
+    # Go to the invitation URL and click on 'Sign in with Facebook' button
+    visit invitations_path(code: @invitation_code, redirect_to: '/my_account/emails')
+    expect(page).to have_content(@identity.name)
+    click_on('Sign in with Facebook', match: :first)
+
+    # The user should has the corresponding identity
+    @user.reload
+    expect(@user).to be_confirmed
+    expect(@user.identities).to include(@identity)
+
+    # The user should be redirected to the given path
+    expect(current_path).to eq('/my_account/emails')
+  end
+
+  scenario "new User signs up using an invitation code with email" do
+    @identity = create(:user_identity)
+    @invitation_code = InvitationCodeService.generate(@identity.email)
+
+    # Prepare the new user's credentials
+    user_rigister_credentials = attributes_for(:user).slice(:name, :email, :password, :password_confirmation)
+    user_login_credentials = user_rigister_credentials.slice(:email, :password)
+
+    # Go to the invitation URL and fill the registration form
+    visit invitations_path(code: @invitation_code, redirect_to: '/my_account/emails')
+    expect(page).to have_content(@identity.name)
+    within ".registration" do
+      fill_form_and_submit(:user, user_rigister_credentials)
+    end
+
+    # Get the newly created user, he/she should be confirmed and has the corresponding identity
+    @user = User.last
+    expect(@user).to be_confirmed
+    expect(@user.organization_code).to eq(@identity.organization_code)
+
+    # The user should be redirected to the given path
+    expect(current_path).to eq('/my_account/emails')
+
+    # On background: identity_token cookie should be maintained because the user is automatically signed in
+    if (page.driver.request.cookies['_identity_token'] !=
+        SiteIdentityTokenService.generate(@user))
+      visit('/refresh_it')
+    end
+    expect(page.driver.request.cookies['_identity_token'][0..-4])
+      .to eq SiteIdentityTokenService.generate(@user)[0..-4]
+  end
+
+  scenario "old User signs in using an invitation code with email" do
+    @identity = create(:user_identity)
+    @invitation_code = InvitationCodeService.generate(@identity.email)
+    user_rigister_credentials = attributes_for(:user).slice(:name, :email, :password, :password_confirmation)
+    user_login_credentials = user_rigister_credentials.slice(:email, :password)
+    @user = create(:user, user_rigister_credentials)
+    @user.confirm!
+
+    # The created user can sign in
+    login_as @user
+    visit(refresh_it_path)
+    expect(page.driver.request.cookies['_identity_token']).not_to be_blank
+
+    # Go to the invitation URL and login (again. users should be signed out after clicking the invitation link)
+    visit invitations_path(code: @invitation_code, redirect_to: '/my_account/emails')
+    expect(page).to have_content(@identity.name)
+    expect(page.driver.request.cookies['_identity_token']).to be_blank
+    within ".login" do
+      fill_form(:user, user_login_credentials)
+      find('form input[type=submit]').click
+    end
+
+    # The user should have the corresponding identity
+    @user.reload
+    expect(@user.identities).to include(@identity)
+
+    # The user should be redirected to the given path
+    expect(current_path).to eq('/my_account/emails')
+  end
+
+  scenario "User cancels using an invitation code" do
+    @identity = create(:user_identity)
+    @invitation_code = InvitationCodeService.generate(@identity.email)
+
+    visit invitations_path(code: @invitation_code, redirect_to: '/my_account/emails')
+    expect(page).to have_content(@identity.name)
+
+    visit(invitations_reject_path)
+    visit(new_user_session_path)
+    expect(page).not_to have_content(@identity.name)
+  end
 end
