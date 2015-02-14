@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/Neson/rails-settings-cached.git
-  revision: e2f24c436c48c6053cd4fabf056daa1543a8787e
+  revision: 8c907acf9976dad76d486079f5bc950fb8d301f5
   specs:
     rails-settings-cached (0.4.1)
       rails (>= 4.0.0)
