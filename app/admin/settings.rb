@@ -4,6 +4,7 @@ ActiveAdmin.register_page "Settings" do
   content do
 
     if current_admin.root?
+      Settings.reload
 
       form :action => admin_settings_update_path, :method => :post do |f|
         f.input :name => 'authenticity_token', :type => :hidden, :value => form_authenticity_token.to_s
