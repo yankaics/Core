@@ -249,7 +249,7 @@ eod
     @invitation_code = InvitationCodeService.generate(@identity.email)
 
     # Prepare the new user's credentials
-    user_rigister_credentials = attributes_for(:user).slice(:name, :email, :password, :password_confirmation)
+    user_rigister_credentials = attributes_for(:user, email: @identity.email).slice(:name, :email, :password, :password_confirmation)
     user_login_credentials = user_rigister_credentials.slice(:email, :password)
 
     # Go to the invitation URL and fill the registration form
@@ -274,6 +274,36 @@ eod
     end
     expect(page.driver.request.cookies['_identity_token'][0..-4])
       .to eq SiteIdentityTokenService.generate(@user)[0..-4]
+  end
+
+  scenario "new User signs up using an invitation code with a different email" do
+    @identity = create(:user_identity)
+    @invitation_code = InvitationCodeService.generate(@identity.email)
+
+    # Prepare the new user's credentials
+    user_rigister_credentials = attributes_for(:user).slice(:name, :email, :password, :password_confirmation)
+    user_login_credentials = user_rigister_credentials.slice(:email, :password)
+
+    # Go to the invitation URL and fill the registration form
+    visit invitations_path(code: @invitation_code, redirect_to: '/my_account/emails')
+    expect(page).to have_content(@identity.name)
+    within ".registration" do
+      fill_form_and_submit(:user, user_rigister_credentials)
+    end
+
+    # Get the newly created user, he/she should not be confirmed and has the corresponding identity
+    @user = User.last
+    expect(@user).not_to be_confirmed
+    expect(@user.organization_code).to eq(@identity.organization_code)
+
+    # Finds his/her account confirmation_path from his/her email inbox
+    confirmation_path = open_last_email.body.match(/confirmation\?confirmation_token=[^"]+/)
+
+    # Visiting the confirmation path should confirm the account
+    expect do
+      visit "/#{confirmation_path}"
+      @user.reload
+    end.to change { @user.confirmed? }.from(false).to(true)
   end
 
   scenario "old User signs in using an invitation code with email" do

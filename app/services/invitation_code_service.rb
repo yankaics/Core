@@ -22,7 +22,7 @@ module InvitationCodeService
       email = verify(code)
       return nil unless email
       ActiveRecord::Base.transaction do
-        user.confirm! unless user.confirmed?
+        user.confirm! if !user.confirmed? && user.email == email
         user.emails.create(email: email)
         user.unconfirmed_emails.find_by(email: email).confirm!
       end
