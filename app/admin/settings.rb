@@ -72,51 +72,59 @@ ActiveAdmin.register_page "Settings" do
             ol do
 
               # li do
-              #   f.input_setting 'Title of Left-1 Chart on Dashboard', :admin_dashboard_l1_chart_title
+              #   f.input_setting 'Title of Left-1 Chart', :admin_dashboard_l1_chart_title
               # end
 
               # li do
-              #   f.input_setting 'Title URL of Left-1 Chart on Dashboard', :admin_dashboard_l1_chart_title_url
+              #   f.input_setting 'Title URL of Left-1 Chart', :admin_dashboard_l1_chart_title_url
               # end
 
               li do
-                f.input_setting 'Code of Left-1 Chart on Dashboard', :admin_dashboard_l1_chart_code
+                f.input_setting "Code of Left-1 Chart", "admin_dashboard_l1_chart_code"
+              end
+
+              (2..8).each do |i|
+
+                li do
+                  f.input_setting "Title of Left-#{i} Chart", "admin_dashboard_l#{i}_chart_title"
+                end
+
+                li do
+                  f.input_setting "Title URL of Left-#{i} Chart", "admin_dashboard_l#{i}_chart_title_url"
+                end
+
+                li do
+                  f.input_setting "Code of Left-#{i} Chart", "admin_dashboard_l#{i}_chart_code"
+                end
+
               end
 
               li do
-                f.input_setting 'Title of Left-2 Chart on Dashboard', :admin_dashboard_l2_chart_title
+                f.input_setting 'Title of Right-1 Chart', :admin_dashboard_r1_chart_title
               end
 
               li do
-                f.input_setting 'Title URL of Left-2 Chart on Dashboard', :admin_dashboard_l2_chart_title_url
+                f.input_setting 'Title URL of Right-1 Chart', :admin_dashboard_r1_chart_title_url
               end
 
               li do
-                f.input_setting 'Code of Left-2 Chart on Dashboard', :admin_dashboard_l2_chart_code
+                f.input_setting 'Code of Right-1 Chart', :admin_dashboard_r1_chart_code
               end
 
-              li do
-                f.input_setting 'Title of Right-1 Chart on Dashboard', :admin_dashboard_r1_chart_title
-              end
+              (2..8).each do |i|
 
-              li do
-                f.input_setting 'Title URL of Right-1 Chart on Dashboard', :admin_dashboard_r1_chart_title_url
-              end
+                li do
+                  f.input_setting "Title of Right-#{i} Chart", "admin_dashboard_r#{i}_chart_title"
+                end
 
-              li do
-                f.input_setting 'Code of Right-1 Chart on Dashboard', :admin_dashboard_r1_chart_code
-              end
+                li do
+                  f.input_setting "Title URL of Right-#{i} Chart", "admin_dashboard_r#{i}_chart_title_url"
+                end
 
-              li do
-                f.input_setting 'Title of Right-2 Chart on Dashboard', :admin_dashboard_r2_chart_title
-              end
+                li do
+                  f.input_setting "Code of Right-#{i} Chart", "admin_dashboard_r#{i}_chart_code"
+                end
 
-              li do
-                f.input_setting 'Title URL of Right-2 Chart on Dashboard', :admin_dashboard_r2_chart_title_url
-              end
-
-              li do
-                f.input_setting 'Code of Right-2 Chart on Dashboard', :admin_dashboard_r2_chart_code
               end
 
             end

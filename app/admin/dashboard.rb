@@ -21,7 +21,7 @@ ActiveAdmin.register_page "Dashboard" do
           ul do
             ENV.each do |key, value|
               if key =~ /key$/ || key =~ /secret/ || key =~ /pepper$/ ||
-                 key =~ /KEY$/ || key =~ /SECRET/ || key =~ /PEPPER$/ || key =~ /DATABASE$/
+                 key =~ /KEY$/ || key =~ /SECRET/ || key =~ /PEPPER$/ || key =~ /DATABASE/
                 li "#{key}: #{value[0..7] + value.gsub(/..?.?/, '*')}"
               else
                 value = value[0..50] + '...' if value.length > 50
@@ -30,9 +30,11 @@ ActiveAdmin.register_page "Dashboard" do
             end
           end if current_admin.root?
         end
-        if Settings['admin_dashboard_l2_chart_code'].to_s != ''
-          panel "<a target=\"_blank\" href=\"#{Settings['admin_dashboard_l2_chart_title_url']}\">#{Settings['admin_dashboard_l2_chart_title']}</a>".html_safe do
-            div Settings['admin_dashboard_l2_chart_code'].html_safe
+        (2..8).each do |i|
+          if Settings["admin_dashboard_l#{i}_chart_code"].to_s != ''
+            panel "<a target=\"_blank\" href=\"#{Settings["admin_dashboard_l#{i}_chart_title_url"]}\">#{Settings["admin_dashboard_l#{i}_chart_title"]}</a>".html_safe do
+              div Settings["admin_dashboard_l#{i}_chart_code"].html_safe
+            end
           end
         end
       end
@@ -75,9 +77,11 @@ ActiveAdmin.register_page "Dashboard" do
             column("IP") { |user| user.current_sign_in_ip }
           end
         end
-        if Settings['admin_dashboard_r2_chart_code'].to_s != ''
-          panel "<a target=\"_blank\" href=\"#{Settings['admin_dashboard_r2_chart_title_url']}\">#{Settings['admin_dashboard_r2_chart_title']}</a>".html_safe do
-            div Settings['admin_dashboard_r2_chart_code'].html_safe
+        (2..8).each do |i|
+          if Settings["admin_dashboard_r#{i}_chart_code"].to_s != ''
+            panel "<a target=\"_blank\" href=\"#{Settings["admin_dashboard_r#{i}_chart_title_url"]}\">#{Settings["admin_dashboard_r#{i}_chart_title"]}</a>".html_safe do
+              div Settings["admin_dashboard_r#{i}_chart_code"].html_safe
+            end
           end
         end
       end
