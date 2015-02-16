@@ -25,8 +25,11 @@ ActiveAdmin.register_page "Settings" do
 
         def f.checkbox_setting(label_text, settings_name)
           label label_text
-          input :id => "cb-#{settings_name.to_s}", :type => 'checkbox', :onchange => "if (this.checked) { document.getElementById('ip-#{settings_name.to_s}').value = 'true'; } else { document.getElementById('ip-#{settings_name.to_s}').value = 'false'; }", "#{Settings[settings_name] ? 'checked' : 'not_checked'}" => 'checked'
-          input :name => "settings[#{settings_name.to_s}]", :id => "ip-#{settings_name.to_s}", :type => 'hidden'
+          input :id => "cb-#{settings_name}", :type => 'checkbox', :onchange => "if (this.checked) { document.getElementById('ip-#{settings_name}').value = 'true'; } else { document.getElementById('ip-#{settings_name}').value = 'false'; }", :onload => "alert('aa')", "#{Settings[settings_name] ? 'checked' : 'not_checked'}" => 'checked'
+          input :name => "settings[#{settings_name}]", :id => "ip-#{settings_name}", :type => 'hidden'
+          script type: 'text/javascript' do
+            "$('#cb-#{settings_name}').change();".html_safe
+          end
         end
 
         # Settings form
