@@ -1,8 +1,7 @@
 unless @inclusion_field[locals[:self_resource]].blank?
   @inclusion_field[locals[:self_resource]].each do |i_field|
     # include child
-    if inclusion[locals[:self_resource]].include?(i_field[:field]) ||
-       (inclusion[locals[:self_resource]].blank? && i_field[:default_included])
+    if inclusion[locals[:self_resource]].include?(i_field[:field])
       child i_field[:field], root: i_field[:field], object_root: false do
         template = (i_field[:class_name] || i_field[:field]).to_s.underscore.singularize
         extends template

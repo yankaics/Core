@@ -14,7 +14,7 @@ class API::V1::Organizations < API::V1
       optional :fields, desc: "Return only specific fields in resource object."
       optional :include, desc: "Returning compound documents that include specific associated objects."
     end
-    get "/", rabl: 'organization' do
+    get rabl: 'organization' do
 
       fieldset_for :organization
 

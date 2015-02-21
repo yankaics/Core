@@ -53,14 +53,36 @@ module APIResourceFieldsettable
       # splits the string into array of symbles
       @fieldset[resource] = @fieldset[resource] ? @fieldset[resource].split(',').map(&:to_sym) : nil
 
-      # set default fields?
-      @fieldset[resource] = default_fields if @fieldset[resource].blank? && !default_fields.blank?
+      # set default fields if default fields are specified and the requested fieldset is blank
+      @fieldset[resource] = default_fields if @fieldset[resource].blank? && default_fields.present?
 
       # filter out unpermitted fields by intersecting them
-      @fieldset[resource] &= permitted_fields if !@fieldset[resource].blank? && !permitted_fields.blank?
+      @fieldset[resource] &= permitted_fields if @fieldset[resource].present? && permitted_fields.present?
 
-      # set default fields to permitted_fields?
-      @fieldset[resource] = permitted_fields if show_all_permitted_fields_by_default && @fieldset[resource].blank? && !permitted_fields.blank?
+      # set default fields to permitted_fields if needed
+      @fieldset[resource] = permitted_fields if show_all_permitted_fields_by_default && @fieldset[resource].blank? && permitted_fields.present?
+    end
+
+    ##
+    # View Helper to set the default and permitted fields.
+    #
+    def set_fieldset(resource, default_fields: [], permitted_fields: [])
+      @fieldset ||= {}
+      @fieldset[resource] = default_fields if @fieldset[resource].blank?
+      @fieldset[resource] &= permitted_fields
+    end
+
+    ##
+    # Getter for the fieldset data.
+    #
+    def fieldset(resource = nil, field = nil)
+      if resource.blank?
+        @fieldset ||= {}
+      elsif field.blank?
+        (@fieldset ||= {})[resource] ||= []
+      else
+        fieldset(resource).include?(field)
+      end
     end
   end
 end

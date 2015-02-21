@@ -16,7 +16,7 @@ class API::V1::Me < API::V1
       optional :fields, desc: "Return only specific fields in resource object."
       optional :include, desc: "Returning compound documents that include specific associated objects."
     end
-    get "/", rabl: 'user' do
+    get rabl: 'user' do
       permitted_attrs = []
       permitted_attrs += User::PUBLIC_ATTRS if scopes.include? :public
       permitted_attrs += User::EMAIL_ATTRS if scopes.include? :email
@@ -38,12 +38,12 @@ class API::V1::Me < API::V1
       @user = current_user
     end
 
-    get "/emails", rabl: 'user_email' do
+    get :emails, rabl: 'user_email' do
       guard! scopes: ['identity']
       @user_email = current_user.emails
     end
 
-    get "/identities", rabl: 'user_identity' do
+    get :identities, rabl: 'user_identity' do
       guard! scopes: ['identity']
       @user_identity = current_user.identities
     end
