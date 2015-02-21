@@ -21,4 +21,8 @@ class Department < ActiveRecord::Base
   #   define_method identity.to_s.pluralize do
   #   end
   # end
+
+  def department_codes
+    department_ids
+  end
 end

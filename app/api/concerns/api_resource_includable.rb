@@ -17,13 +17,22 @@ module APIResourceIncludable
     # +resource+::
     #   +Symbol+ name of resource to receive the inclusion
     #
-    def inclusion_for(resource, default_includes: [])
-      @inclusion ||= {}
-      @inclusion[resource] = params[:include] ? params[:include].split(',').map(&:to_sym) : default_includes
+    def inclusion_for(resource, root: false, default_includes: [])
+      @inclusion ||= Hashie::Mash.new
+
+      # put the includes in place
+      if params[:include].is_a? Hash
+        @inclusion[resource] = params[:include][resource] || params[:include][resource.to_s.camelize]
+      elsif root
+        @inclusion[resource] = params[:include]
+      end
+
+      # splits the string into array of symbles
+      @inclusion[resource] = @inclusion[resource] ? @inclusion[resource].split(',').map(&:to_sym) : default_includes
     end
 
     ##
-    # View Helper to set the inclusion and default_inclusion fields.
+    # View Helper to set the inclusion and default_inclusion.
     #
     def set_inclusion(resource, default_includes: [])
       @inclusion ||= {}

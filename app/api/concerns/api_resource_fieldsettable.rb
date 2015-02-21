@@ -51,10 +51,7 @@ module APIResourceFieldsettable
       end
 
       # splits the string into array of symbles
-      @fieldset[resource] = @fieldset[resource] ? @fieldset[resource].split(',').map(&:to_sym) : nil
-
-      # set default fields if default fields are specified and the requested fieldset is blank
-      @fieldset[resource] = default_fields if @fieldset[resource].blank? && default_fields.present?
+      @fieldset[resource] = @fieldset[resource].present? ? @fieldset[resource].split(',').map(&:to_sym) : default_fields
 
       # filter out unpermitted fields by intersecting them
       @fieldset[resource] &= permitted_fields if @fieldset[resource].present? && permitted_fields.present?

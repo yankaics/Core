@@ -33,7 +33,7 @@ class API::V1::Me < API::V1
       fieldset_for :organization
       fieldset_for :department
 
-      inclusion_for :user
+      inclusion_for :user, root: true
 
       @user = current_user
     end

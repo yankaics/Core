@@ -24,6 +24,10 @@ class Organization < ActiveRecord::Base
     all.map { |u| [u.name, u.code] }
   end
 
+  def department_codes
+    department_ids
+  end
+
   def departments_for_select
     departments.all.map { |d| [d.name, d.code] }
   end
