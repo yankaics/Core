@@ -186,16 +186,19 @@ NewUserEmailBox = React.createClass
 
     @state.department = @state.departments[@state.department_code]
     baseGroup = @state.department?.group
-    if (@state.permit_changing_department_in_group || @state.permit_changing_department_in_organization) && @state.department
+    if (@state.permit_changing_department_in_group && @state.department) || @state.permit_changing_department_in_organization
+      departments = @state.departments
+      window.dd = departments
+      departments = $.extend({0: {code: '', name: '請選擇系所／部門'}}, departments) if @state.permit_changing_department_in_organization
 
       department_selector =
         `<select ref="deps"
           id="department-select"
           className="chosen-select"
           name="user_email[department_code]" >
-          {Object.keys(this.state.departments).map(function(value, index) {
-            d = this.state.departments[value];
-            if (baseGroup == d.group || permit_changing_department_in_organization)
+          {Object.keys(departments).map(function(value, index) {
+            d = departments[value];
+            if (d.name && (baseGroup == d.group || permit_changing_department_in_organization))
               return (<option
                   value={d.code} >
                     {d.name}
@@ -269,7 +272,7 @@ NewUserEmailBox = React.createClass
     </div>`
 
   componentDidUpdate: ->
-    document.getElementById('department-select')?.value = @state.department_code
+    document.getElementById('department-select')?.value = @state.department_code || ''
     $('#department-select').select2()
     $('.select2-choice').hover ->
       $('.select2-choice')[0].focus()
