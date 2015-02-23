@@ -6,16 +6,16 @@
       <p style="text-align: center;">您可以建立一個新的帳號，或使用現有帳號登入...</p>
       <p style="text-align: center;"><%= link_to "不是 #{@invited_guest_identity.name} 嗎？", invitations_reject_path %></p>
     <% else %>
-      <h2 style="text-align:center; color:#5E5E5E;">登入 / 註冊</h2>
+      <h2 style="text-align:center; color:#5E5E5E;">登入</h2>
     <% end %>
     <div class="row">
       <div class="col-md-12">
         <%= link_to raw('<div class="form-actions fb-login-btn" style="margin-left: auto; margin-right: auto; margin-top:40px; margin-bottom:40px; max-width:300px; text-align: center;">Sign in with Facebook</div>'), user_omniauth_authorize_path(:facebook) %>
         <p style="text-align: center;">登入時視同您已同意本站之<a href=<%= eula_path %> target="_blank">用戶許可協議</a></p>
-        <p style="text-align: center;">沒有 Facebook 帳號？<br>您也可以使用慣用 Email 來登入...</p>
+        <a href="#more-login-form" data-toggle="collapse">其他登入方式</a>
       </div>
     </div>
-    <div class="row more-login-field" style="overflow: hidden; min-height: 500px; ">
+    <div id="more-login-form" class="collapse row more-login-field" style="overflow: hidden; min-height: 500px; ">
       <div class="col-md-6 registration" style="padding:40px;">
         <h2 style="text-align:center; color:#5E5E5E;">註冊</h2>
         <%= simple_form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
