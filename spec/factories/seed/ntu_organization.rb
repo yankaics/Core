@@ -309,6 +309,10 @@ FactoryGirl.define do
         ], :validate => false
       )
 
+      if ntu.email_patterns.count < 1
+        create(:ntu_student_email_pattern)
+        create(:ntu_staff_email_pattern)
+      end
     end
   end
 
