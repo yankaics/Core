@@ -59,12 +59,12 @@ gem 'redcarpet'
 gem 'rouge'
 
 # Create human-friendly IDs for models
-gem 'friendly_id', '~> 5.0.4'
+gem 'friendly_id', '~> 5.1.0'
 gem 'babosa'
 gem 'ruby-pinyin'
 
 # Grape API
-gem 'grape', '~> 0.10.1'
+gem 'grape', '~> 0.11.0'
 gem 'grape-rabl'
 gem 'grape-entity'
 gem 'grape-swagger'
@@ -75,7 +75,7 @@ gem 'rack-oauth2', '~> 1.0.10'
 gem 'devise', '~> 3.4.0'
 gem 'cancancan', '~> 1.10.0'
 gem 'omniauth-facebook', '~> 2.0.0'
-gem 'doorkeeper', '~> 2.0.1'
+gem 'doorkeeper', '2.1.0'
 gem 'httparty', '~> 0.13.1'
 
 gem 'validates_email_format_of'
