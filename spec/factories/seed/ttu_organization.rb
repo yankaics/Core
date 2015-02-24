@@ -102,6 +102,29 @@ FactoryGirl.define do
         ], :validate => false
       )
 
+      if ttu.email_patterns.count < 1
+        create(:ttu_student_email_pattern)
+        create(:ttu_staff_email_pattern)
+      end
     end
+  end
+
+  factory :ttu_student_email_pattern, parent: :email_pattern do
+    priority 15
+    organization { Organization.find_by(code: 'TTU') || create(:ttu_organization) }
+    corresponded_identity UserIdentity::IDENTITIES[:student]
+    email_regexp '^(?<uid>[uged](?<started_at>\\d{3})\\d{2,10})@ms\\.ttu\\.edu\\.tw$'
+    uid_postparser "n.toLowerCase().replace('u', '4').replace('g', '6').replace('e', '7').replace('d', '8')"
+    started_at_postparser "new Date((parseInt(n)+1911) + '-9')"
+    permit_changing_department_in_organization true
+  end
+
+  factory :ttu_staff_email_pattern, parent: :email_pattern do
+    priority 100
+    organization { Organization.find_by(code: 'TTU') || create(:ttu_organization) }
+    corresponded_identity UserIdentity::IDENTITIES[:staff]
+    email_regexp '^(?<uid>.+)@ms\\.ttu\\.edu\\.tw$'
+    uid_postparser "n.toLowerCase()"
+    permit_changing_department_in_organization true
   end
 end
