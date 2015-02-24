@@ -24,7 +24,7 @@ ActiveAdmin.register UserIdentity do
   scope :unlinked
 
   permit_params do
-    params = [:name, :email, :identity, :uid, :department, :department_code, :original_department, :original_department_code, :permit_changing_department_in_group, :permit_changing_department_in_organization]
+    params = [:name, :email, :identity, :uid, :department, :department_code, :original_department, :original_department_code, :permit_changing_department_in_group, :permit_changing_department_in_organization, :skip_confirmation, :email_pattern, :email_pattern_id]
     params.concat [:organization_code, :organization] if current_admin.root?
     params
   end
@@ -138,6 +138,8 @@ ActiveAdmin.register UserIdentity do
       f.input :uid
       f.input :permit_changing_department_in_group
       f.input :permit_changing_department_in_organization
+      f.input :skip_confirmation
+      f.input :email_pattern_id, hint: "User Identities with no belonging Email Pattern will be treated as predefined identity data, and will not be deleted if it's user deletes the corresponding email."
     end
     f.actions
   end

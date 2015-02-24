@@ -11,7 +11,7 @@ ActiveAdmin.register EmailPattern do
   end
 
   permit_params do
-    params = [:priority, :corresponded_identity, :email_regexp, :uid_postparser, :department_code_postparser, :identity_detail_postparser, :started_at_postparser, :permit_changing_department_in_group, :permit_changing_department_in_organization]
+    params = [:priority, :corresponded_identity, :email_regexp, :uid_postparser, :department_code_postparser, :identity_detail_postparser, :started_at_postparser, :permit_changing_department_in_group, :permit_changing_department_in_organization, :skip_confirmation]
     params.concat [:organization_code, :organization] if current_admin.root?
     params
   end
@@ -82,6 +82,10 @@ ActiveAdmin.register EmailPattern do
       f.input :department_code_postparser, hint: "JavaScript 程式碼，可用變數 n 取得原始資料，必須返回一個字串，留白表示不處理，例如：`'0' + n`"
       f.input :identity_detail_postparser, hint: "JavaScript 程式碼，可用變數 n 取得原始資料，必須返回一個字串，留白表示不處理，例如：`switch (n.toLowerCase()) { case 'a': 'a'; break; case 'b': 'bachelor'; break; case 'm': 'master'; break; case 'd': 'doctor'; break; }`"
       f.input :started_at_postparser, hint: "JavaScript 程式碼，可用變數 n 取得原始資料，必須返回一個日期物件，留白表示不處理，例如：`new Date((parseInt(n)+1911) + '-9')`"
+
+      f.input :permit_changing_department_in_group
+      f.input :permit_changing_department_in_organization
+      f.input :skip_confirmation
     end
     f.actions
   end

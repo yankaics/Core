@@ -27,16 +27,18 @@ class Users::EmailsController < ApplicationController
   def create
     @email = current_user.emails.build(user_email_params)
 
-    if @email.save
-      if @email.email == current_user.email
-        @email.confirm!
-        flash[:notice] = "Email 經驗證，已開通對應身份！"
+    ActiveRecord::Base.transaction do
+      if @email.save
+        if @email.email == current_user.email || @email.can_skip_confirmation?
+          @email.confirm!
+          flash[:notice] = "Email 經驗證，已開通對應身份！"
+        else
+          @email.send_confirmation_instructions
+          flash[:notice] = "驗証信已送出！"
+        end
       else
-        @email.send_confirmation_instructions
-        flash[:notice] = "驗証信已送出！"
+        flash[:error] = "無效的 Email，或該 Email 已經被使用。"
       end
-    else
-      flash[:error] = "無效的 Email，或該 Email 已經被使用。"
     end
 
     redirect_to :action => :index

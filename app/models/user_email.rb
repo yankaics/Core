@@ -72,6 +72,11 @@ class UserEmail < ActiveRecord::Base
     confirmed
   end
 
+  def can_skip_confirmation?
+    pattern = EmailPattern.identify(email)
+    pattern.present? && pattern[:skip_confirmation]
+  end
+
   private
 
   def destroy_corresponding_user_identity

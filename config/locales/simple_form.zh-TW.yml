@@ -32,6 +32,7 @@ zh-TW:
         started_at_postparser: "開始日期運算式"
         permit_changing_department_in_group: "允許切換到同類型的部門"
         permit_changing_department_in_organization: "允許切換到同組織的部門"
+        skip_confirmation: "略過驗証信"
       user_identity:
         user: "對應使用者"
         email_pattern: "對應電子郵件識別模型"
@@ -47,6 +48,7 @@ zh-TW:
         original_department_code: "原所屬部門代碼"
         permit_changing_department_in_group: "可切換同型部門"
         permit_changing_department_in_organization: "可切換部門"
+        skip_confirmation: "已略過驗証"
       admin:
         username: "帳號"
         password: "密碼"
