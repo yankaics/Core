@@ -97,4 +97,33 @@ FactoryGirl.define do
     uid_postparser "n.toLowerCase()"
     permit_changing_department_in_organization true
   end
+
+  factory :ntpu_student_email_pattern_1_2, parent: :email_pattern do
+    priority 12
+    organization { Organization.find_by(code: 'NTPU') || create(:ntpu_organization) }
+    corresponded_identity UserIdentity::IDENTITIES[:student]
+    email_regexp '^s(?<uid>(?<identity_detail>\\d)(?<started_at>\\d{3})(?<department_code>\\d{2})\\d{1,5})@\\w{1,5}\\.ntpu\\.edu\\.tw$'
+    uid_postparser "n.toLowerCase()"
+    started_at_postparser "new Date((parseInt(n)+1911) + '-9')"
+    permit_changing_department_in_organization true
+  end
+
+  factory :ntpu_student_email_pattern_2_2, parent: :email_pattern do
+    priority 13
+    organization { Organization.find_by(code: 'NTPU') || create(:ntpu_organization) }
+    corresponded_identity UserIdentity::IDENTITIES[:student]
+    email_regexp '^s(?<uid>.+)@\\w{1,5}\\.ntpu\\.edu\\.tw$'
+    uid_postparser "n.toLowerCase()"
+    started_at_postparser "new Date((parseInt(n)+1911) + '-9')"
+    permit_changing_department_in_organization true
+  end
+
+  factory :ntpu_staff_email_pattern_2, parent: :email_pattern do
+    priority 101
+    organization { Organization.find_by(code: 'NTPU') || create(:ntpu_organization) }
+    corresponded_identity UserIdentity::IDENTITIES[:staff]
+    email_regexp '^(?<uid>.+)@\\w{1,5}\\.ntpu\\.edu\\.tw$'
+    uid_postparser "n.toLowerCase()"
+    permit_changing_department_in_organization true
+  end
 end
