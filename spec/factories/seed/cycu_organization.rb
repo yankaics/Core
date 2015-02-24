@@ -7,6 +7,7 @@ FactoryGirl.define do
       columns = [:organization_code, :code, :name, :short_name, :parent_code, :group]
       Department.import(columns,
         [
+
           ["CYCU", "SC", "理學院", "理學院", nil, 'C'],
           ["CYCU", "EG", "工學院", "工學院", nil, 'C'],
           ["CYCU", "CM", "商學院", "商學院", nil, 'C'],
@@ -62,6 +63,30 @@ FactoryGirl.define do
         ], :validate => false
       )
 
+      if cycu.email_patterns.count < 1
+        create(:cycu_student_email_pattern)
+        create(:cycu_staff_email_pattern)
+      end
     end
+  end
+
+  factory :cycu_student_email_pattern, parent: :email_pattern do
+    priority 15
+    organization { Organization.find_by(code: 'CYCU') || create(:cycu_organization) }
+    corresponded_identity UserIdentity::IDENTITIES[:student]
+    email_regexp '^(?<uid>(?<identity_detail>[sSgG])(?<started_at>\\d{3})\\d{2,10})@cycu\\.edu\\.tw$'
+    uid_postparser "n.toLowerCase()"
+    identity_detail_postparser "switch (n.toLowerCase()) { case 's': 'bachelor'; break; case 'g': 'master'; break; }"
+    started_at_postparser "new Date((parseInt(n)+1911) + '-9')"
+    permit_changing_department_in_organization true
+  end
+
+  factory :cycu_staff_email_pattern, parent: :email_pattern do
+    priority 100
+    organization { Organization.find_by(code: 'CYCU') || create(:cycu_organization) }
+    corresponded_identity UserIdentity::IDENTITIES[:staff]
+    email_regexp '^(?<uid>.+)@cycu\\.edu\\.tw$'
+    uid_postparser "n.toLowerCase()"
+    permit_changing_department_in_organization true
   end
 end

@@ -306,6 +306,29 @@ FactoryGirl.define do
         ], :validate => false
       )
 
+      if ntnu.email_patterns.count < 1
+        create(:ntnu_student_email_pattern)
+        create(:ntnu_staff_email_pattern)
+      end
     end
+  end
+
+  factory :ntnu_student_email_pattern, parent: :email_pattern do
+    priority 18
+    organization { Organization.find_by(code: 'NTNU') || create(:ntnu_organization) }
+    corresponded_identity UserIdentity::IDENTITIES[:student]
+    email_regexp '^(?<uid>\\d(?<started_at>\\d{3})\\d{2,12})@ntnu\\.edu\\.tw$'
+    uid_postparser "n.toLowerCase()"
+    started_at_postparser "new Date((parseInt(n)+1911) + '-9')"
+    permit_changing_department_in_organization true
+  end
+
+  factory :ntnu_staff_email_pattern, parent: :email_pattern do
+    priority 100
+    organization { Organization.find_by(code: 'NTNU') || create(:ntnu_organization) }
+    corresponded_identity UserIdentity::IDENTITIES[:staff]
+    email_regexp '^(?<uid>.+)@ntnu\\.edu\\.tw$'
+    uid_postparser "n.toLowerCase()"
+    permit_changing_department_in_organization true
   end
 end

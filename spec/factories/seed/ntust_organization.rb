@@ -119,5 +119,6 @@ FactoryGirl.define do
     corresponded_identity UserIdentity::IDENTITIES[:staff]
     email_regexp '^(?<uid>.+)@mail\\.ntust\\.edu\\.tw$'
     uid_postparser "n.toLowerCase()"
+    permit_changing_department_in_organization true
   end
 end

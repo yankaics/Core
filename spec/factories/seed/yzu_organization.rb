@@ -92,6 +92,29 @@ FactoryGirl.define do
         ], :validate => false
       )
 
+      if yzu.email_patterns.count < 1
+        create(:yzu_student_email_pattern)
+        create(:yzu_staff_email_pattern)
+      end
     end
+  end
+
+  factory :yzu_student_email_pattern, parent: :email_pattern do
+    priority 15
+    organization { Organization.find_by(code: 'YZU') || create(:yzu_organization) }
+    corresponded_identity UserIdentity::IDENTITIES[:student]
+    email_regexp '^s(?<uid>(?<started_at>\\d{3})\\d{2,10})@mail\\.yzu\\.edu\\.tw$'
+    uid_postparser "n.toLowerCase()"
+    started_at_postparser "new Date((parseInt(n)+1911) + '-9')"
+    permit_changing_department_in_organization true
+  end
+
+  factory :yzu_staff_email_pattern, parent: :email_pattern do
+    priority 100
+    organization { Organization.find_by(code: 'YZU') || create(:yzu_organization) }
+    corresponded_identity UserIdentity::IDENTITIES[:staff]
+    email_regexp '^(?<uid>.+)@saturn\\.yzu\\.edu\\.tw$'
+    uid_postparser "n.toLowerCase()"
+    permit_changing_department_in_organization true
   end
 end
