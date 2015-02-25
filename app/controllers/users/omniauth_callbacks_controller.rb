@@ -2,7 +2,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   def facebook
     @user = User.from_facebook(request.env["omniauth.auth"])
 
-    # if @user...
+    if @user.present? && @user.valid?
       SiteIdentityTokenService.create(cookies, @user)
 
       # if an invitation_code exists, activate the email for that user
@@ -22,7 +22,9 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
       else
         sign_in_and_redirect @user, event: :authentication
       end
-    # else
-    # end
+    else
+      flash[:alert] = "錯誤：請確認您的 Facebook 資料是有效的，或嘗試其他登入方式！"
+      redirect_to new_user_session_path
+    end
   end
 end
