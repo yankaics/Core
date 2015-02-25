@@ -321,10 +321,10 @@ FactoryGirl.define do
     priority 10
     organization { Organization.find_by(code: 'NTU') || create(:ntu_organization) }
     corresponded_identity UserIdentity::IDENTITIES[:student]
-    email_regexp '^(?<uid>(?<identity_detail>[aAbmdBMD])(?<started_at>\\d{2})(?<department_code>\\d{4})\\d{1,4})@ntu\\.edu\\.tw$'
+    email_regexp '^(?<uid>(?<identity_detail>[rRaAbmdBMD])(?<started_at>\\d{2})(?<department_code>\\d{4})\\d{1,4})@ntu\\.edu\\.tw$'
     uid_postparser "n.toLowerCase()"
     department_code_postparser "n"
-    identity_detail_postparser "switch (n.toLowerCase()) { case 'a': 'a'; break; case 'b': 'bachelor'; break; case 'm': 'master'; break; case 'd': 'doctor'; break; }"
+    identity_detail_postparser "switch (n.toLowerCase()) { case 'a': 'a'; break; case 'b': 'bachelor'; break; case 'm': case 'r': 'master'; break; case 'd': 'doctor'; break; }"
     started_at_postparser "new Date((parseInt(n)+1911+100) + '-9')"
     permit_changing_department_in_group true
   end
