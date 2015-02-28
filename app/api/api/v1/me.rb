@@ -21,7 +21,7 @@ class API::V1::Me < API::V1
       permitted_attrs += User::PUBLIC_ATTRS if scopes.include? :public
       permitted_attrs += User::EMAIL_ATTRS if scopes.include? :email
       permitted_attrs += User::ACCOUNT_ATTRS if scopes.include? :account
-      permitted_attrs += User::FB_ATTRS if scopes.include? :fb
+      permitted_attrs += User::FB_ATTRS if scopes.include? :facebook
       permitted_attrs += User::INFO_ATTRS if scopes.include? :info
       permitted_attrs += User::IDENTITY_ATTRS if scopes.include? :identity
       permitted_attrs += User::CORE_ATTRS if current_app.core_app?

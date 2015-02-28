@@ -30,7 +30,7 @@ describe "Me API" do
   {
     'email' => %w(email),
     'account' => %w(sign_in_count last_sign_in_at),
-    'fb' => %w(fbid),
+    'facebook' => %w(fbid),
     'info' => %w(birth_month motto),
     'identity' => %w(emails identities organizations department uid identity)
   }.each do |scope, attrs|
