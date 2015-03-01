@@ -17,10 +17,21 @@ RSpec.describe UserEmail, :type => :model do
     expect(user).not_to be_valid
   end
 
+  context "when builded" do
+    it "strips the email" do
+      e = user.emails.build(email: ' foo@bar.baz ')
+      expect(e.email).to eq('foo@bar.baz')
+    end
+  end
+
   context "when created" do
     subject { user_email }
     it { is_expected.not_to be_confirmed }
     its(:confirmation_token) { is_expected.not_to be_blank }
+    it "strips the email" do
+      e = user.emails.create(email: ' foo@bar.baz ')
+      expect(e.email).to eq('foo@bar.baz')
+    end
   end
 
   context "when the user has a same email" do

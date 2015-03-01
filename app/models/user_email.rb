@@ -19,6 +19,8 @@ class UserEmail < ActiveRecord::Base
   validates :confirmation_token, uniqueness: true, allow_nil: true
   validates_with UserEmailValidator
 
+  after_initialize :strip_email
+  before_validation :strip_email
   before_create :generate_confirmation_token
   before_destroy :destroy_corresponding_user_identity
 
@@ -30,6 +32,10 @@ class UserEmail < ActiveRecord::Base
 
   def confirmed?
     !confirmed_at.blank?
+  end
+
+  def strip_email
+    email.strip! if email.present?
   end
 
   def generate_confirmation_token
