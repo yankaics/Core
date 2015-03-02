@@ -116,7 +116,30 @@ FactoryGirl.define do
         ], :validate => false
       )
 
+      if fju.email_patterns.count < 1
+        create(:fju_student_email_pattern)
+        create(:fju_staff_email_pattern)
+      end
     end
   end
 
+  factory :fju_student_email_pattern, parent: :email_pattern do
+    priority 18
+    organization { Organization.find_by(code: 'FJU') || create(:fju_organization) }
+    corresponded_identity UserIdentity::IDENTITIES[:student]
+    email_regexp '^(?<uid>(?<identity_detail>[4])(?<started_at>\\d{2}).{3,7})@mail\\.fju\\.edu\\.tw$'
+    uid_postparser "n.toLowerCase()"
+    identity_detail_postparser "switch (n.toLowerCase()) { case '4': 'day_division'; break; }"
+    started_at_postparser "new Date((parseInt(n)+1911+100) + '-9')"
+    permit_changing_department_in_organization true
+  end
+
+  factory :fju_staff_email_pattern, parent: :email_pattern do
+    priority 100
+    organization { Organization.find_by(code: 'FJU') || create(:fju_organization) }
+    corresponded_identity UserIdentity::IDENTITIES[:staff]
+    email_regexp '^(?<uid>.+)@mail\\.fju\\.edu\\.tw$'
+    uid_postparser "n.toLowerCase()"
+    permit_changing_department_in_organization true
+  end
 end

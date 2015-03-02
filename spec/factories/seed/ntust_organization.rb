@@ -105,7 +105,7 @@ FactoryGirl.define do
     priority 10
     organization { Organization.find_by(code: 'NTUST') || create(:ntust_organization) }
     corresponded_identity UserIdentity::IDENTITIES[:student]
-    email_regexp '^(?<uid>(?<identity_detail>[aAbmdBMD])(?<started_at>\\d*)(?<department_code>\\d{2})\\d{3})@mail\\.ntust\\.edu\\.tw$'
+    email_regexp '^(?<uid>(?<identity_detail>[aAbmdBMD])(?<started_at>[123]?\\d{2})(?<department_code>\\d{2})[0-9a-zA-Z]{2,4})@mail\\.ntust\\.edu\\.tw$'
     uid_postparser "n.toLowerCase()"
     department_code_postparser "'D' + n"
     identity_detail_postparser "switch (n.toLowerCase()) { case 'a': 'a'; break; case 'b': 'bachelor'; break; case 'm': 'master'; break; case 'd': 'doctor'; break; }"

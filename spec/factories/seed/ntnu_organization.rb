@@ -317,7 +317,7 @@ FactoryGirl.define do
     priority 18
     organization { Organization.find_by(code: 'NTNU') || create(:ntnu_organization) }
     corresponded_identity UserIdentity::IDENTITIES[:student]
-    email_regexp '^(?<uid>\\d(?<started_at>\\d{3})\\d{2,12})@ntnu\\.edu\\.tw$'
+    email_regexp '^(?<uid>\\d(?<started_at>\\d{3})[0-9a-zA-Z]{2,12})@ntnu\\.edu\\.tw$'
     uid_postparser "n.toLowerCase()"
     started_at_postparser "new Date((parseInt(n)+1911) + '-9')"
     permit_changing_department_in_organization true
