@@ -66,4 +66,8 @@ class UserIdentity < ActiveRecord::Base
       self.user = nil
     end
   end
+
+  def generated?
+    email_pattern_id.present?
+  end
 end

@@ -324,6 +324,9 @@ feature "Control Panel", :type => :feature do
     let(:user_identity_csv_file) do
       Rails.root.join('spec', 'fixtures', 'files', 'sample_user_identity.csv')
     end
+    let(:user_identity_csv_file_2) do
+      Rails.root.join('spec', 'fixtures', 'files', 'sample_user_identity_2.csv')
+    end
 
     context "signed in as a root admin" do
       before(:all) do
@@ -386,6 +389,57 @@ feature "Control Panel", :type => :feature do
         find('input[type=submit]').click
 
         expect(UserIdentity.where(organization_code: 'NTUST', email: 'a_prof@example.com').count).to eq 1
+      end
+
+      scenario "Admin re-imports user_identities", :js => false do
+        visit(import_admin_user_identities_path)
+        attach_file('active_admin_import_model_file', user_identity_csv_file)
+        find('input[type=submit]').click
+
+        expect(UserIdentity.find_by(email: 'a_student@example.com').name).to eq('A Student')
+
+        # link an identity to a user
+        user = create(:user)
+        user.confirm!
+        ue = user.emails.create(email: 'a_prof@example.com')
+        ue.confirm!
+        user.reload
+        expect(user.primary_identity.name).to eq('A Prof')
+
+        # create a user with a currently unrecognized email
+        user2 = create(:user)
+        user2.confirm!
+        ue = user2.emails.create(email: 'a_new_prof@example.com')
+        ue.confirm!
+        user2.reload
+        expect(user2.primary_identity).to be_nil
+
+        # create a user with a auto generated identity
+        create(:email_pattern, organization: Organization.find_by(code: 'NTUST'), priority: 1, corresponded_identity: UserIdentity::IDENTITIES[:staff], email_regexp: '^(?<uid>.+)@example.com$')
+        user3 = create(:user)
+        user3.confirm!
+        ue = user3.emails.create(email: 'another_new_prof@example.com')
+        ue.confirm!
+        user3.reload
+        expect(user3.organization_code).to eq('NTUST')
+
+        # import a file with duplicated entries
+        visit(import_admin_user_identities_path)
+        attach_file('active_admin_import_model_file', user_identity_csv_file_2)
+        find('input[type=submit]').click
+
+        user.reload
+        user2.reload
+        user3.reload
+
+        # existing identity will be updated
+        expect(UserIdentity.find_by(email: 'a_student@example.com').name).to eq('A Duplicated Student')
+        # linked identity will not be updated
+        expect(user.primary_identity.name).to eq('A Prof')
+        # new identity will be automatically linked
+        expect(user2.primary_identity.name).to eq('A New Prof')
+        # new identity will be automatically linked, replaceing the generated ones
+        expect(user3.primary_identity.name).to eq('Another New Prof')
       end
     end
 

@@ -1,0 +1,8 @@
+professor,"A Duplicated Prof",a_prof@example.com,a_prof@example.com,D15,NTUST,true,true
+professor,"A New Prof",a_new_prof@example.com,a_new_prof@example.com,D15,NTUST,true,true
+professor,"Another New Prof",another_new_prof@example.com,another_new_prof@example.com,D15,NTUST,true,true
+lecturer,"A Duplicated Lecturer",a_lecturer@example.com,a_lecturer@example.com,D15,NTUST,true,true
+staff,"A Duplicated Staff",a_staff@example.com,a_staff@example.com,U13,NTUST,true,true
+student,"A Duplicated Student",a_student@example.com,a_student@example.com,D15,NTUST,true,false
+student,"A New Student",a_new_student@example.com,a_new_student@example.com,D10,NTUST,true,false,D15
+guest,"A Duplicated Guest",a_guest@example.com,a_guest@example.com,,NTUST,false,false

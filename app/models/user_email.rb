@@ -53,6 +53,11 @@ class UserEmail < ActiveRecord::Base
     send_confirmation_instructions
   end
 
+  def linked_associated_user_identity
+    return nil if associated_user_identity.blank?
+    associated_user_identity.user_id == user_id ? associated_user_identity : nil
+  end
+
   def identify!
     ActiveRecord::Base.transaction do
       # find if there is a predefined identity with this email
@@ -70,9 +75,9 @@ class UserEmail < ActiveRecord::Base
   end
 
   def re_identify!
+    return if linked_associated_user_identity.present? && !linked_associated_user_identity.generated?
     ActiveRecord::Base.transaction do
-      generated_identity = UserIdentity.where(email: email).where.not(email_pattern_id: nil).last
-      generated_identity.destroy if generated_identity.present?
+      linked_associated_user_identity.destroy if linked_associated_user_identity.present?
       identify!
     end
   end

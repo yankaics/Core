@@ -43,6 +43,26 @@ ActiveAdmin.register UserIdentity do
                         # imported by a scoped Admin
                         importer_csv_lines.delete_if { |csv_line| Admin.current_admin.scoped? && Admin.current_admin.scoped_organization_code != csv_line[5] }
 
+                        total_emails = importer_csv_lines.count
+
+                        # delete this line if a predefined UserIdentity already exists and is linked
+                        ignored_emails = []
+                        emails = importer_csv_lines.map { |csv_line| csv_line[2] }
+                        existing_linked_emails = UserIdentity.select(:email).where(email: emails).where('user_id IS NOT NULL AND email_pattern_id IS NULL').map(&:email)
+                        importer_csv_lines.delete_if do |csv_line|
+                          ignored = existing_linked_emails.include?(csv_line[2])
+                          ignored_emails << csv_line[2] if ignored
+                          ignored
+                        end
+
+                        # delete the existing duplicated and unlinked/generated UserIdentity
+                        updated_emails = []
+                        existing_unlinked_emails = UserIdentity.select(:email).where(email: emails).where('user_id IS NULL OR email_pattern_id IS NOT NULL').map(&:email)
+                        importer_csv_lines.each do |csv_line|
+                          updated_emails << csv_line[2] if existing_unlinked_emails.include?(csv_line[2])
+                        end
+                        UserIdentity.where(email: updated_emails).delete_all if updated_emails.present?
+
                         # preprocess each line
                         importer_csv_lines.each do |csv_line|
                           # convert identity string to integer for batch import
@@ -69,6 +89,16 @@ ActiveAdmin.register UserIdentity do
 
                         # save the preprocessed lines
                         importer.instance_variable_set(:@csv_lines, importer_csv_lines)
+
+                        # log the result
+                        Rails.logger.info "UserIdentity batch import result: total #{total_emails}, ignored #{ignored_emails.count}, updated #{updated_emails.count}."
+                        Rails.logger.info "UserIdentity batch import result: ignored: #{ignored_emails.join(', ')}." if ignored_emails.present?
+                        Rails.logger.info "UserIdentity batch import result: updated: #{updated_emails.join(', ')}." if updated_emails.present?
+                      },
+                      :after_batch_import => proc { |importer|
+                        importer_csv_lines = importer.instance_variable_get(:@csv_lines)
+                        emails = importer_csv_lines.map { |csv_line| csv_line[2] }
+                        UserEmail.includes(:associated_user_identity).where(email: emails).each(&:re_identify!)
                       }
 
   filter :organization, if: proc { current_admin.root? }
