@@ -164,4 +164,42 @@ RSpec.describe UserEmail, :type => :model do
       end
     end
   end
+
+  describe "#re_identify!" do
+    context "with an unidentified email" do
+      let(:email) { e = create(:user_email, email: 'b10132023@mail.ntust.edu.tw'); e.confirm!; e }
+      let(:user) { email.user }
+      before do
+        expect(user.organization_code).to be_nil
+      end
+
+      it "re-identifies itself" do
+        create(:ntust_organization)
+
+        email.re_identify!
+        user.reload
+        expect(user.organization_code).to eq('NTUST')
+      end
+    end
+
+    context "with an old generated identity" do
+      let(:email) { e = create(:user_email, email: 'b10132023@mail.ntust.edu.tw'); e.confirm!; e }
+      let(:user) { email.user }
+      before do
+        create(:ntust_organization)
+        EmailPattern.where(corresponded_identity: UserIdentity::IDENTITIES[:student]).destroy_all
+        expect(user.organization_code).to eq('NTUST')
+        expect(user.identity).to eq('staff')
+      end
+
+      it "re-identifies itself" do
+        create(:ntust_student_email_pattern)
+
+        email.re_identify!
+        user.reload
+        expect(user.organization_code).to eq('NTUST')
+        expect(user.identity).to eq('student')
+      end
+    end
+  end
 end

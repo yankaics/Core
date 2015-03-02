@@ -39,7 +39,7 @@ class UserEmail < ActiveRecord::Base
   end
 
   def generate_confirmation_token
-    self.confirmation_token = SecureRandom.urlsafe_base64(32)
+    self.confirmation_token = SecureRandom.urlsafe_base64(36)
     self.confirmation_sent_at = Time.now
   end
 
@@ -53,10 +53,8 @@ class UserEmail < ActiveRecord::Base
     send_confirmation_instructions
   end
 
-  def confirm
-    return false unless valid?
+  def identify!
     ActiveRecord::Base.transaction do
-      update(confirmed_at: Time.now, confirmation_token: nil)
       # find if there is a predefined identity with this email
       identity = UserIdentity.find_by(user_id: nil, email: email)
       if identity
@@ -67,6 +65,23 @@ class UserEmail < ActiveRecord::Base
         identity = user.identities.create!(pattern_identity)
         identity.update(department_code: department_code) unless department_code.blank?
       end
+      user.touch
+    end
+  end
+
+  def re_identify!
+    ActiveRecord::Base.transaction do
+      generated_identity = UserIdentity.where(email: email).where.not(email_pattern_id: nil).last
+      generated_identity.destroy if generated_identity.present?
+      identify!
+    end
+  end
+
+  def confirm
+    return false unless valid?
+    ActiveRecord::Base.transaction do
+      update(confirmed_at: Time.now, confirmation_token: nil)
+      identify!
     end
     return false unless user.reload.valid?
     self
