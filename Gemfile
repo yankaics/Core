@@ -75,7 +75,7 @@ gem 'rack-oauth2', '~> 1.0.10'
 gem 'devise', '~> 3.4.0'
 gem 'cancancan', '~> 1.10.0'
 gem 'omniauth-facebook', '~> 2.0.0'
-gem 'doorkeeper', '2.1.0'
+gem 'doorkeeper', '2.1.3'
 gem 'httparty', '~> 0.13.1'
 
 gem 'validates_email_format_of'

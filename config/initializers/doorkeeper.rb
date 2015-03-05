@@ -99,11 +99,6 @@ Doorkeeper.configure do
 
   # WWW-Authenticate Realm (default "Doorkeeper").
   realm ENV['APP_NAME']
-
-  # Allow dynamic query parameters (disabled by default)
-  # Some applications require dynamic query parameters on their request_uri
-  # set to true if you want this to be allowed
-  wildcard_redirect_uri true
 end
 
 # require Rails.root.join('app', 'models', 'concerns', 'oauth_application') unless defined? OAuthApplication
