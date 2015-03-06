@@ -5,6 +5,8 @@
   = simple_form_for @email, url: my_account_emails_path do |f|
     = react_component(:NewUserEmailBox, emailPatterns: @email_patterns, email: @email)
 
+  p 目前提供服務於 #{Organization.short_name_list.join(t(:comma, scope: :general))}。
+
 css:
   .row h3 {
     margin-top: 8px;

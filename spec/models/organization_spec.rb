@@ -27,6 +27,32 @@ RSpec.describe Organization, :type => :model do
     expect(described_class.friendly.find(thing.code)).to eq thing
   end
 
+  describe ".all_for_select" do
+    let!(:org_1) { create(:organization) }
+    let!(:org_2) { create(:organization) }
+    let!(:org_3) { create(:organization) }
+
+    it "returns an array for all organization selections" do
+      selections = Organization.all_for_select
+      expect(selections).to include([org_1.name, org_1.code])
+      expect(selections).to include([org_2.name, org_2.code])
+      expect(selections).to include([org_3.name, org_3.code])
+    end
+  end
+
+  describe ".short_name_list" do
+    let!(:org_1) { create(:organization) }
+    let!(:org_2) { create(:organization) }
+    let!(:org_3) { create(:organization) }
+
+    it "returns an array for all organization selections" do
+      selections = Organization.short_name_list
+      expect(selections).to include(org_1.short_name)
+      expect(selections).to include(org_2.short_name)
+      expect(selections).to include(org_3.short_name)
+    end
+  end
+
   context "destroyed" do
     before do
       @org = create(:organization)

@@ -1,4 +1,6 @@
 zh-TW:
+  general:
+    comma: '、'
   user:
     identity:
       student: 學生
