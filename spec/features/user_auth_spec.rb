@@ -6,7 +6,7 @@ feature "User Auth", :type => :feature do
       .to_return(:status => 200, :body => (<<-eod
 {
    "id": "87654321",
-   "name": "Facebook User",
+   "name": "FB User",
    "link": "https://www.facebook.com/app_scoped_user_id/87654321/",
    "picture": {
       "data": {
@@ -83,6 +83,8 @@ eod
     # Get the newly created user, he/she should be confirmed
     user = User.last
     expect(user).to be_confirmed
+    expect(user.name).to eq('FB User')
+    expect(user.gender).to eq('male')
 
     # Users should be redirected to the new email page after their first login
     expect(current_path).to eq new_my_account_email_path

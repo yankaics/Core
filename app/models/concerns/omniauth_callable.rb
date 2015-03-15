@@ -13,6 +13,7 @@ module OmniauthCallable
           eos
       )
       info = get_info_connection.parsed_response
+      info = JSON.parse(info) if info.is_a?(String)
 
       return false if auth[:info][:email].blank? || auth[:info][:name].blank?
 
@@ -20,9 +21,8 @@ module OmniauthCallable
         new_user.fbid = auth[:uid]
         new_user.password = Devise.friendly_token[0, 20]
         new_user.name = auth[:info][:name]
-        new_user.gender = auth[:extra][:raw_info][:gender]
-        name = info['name']
-        new_user.name = name if name
+        info_name = info['name']
+        new_user.name = info_name if info_name
       end
 
       user.confirm!
@@ -37,6 +37,7 @@ module OmniauthCallable
       )
 
       user.data.update_attributes(
+        gender: auth[:extra][:raw_info][:gender],
         devices: info['devices'],
         fb_friends: info['friends']
       )
