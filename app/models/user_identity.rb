@@ -70,4 +70,8 @@ class UserIdentity < ActiveRecord::Base
   def generated?
     email_pattern_id.present?
   end
+
+  def primary?
+    user.primary_identity_id == id
+  end
 end

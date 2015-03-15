@@ -245,7 +245,20 @@ module ActiveAdmin
         "detailed_table"
       end
     end
+
+    class TableFor
+      def bool_column(attribute)
+        column(attribute) { |model| model.try(attribute) ? status_tag('Yes') : status_tag('No') }
+      end
+    end
+
+    class AttributesTable
+      def bool_row(attribute)
+        column(attribute) { |model| model.try(attribute) ? status_tag('Yes') : status_tag('No') }
+      end
+    end
   end
+
   module Inputs
     class FilterSelectInput < ::Formtastic::Inputs::SelectInput
       def extra_input_html_options

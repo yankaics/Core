@@ -93,7 +93,7 @@ ActiveAdmin.register User do
     column :primary_identity_id
     column :avatar_url
     column :cover_photo_url
-    column :fbtoken
+    column :fbtoken if current_admin.root?
     column :gender
     column :birth_year
     column :birth_month
@@ -117,6 +117,106 @@ ActiveAdmin.register User do
       link_to(image_tag(user.avatar_url), admin_user_path(user))
     end
     link_to(user.name, admin_user_path(user))
+  end
+
+  show do
+    attributes_table do
+      row(:id)
+      row(:email)
+      row(:username)
+      row(:name)
+
+      row(:primary_identity)
+      row(:identity)
+      row(:organization)
+      row(:department)
+      row(:uid)
+
+      row(:avatar_url)
+      row(:cover_photo_url)
+
+      row(:gender)
+      row(:birth_date)
+      row(:url)
+      row(:brief)
+      row(:motto)
+      row(:mobile)
+
+      row(:fbid)
+      row(:fbtoken)
+
+      row(:sign_in_count)
+      row(:current_sign_in_at)
+      row(:last_sign_in_at)
+      row(:current_sign_in_ip)
+      row(:last_sign_in_ip)
+
+      row(:confirmation_sent_at)
+      row(:confirmed_at)
+      row(:created_at)
+      row(:updated_at)
+    end
+
+    panel '操作' do
+      para do
+        link_to '使用此帳號登入', testing_user_sessions_path(id: user.id), method: :post, class: :login, data: { confirm: "確定要用 #{user.name} 的帳號登入嗎？" }
+      end
+    end if current_admin.root?
+
+    panel '使用者 Email' do
+      table_for user.all_emails do
+        column(:id)
+        column(:email)
+        bool_column(:confirmed?)
+        column(:associated_user_identity)
+        column(:created_at)
+        column(:confirmation_sent_at)
+        column(:confirmed_at)
+      end
+    end if current_admin.root?
+
+    panel '使用者身份' do
+      table_for user.identities do
+        column(:id) { |identity| link_to identity.id, admin_user_identity_path(identity) }
+        column(:email)
+        bool_column(:primary?)
+        bool_column(:generated?)
+        column(:email_pattern)
+        column(:identity)
+        column(:name)
+        column(:organization)
+        column(:department)
+        column(:original_department)
+        column(:created_at)
+      end
+    end if current_admin.root?
+
+    panel '細項' do
+      attributes_table_for user do
+        row(:encrypted_password)
+        row(:reset_password_sent_at)
+        row(:reset_password_token)
+
+        row(:unconfirmed_email)
+        row(:confirmation_sent_at)
+        row(:confirmation_token)
+        row(:confirmed_at)
+
+        row(:mobile)
+        row(:unconfirmed_mobile)
+        row(:mobile_confirmation_token)
+        row(:mobile_confirmation_sent_at)
+        row(:mobile_confirm_tries)
+
+        row(:failed_attempts)
+        row(:locked_at)
+        row(:unlock_token)
+
+        row(:remember_created_at)
+
+        row(:devices)
+      end
+    end if current_admin.root?
   end
 
   form do |f|

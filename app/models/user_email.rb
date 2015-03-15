@@ -31,7 +31,7 @@ class UserEmail < ActiveRecord::Base
   end
 
   def confirmed?
-    !confirmed_at.blank?
+    confirmed_at.present?
   end
 
   def strip_email
