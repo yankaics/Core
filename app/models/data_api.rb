@@ -1,4 +1,6 @@
 class DataAPI < ActiveRecord::Base
+  has_paper_trail class_name: 'DataAPIVersion'
+
   scope :global, -> { where(organization_code: nil) }
   scope :local, -> { where.not(organization_code: nil) }
 
