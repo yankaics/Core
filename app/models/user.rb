@@ -83,6 +83,14 @@ class User < ActiveRecord::Base
     !primary_identity_id.blank?
   end
 
+  def avatar_url
+    external_avatar_url
+  end
+
+  def cover_photo_url
+    external_cover_photo_url
+  end
+
   private
 
   def ensure_user_has_valid_primary_identity

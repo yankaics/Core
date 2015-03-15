@@ -242,8 +242,8 @@ ActiveAdmin.register User do
       f.input :unlock_token if current_admin.root?
       f.input :locked_at if current_admin.root?
       f.input :primary_identity_id if current_admin.root?
-      f.input :avatar_url
-      f.input :cover_photo_url
+      # f.input :avatar_url
+      # f.input :cover_photo_url
       f.input :fbtoken if current_admin.root?
       f.input :gender, as: :select, collection: options_for_select(UserData.enum_for_select(:gender), user.gender)
       f.input :birth_date, as: :datepicker

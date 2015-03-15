@@ -32,8 +32,8 @@ module OmniauthCallable
       user.update_attributes(
         fbid: auth[:uid],
         fbtoken: auth[:credentials][:token],
-        avatar_url: info['picture'] && info['picture']['data'] && info['picture']['data']['url'],
-        cover_photo_url: info['cover'] && info['cover']['source']
+        external_avatar_url: info['picture'] && info['picture']['data'] && info['picture']['data']['url'],
+        external_cover_photo_url: info['cover'] && info['cover']['source']
       )
 
       user.data.update_attributes(
