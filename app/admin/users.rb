@@ -164,7 +164,7 @@ ActiveAdmin.register User do
     end if current_admin.root?
 
     panel '使用者 Email' do
-      table_for user.all_emails do
+      table_for user.all_emails.includes(:associated_user_identity) do
         column(:id)
         column(:email)
         bool_column(:confirmed?)
@@ -176,7 +176,7 @@ ActiveAdmin.register User do
     end if current_admin.root?
 
     panel '使用者身份' do
-      table_for user.identities do
+      table_for user.identities.includes(:email_pattern, :organization, :department, :original_department) do
         column(:id) { |identity| link_to identity.id, admin_user_identity_path(identity) }
         column(:email)
         bool_column(:primary?)
