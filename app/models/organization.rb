@@ -7,6 +7,7 @@ class Organization < ActiveRecord::Base
   has_many :email_patterns, primary_key: :code, foreign_key: :organization_code, dependent: :delete_all
   has_many :user_identities, primary_key: :code, foreign_key: :organization_code
   has_many :users, through: :user_identities
+  has_many :data_apis, class_name: :DataAPI, primary_key: :code, foreign_key: :organization_code
 
   accepts_nested_attributes_for :departments, allow_destroy: true
   accepts_nested_attributes_for :email_patterns, allow_destroy: true
