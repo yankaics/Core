@@ -1,3 +1,14 @@
+module ActiveAdmin
+  class Namespace
+    def register_module
+      return if module_name == 'Admin'
+      unless Object.const_defined? module_name
+        Object.const_set module_name, Module.new
+      end
+    end
+  end
+end
+
 ActiveAdmin.setup do |config|
   # == Site Title
   #
