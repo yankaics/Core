@@ -1,8 +1,8 @@
 FactoryGirl.define do
   factory :data_api, class: DataAPI do
-    name { SecureRandom.hex }
-    path { SecureRandom.hex }
+    sequence(:name) { |n| "api_#{SecureRandom.urlsafe_base64(4).underscore}#{n}" }
+    path { name }
     organization { nil }
-    schema { { id: {}, name: {} } }
+    schema { { name: { type: 'string' }, text: { type: 'text' } } }
   end
 end
