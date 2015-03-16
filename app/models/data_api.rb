@@ -8,6 +8,7 @@ class DataAPI < ActiveRecord::Base
 
   serialize :schema
 
+  validates_with DataAPIValidator
   validates :name, :path, presence: true
 
   after_find :reset_data_model_if_needed

@@ -21,12 +21,58 @@ RSpec.describe DataAPI, type: :model do
     end
   end
 
+  context "with invalid attributes" do
+    it "should not be valid if name starts with a number" do
+      data_api = build(:data_api, name: '0abcd')
+      expect(data_api).not_to be_valid
+    end
+
+    it "should not be valid if name contains special characters" do
+      data_api = build(:data_api, name: 'OK_好！')
+      expect(data_api).not_to be_valid
+    end
+
+    it "should not be valid if path contains special characters" do
+      data_api = build(:data_api, path: 'a_b_c_d')
+      expect(data_api).to be_valid
+      data_api = build(:data_api, path: 'a/b')
+      expect(data_api).to be_valid
+      data_api = build(:data_api, path: 'a/b/c')
+      expect(data_api).to be_valid
+      data_api = build(:data_api, path: 'a/b/c/d')
+      expect(data_api).not_to be_valid
+      data_api = build(:data_api, path: 'A/B')
+      expect(data_api).not_to be_valid
+    end
+
+    it "should not be valid if schema column has duplicated uuid" do
+      data_api = build(:data_api, schema: { attr1: { type: 'string', uuid: 'uuid' }, attr2: { type: 'text', uuid: 'uuid' } })
+      expect(data_api).not_to be_valid
+    end
+
+    it "should not be valid if schema column used a reserved name" do
+      data_api = build(:data_api, schema: { created_at: { type: 'string' } })
+      expect(data_api).not_to be_valid
+      data_api = build(:data_api, schema: { updated_at: { type: 'string' } })
+      expect(data_api).not_to be_valid
+      data_api = build(:data_api, schema: { uid: { type: 'string' } })
+      expect(data_api).not_to be_valid
+    end
+
+    it "should not be valid if type of existing schema column has changed" do
+      data_api = create(:data_api, schema: { attr1: { type: 'string' }, attr2: { type: 'text' } })
+      expect(data_api).to be_valid
+      data_api.schema[:attr2][:type] = 'string'
+      expect(data_api).not_to be_valid
+    end
+  end
+
   with_versioning do
     let!(:data_api) do
       create(:data_api, schema: { string_attr: { type: 'string' },
                                   text_attr: { type: 'text' },
                                   datetime_attr: { type: 'datetime' },
-                                  boolean_attr: { type: 'boolean' } } )
+                                  boolean_attr: { type: 'boolean' } })
     end
 
     context "on create" do
