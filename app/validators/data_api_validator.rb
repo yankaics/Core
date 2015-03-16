@@ -4,13 +4,14 @@ class DataAPIValidator < ActiveModel::Validator
     record.errors[:base] << "The name should only contains a-z 0-9 and baselines!" unless record.name.present? && record.name.match(/^[a-z0-9_]+$/)
     record.errors[:base] << "The path is not valid!" unless record.path.present? && record.path.match(/^[a-z0-9_]+(\/[a-z0-9_]+)?(\/[a-z0-9_]+)?$/)
 
-    reserved_column_names = [:uid, :created_at, :updated_at]
-    used_uuid = []
+    reserved_column_names = %w(uid created_at updated_at)
+    used_column_uuids = []
 
     record.schema.each do |name, column|
       record.errors[:base] << "The schema column name '#{name}' is reserved!" if reserved_column_names.include?(name)
-      record.errors[:base] << "The schema column '#{name}' has duplicated uuid!" if used_uuid.include?(column[:uuid])
-      used_uuid << column[:uuid]
+      record.errors[:base] << "The schema column '#{name}' has duplicated uuid!" if used_column_uuids.include?(column[:uuid])
+      record.errors[:base] << "The schema column '#{name}' has invalid type!" unless DataAPI::COLUMN_TYPES.include?(column[:type])
+      used_column_uuids << column[:uuid]
     end
 
     if record.id.present? && old_record = DataAPI.find_by(id: record.id)

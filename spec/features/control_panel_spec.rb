@@ -124,6 +124,146 @@ feature "Control Panel", :type => :feature do
     end
   end
 
+  describe "Data API Control Panel" do
+    before(:all) { DatabaseCleaner.clean_with(:deletion) }
+
+    context "signed in as a root admin" do
+      before(:each) do
+        @admin = create(:admin)
+        login_as @admin, scope: :admin
+        visit(admin_data_apis_path)
+      end
+
+      scenario "Admin views a Data API", :js => true do
+        data_api = create(:data_api)
+        visit(current_path)
+        click_link data_api.name
+        expect(page).to have_content(data_api.name)
+        expect(page).to have_content(data_api.path)
+        data_api.schema.each do |k, v|
+          expect(page).to have_content(k)
+        end
+      end
+
+      scenario "Admin creates a Data API", :js => true do
+        click_link I18n.t(:'active_admin.new_model', model: I18n.t(:'activerecord.models.data_api'))
+
+        within("#main_content") do
+          fill_in 'data_api_name', with: "my_new_api"
+          fill_in 'data_api_path', with: "my_apis/my_new_api"
+
+          within(".data_api_schema_table") do
+            within("tbody tr:nth-child(1)") do
+              find('.name').set 'my_string'
+              find('.type').set 'string'
+            end
+            first('a.add').click
+            within("tbody tr:nth-child(2)") do
+              find('.name').set 'my_int'
+              find('.type').set 'integer'
+            end
+            first('a.add').click
+            within("tbody tr:nth-child(3)") do
+              find('.name').set 'unused_int'
+              find('.type').set 'integer'
+            end
+            first('a.add').click
+            within("tbody tr:nth-child(4)") do
+              find('.name').set 'my_bool'
+              find('.type').set 'boolean'
+            end
+            within("tbody tr:nth-child(3)") do
+              first('a.delete').click
+            end
+          end
+
+          first('#data_api_submit_action').find('input').click
+        end
+
+        expect(page).to have_content('my_int')
+        expect(page).to have_content('my_string')
+        expect(page).not_to have_content('unused_int')
+        expect(page).to have_content('my_bool')
+
+        data_api = DataAPI.last
+        data_api.data_model.create(uid: 'one', my_int: 1, my_string: 'Hi', my_bool: true)
+
+        expect(data_api.data_model.last.my_int).to be_a(Integer)
+        expect(data_api.data_model.last.my_string).to be_a(String)
+        expect(data_api.data_model.last.my_bool).to be_a(TrueClass)
+      end
+
+      scenario "Admin updates a Data API", :js => true do
+        Timecop.scale(3600)
+
+        data_api = create(:data_api)
+        visit(edit_admin_data_api_path(data_api))
+
+        within("#main_content") do
+          fill_in 'data_api_name', with: "my_todo_list"
+          fill_in 'data_api_path', with: "my/todos"
+
+          within(".data_api_schema_table") do
+            within("tbody tr:nth-child(2)") do
+              first('a.delete').click
+            end
+            first('a.add').click
+            within("tbody tr:nth-child(2)") do
+              find('.name').set 'done'
+              find('.type').set 'boolean'
+            end
+          end
+          first('#data_api_submit_action').find('input').click
+        end
+
+        expect(page).to have_content('name')
+        expect(page).to have_content('done')
+
+        data_api = DataAPI.find(data_api.id)
+        data_api.data_model.create(uid: 'one', name: 'sleep', done: false)
+
+        Timecop.return
+      end
+    end
+
+    context "signed in as a scoped admin" do
+      before(:each) do
+        @admin = create(:admin, :scoped)
+        login_as @admin, scope: :admin
+        visit(admin_data_apis_path)
+      end
+
+      scenario "Admin can't view a global Data API", :js => true do
+        data_api = create(:data_api)
+        visit(current_path)
+        expect(page).not_to have_content(data_api.name)
+      end
+
+      scenario "Admin creates a Data API", :js => true do
+        click_link I18n.t(:'active_admin.new_model', model: I18n.t(:'activerecord.models.data_api'))
+
+        within("#main_content") do
+          fill_in 'data_api_name', with: "my_simple_api"
+          fill_in 'data_api_path', with: "my_apis/my_simple_api"
+
+          within(".data_api_schema_table") do
+            within("tbody tr:nth-child(1)") do
+              find('.name').set 'my_string'
+              find('.type').set 'string'
+            end
+          end
+
+          first('#data_api_submit_action').find('input').click
+        end
+
+        expect(page).to have_content('my_string')
+
+        data_api = DataAPI.last
+        expect(data_api.organization).to eq(@admin.organization)
+      end
+    end
+  end
+
   describe "Organization Control Panel" do
     before(:all) { DatabaseCleaner.clean_with(:deletion) }
     before :each do

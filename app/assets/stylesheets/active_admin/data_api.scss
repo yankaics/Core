@@ -1,0 +1,34 @@
+.data_api_schema_table {
+
+	&.editable {
+
+		th:last-child, td:last-child {
+			text-align: right;
+		}
+
+		a.add,
+		a.delete {
+			display: inline-block;
+			width: 14px;
+			height: 14px;
+			margin-top: 2px;
+			margin-right: 2px;
+			border: 1px solid #000;
+			border-radius: 100px;
+			cursor: pointer;
+			line-height: 14px;
+			text-align: center;
+			text-decoration: none;
+		}
+
+		a.add {
+			color: #507c59;
+			border-color: #507c59;
+		}
+
+		a.delete {
+			color: #b33c33;
+			border-color: #b33c33;
+		}
+	}
+}

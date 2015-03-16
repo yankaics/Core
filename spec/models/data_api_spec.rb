@@ -6,6 +6,12 @@ RSpec.describe DataAPI, type: :model do
   it { should validate_presence_of(:name) }
   it { should validate_presence_of(:path) }
 
+  describe "instance" do
+    subject(:data_api) { create(:data_api) }
+
+    its(:schema) { is_expected.to be_a(HashWithIndifferentAccess) }
+  end
+
   describe "DataAPI #data_model" do
     subject(:model) { create(:data_api).data_model }
 
@@ -46,7 +52,12 @@ RSpec.describe DataAPI, type: :model do
     end
 
     it "should not be valid if schema column has duplicated uuid" do
-      data_api = build(:data_api, schema: { attr1: { type: 'string', uuid: 'uuid' }, attr2: { type: 'text', uuid: 'uuid' } })
+      data_api = build(:data_api, schema: { attr1: { type: 'string', uuid: '86f05e6d-7fac-4837-a424-a883b90b2a94' }, attr2: { type: 'text', uuid: '86f05e6d-7fac-4837-a424-a883b90b2a94' } })
+      expect(data_api).not_to be_valid
+    end
+
+    it "should not be valid if schema column has invalid type" do
+      data_api = build(:data_api, schema: { attr1: { type: 'foo', uuid: '86f05e6d-7fac-4837-a424-a883b90b2a94' } })
       expect(data_api).not_to be_valid
     end
 
@@ -140,6 +151,21 @@ RSpec.describe DataAPI, type: :model do
 
         data_api.destroy
         expect(model.inspect).to include("Table doesn't exist")
+      end
+    end
+
+    describe "#schema_from_array" do
+      it "loads the schema from an array" do
+        array = [{ name: 'string', type: 'string' }, { name: 'text', type: 'text' }]
+        data_api.schema_from_array(array)
+
+        expect(data_api.schema[:string]).to eq({ 'type' => 'string' })
+        expect(data_api.schema[:text]).to eq({ 'type' => 'text' })
+
+        data_api.save!
+
+        expect(data_api.schema).to have_key(:string)
+        expect(data_api.schema).to have_key(:text)
       end
     end
   end

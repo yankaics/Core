@@ -9,6 +9,7 @@ zh-TW:
       admin: "系統管理員"
       user: "使用者"
       doorkeeper_application: "應用程式"
+      data_api: "資料集 API"
 
     attributes:
       user:
@@ -101,3 +102,6 @@ zh-TW:
         uid: "應用程式 ID"
         secret: "應用程式密鑰"
         redirect_uri: "應用程式網址"
+      data_api:
+        name: "名稱"
+        path: "路徑"

@@ -211,6 +211,12 @@ ActiveAdmin.setup do |config|
   #       menu.add label: "My Great Website", url: "http://www.mygreatwebsite.com", html_options: { target: :blank }
   #     end
   #   end
+  config.namespace config.default_namespace do |admin|
+    admin.build_menu do |menu|
+      menu.add id: 'api', label: proc { 'API' }, priority: 50
+      menu.add id: 'organization', label: proc { '組織管理' }, priority: 100
+    end
+  end
 
   # == Download Links
   #

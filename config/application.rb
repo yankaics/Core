@@ -7,6 +7,8 @@ require 'rails/all'
 Bundler.require(*Rails.groups)
 
 module Core
+  VERSION = '0.1'
+
   class Application < Rails::Application
     Dotenv::Railtie.load if defined? Dotenv::Railtie
 
