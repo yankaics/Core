@@ -84,6 +84,10 @@ class DataAPI < ActiveRecord::Base
     # validates :uid, uniqueness: true
   end
 
+  def get_database_url
+    DataAPI.database_url
+  end
+
   def schema_from_array(columns)
     self.schema = HashWithIndifferentAccess.new
     columns.each do |column|
@@ -97,6 +101,7 @@ class DataAPI < ActiveRecord::Base
     return Models.const_get(name.classify) if Models.const_defined?(name.classify)
     Models.const_set(name.classify, Class.new(DataAPI::Model))
     m = Models.const_get(name.classify)
+    m.establish_connection get_database_url
     m.table_name = name
     m.updated_at = updated_at
     m
@@ -108,6 +113,7 @@ class DataAPI < ActiveRecord::Base
 
   def reset_data_model_const
     Models.send(:remove_const, name.classify) if Models.const_defined?(name.classify)
+    data_model.establish_connection get_database_url
     data_model.connection.schema_cache.clear!
     data_model.reset_column_information
   end
@@ -208,8 +214,11 @@ class DataAPI < ActiveRecord::Base
 
   def new_migration
     migration = ActiveRecord::Migration.new
-    migration.instance_eval do
+    migration.instance_exec(get_database_url) do |db_url|
+      @db_url = db_url
+
       def connection
+        DataAPI::Model.establish_connection @db_url
         DataAPI::Model.connection
       end
     end

@@ -87,6 +87,7 @@ RSpec.describe DataAPI, type: :model do
     context "on create" do
       it "creates the corresponding database table" do
         model = data_api.data_model
+        model.connection
         expect(model.inspect).to include('string_attr: string')
         expect(model.inspect).to include('datetime_attr: datetime')
         expect(model.inspect).to include('boolean_attr: boolean')
@@ -96,15 +97,18 @@ RSpec.describe DataAPI, type: :model do
 
     context "on renamed" do
       it "renames the corresponding database table" do
+        data_api.data_model.connection
         expect(data_api.data_model.inspect).to include('string_attr: string')
         expect(data_api.data_model.table_name).to eq(data_api.name)
 
         data_api.name = 'hello_api'
         data_api.save
+        data_api.data_model.connection
         expect(data_api.data_model.inspect).to include('string_attr: string')
         expect(data_api.data_model.table_name).to eq('hello_api')
 
         data_api.update(name: 'hello_world')
+        data_api.data_model.connection
         expect(data_api.data_model.inspect).to include('string_attr: string')
         expect(data_api.data_model.table_name).to eq('hello_world')
       end
@@ -112,6 +116,7 @@ RSpec.describe DataAPI, type: :model do
 
     context "on schema changed" do
       it "renames the renamed column in database" do
+        data_api.data_model.connection
         expect(data_api.data_model.inspect).to include('string_attr: string')
         expect(data_api.data_model.inspect).to include('text_attr: text')
         data_api.schema[:hi_string] = data_api.schema[:string_attr]
@@ -119,16 +124,19 @@ RSpec.describe DataAPI, type: :model do
         data_api.schema[:hi_text] = data_api.schema[:text_attr]
         data_api.schema[:text_attr] = nil
         data_api.save
+        data_api.data_model.connection
         expect(data_api.data_model.inspect).to include('hi_string: string')
         expect(data_api.data_model.inspect).to include('hi_text: text')
       end
 
       it "removes the removed column in database" do
+        data_api.data_model.connection
         expect(data_api.data_model.inspect).to include('string_attr: string')
         expect(data_api.data_model.inspect).to include('text_attr: text')
         data_api.schema[:string_attr] = nil
         data_api.schema[:text_attr] = nil
         data_api.save
+        data_api.data_model.connection
         expect(data_api.data_model.inspect).not_to include('string_attr: string')
         expect(data_api.data_model.inspect).not_to include('text_attr: text')
       end
@@ -137,6 +145,7 @@ RSpec.describe DataAPI, type: :model do
         data_api.schema[:new_string_attr] = { type: 'string' }
         data_api.schema[:new_text_attr] = { type: 'text' }
         data_api.save
+        data_api.data_model.connection
         expect(data_api.data_model.inspect).to include('new_string_attr: string')
         expect(data_api.data_model.inspect).to include('new_text_attr: text')
       end
@@ -148,6 +157,7 @@ RSpec.describe DataAPI, type: :model do
         model.all
 
         data_api.destroy
+        model.connection
         expect(model.inspect).to include("Table doesn't exist")
       end
     end
