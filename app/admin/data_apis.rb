@@ -69,6 +69,7 @@ ActiveAdmin.register DataAPI do
     column(:path)
     column(:organization) { |data_api| data_api.organization.blank? ? nil : link_to(data_api.organization_code, admin_organization_path(data_api.organization)) } if current_admin.root?
     id_column
+    column(:manage) { |data_api| link_to '管理資料集', admin_data_api_data_api_data_path(data_api_id: data_api.id) }
     actions
   end
 
@@ -101,6 +102,12 @@ ActiveAdmin.register DataAPI do
         end
       end
     end
+
+    panel '資料集' do
+      para do
+        link_to '管理資料集', admin_data_api_data_api_data_path(data_api_id: data_api.id)
+      end
+    end
   end
 
   form do |f|
@@ -109,8 +116,6 @@ ActiveAdmin.register DataAPI do
       f.input :path
       f.input :organization_code, as: :select, collection: options_for_select(Organization.all_for_select, data_api.organization_code) if current_admin.root?
     end
-
-    f.actions
 
     panel '資料綱要' do
       table(class: 'data_api_schema_table editable') do

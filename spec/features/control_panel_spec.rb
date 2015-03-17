@@ -126,6 +126,9 @@ feature "Control Panel", :type => :feature do
 
   describe "Data API Control Panel" do
     before(:all) { DatabaseCleaner.clean_with(:deletion) }
+    let(:api_data_stores_csv_file) do
+      Rails.root.join('spec', 'fixtures', 'files', 'api_data_stores.csv')
+    end
 
     context "signed in as a root admin" do
       before(:each) do
@@ -186,7 +189,7 @@ feature "Control Panel", :type => :feature do
         expect(page).to have_content('my_bool')
 
         data_api = DataAPI.last
-        data_api.data_model.create(uid: 'one', my_int: 1, my_string: 'Hi', my_bool: true)
+        data_api.data_model.create(my_int: 1, my_string: 'Hi', my_bool: true)
 
         expect(data_api.data_model.last.my_int).to be_a(Integer)
         expect(data_api.data_model.last.my_string).to be_a(String)
@@ -220,9 +223,37 @@ feature "Control Panel", :type => :feature do
         expect(page).to have_content('done')
 
         data_api = DataAPI.find(data_api.id)
-        data_api.data_model.create(uid: 'one', name: 'sleep', done: false)
+        data_api.data_model.create(name: 'sleep', done: false)
 
+        Timecop.scale(1)
         Timecop.return
+      end
+
+      scenario "Admin manages data of an Data API", :js => false do
+        data_api = create(:data_api, schema: { string: { type: 'string' }, text: { type: 'text' }, boolean: { type: 'boolean' } })
+        visit(admin_data_api_data_api_data_path data_api_id: data_api.id)
+        click_link I18n.t(:'active_admin.new_model', model: I18n.t(:'activerecord.models.data_api_data'))
+        fill_in 'data_api_data_string', with: "Hello World"
+        fill_in 'data_api_data_text', with: "Have a good day!"
+        check 'data_api_data_boolean'
+        find('input[type=submit]').click
+        expect(data_api.data_model.first.string).to eq("Hello World")
+        expect(data_api.data_model.first.text).to eq("Have a good day!")
+        expect(data_api.data_model.first.boolean).to be(true)
+        expect(page).to have_content("Hello World")
+        visit(admin_data_api_data_api_data_path data_api_id: data_api.id)
+        expect(page).to have_content("Hello World")
+      end
+
+      scenario "Admin imports data to an Data API", :js => false do
+        data_api = create(:data_api, name: 'stores', path: 'stores', schema: { code: { type: 'string', null: false, unique: true }, name: { type: 'string', null: false }, location_latitude: { type: 'string' }, location_longitude: { type: 'string' }, open_at: { type: 'integer' }, close_at: { type: 'integer' }, description: { type: 'text' } })
+        visit(import_admin_data_api_data_api_data_path data_api_id: data_api.id)
+        attach_file('active_admin_import_model_file', api_data_stores_csv_file)
+        find('input[type=submit]').click
+
+        expect(data_api.data_model.first.name).to eq('摩斯漢堡')
+        expect(data_api.data_model.second.location_latitude).to eq('25.022872')
+        expect(data_api.data_model.last.close_at).to eq(2399)
       end
     end
 

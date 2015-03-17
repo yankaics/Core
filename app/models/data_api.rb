@@ -16,7 +16,7 @@ class DataAPI < ActiveRecord::Base
   validates :path, format: { with: /\A[a-z0-9_]+(\/[a-z0-9_]+)?(\/[a-z0-9_]+)?\z/ }
 
   after_find :reset_data_model_if_needed, :inspect_data_model
-  before_validation :convert_schema_hash_to_hash_with_indifferent_access, :remove_blank_columns, :generate_uuid_for_new_columns, :set_type_for_new_columns
+  before_validation :convert_schema_hash_to_hash_with_indifferent_access, :remove_blank_columns, :generate_uuid_for_new_columns, :set_type_for_new_columns, :check_organization_code
   after_create :create_db_table
   before_update :reset_data_model_const, :change_db_table
   after_destroy :drop_db_table
@@ -33,6 +33,46 @@ class DataAPI < ActiveRecord::Base
   module Models
   end
 
+  class Data < ActiveRecord::Base
+    cattr_accessor :model
+
+    def self.column_names(*args, &block)
+      model.column_names(*args, &block)
+    end
+
+    def self.connection(*args, &block)
+      model.connection(*args, &block)
+    end
+
+    def self.quoted_table_name(*args, &block)
+      model.quoted_table_name(*args, &block)
+    end
+
+    def self.primary_key(*args, &block)
+      model.primary_key(*args, &block)
+    end
+
+    def self.human_attribute_name(*args, &block)
+      model.human_attribute_name(*args, &block)
+    end
+
+    def self.content_columns(*args, &block)
+      model.content_columns(*args, &block)
+    end
+
+    def self.find_by_id(*args, &block)
+      model.find_by_id(*args, &block)
+    end
+
+    def self.transaction(*args, &block)
+      model.transaction(*args, &block)
+    end
+
+    def self.import(*args, &block)
+      model.import(*args, &block)
+    end
+  end
+
   class Model < ActiveRecord::Base
     establish_connection DataAPI.database_url
     self.abstract_class = true
@@ -40,8 +80,8 @@ class DataAPI < ActiveRecord::Base
 
     cattr_accessor :updated_at
 
-    validates :uid, presence: true
-    validates :uid, uniqueness: true
+    # validates :uid, presence: true
+    # validates :uid, uniqueness: true
   end
 
   def schema_from_array(columns)
@@ -60,6 +100,10 @@ class DataAPI < ActiveRecord::Base
     m.table_name = name
     m.updated_at = updated_at
     m
+  end
+
+  def data_api_data
+    data_model.all
   end
 
   def reset_data_model_const
@@ -97,16 +141,16 @@ class DataAPI < ActiveRecord::Base
     migration = new_migration
 
     migration.create_table name do |t|
-      t.string :uid, null: false
+      # t.string :uid, null: false
 
       schema.each do |k, v|
         t.send(v[:type], k)
       end
 
-      t.timestamps
+      # t.timestamps
     end
 
-    migration.add_index name, :uid, unique: true
+    # migration.add_index name, :uid, unique: true
   end
 
   def change_db_table
@@ -170,6 +214,10 @@ class DataAPI < ActiveRecord::Base
       end
     end
     migration
+  end
+
+  def check_organization_code
+    self.organization_code = nil if organization_code.blank?
   end
 
   def convert_schema_hash_to_hash_with_indifferent_access

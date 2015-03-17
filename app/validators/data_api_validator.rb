@@ -4,7 +4,7 @@ class DataAPIValidator < ActiveModel::Validator
     record.errors[:base] << "The name should only contains a-z 0-9 and baselines!" unless record.name.present? && record.name.match(/^[a-z0-9_]+$/)
     record.errors[:base] << "The path is not valid!" unless record.path.present? && record.path.match(/^[a-z0-9_]+(\/[a-z0-9_]+)?(\/[a-z0-9_]+)?$/)
 
-    reserved_column_names = %w(uid created_at updated_at)
+    reserved_column_names = %w()
     used_column_uuids = []
 
     record.schema.each do |name, column|

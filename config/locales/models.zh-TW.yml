@@ -10,6 +10,8 @@ zh-TW:
       user: "使用者"
       doorkeeper_application: "應用程式"
       data_api: "資料集 API"
+      data_api/data: "資料集 API 資料"
+      data_api_data: "資料集 API 資料"
 
     attributes:
       user:
@@ -32,6 +34,9 @@ zh-TW:
           female: "女"
           other: "其他"
           unspecified: "未指定"
+      data_api:
+        data_api/data: "資料集 API 資料"
+        data_api_data: "資料集 API 資料"
       organization:
         code: "代碼"
         code_cont: "代碼"
