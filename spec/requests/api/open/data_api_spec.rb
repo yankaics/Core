@@ -31,7 +31,7 @@ describe "Open Data API" do
       expect(response).to be_success
       json = JSON.parse(response.body)
       last_data = data_api.data_model.last
-      expect(json).to include({ 'id' => last_data.id, 'string_col' => last_data.string_col, 'integer_col' => last_data.integer_col, 'type' => data_api.name.classify })
+      expect(json).to include({ 'id' => last_data.id, 'string_col' => last_data.string_col, 'integer_col' => last_data.integer_col, '_type' => data_api.name })
     end
 
     it "is fieldsettable" do
@@ -55,7 +55,7 @@ describe "Open Data API" do
       get "/api/v1/#{data_api.path}/#{first_data.id}.json"
       expect(response).to be_success
       json = JSON.parse(response.body)
-      expect(json).to eq({ 'id' => first_data.id, 'string_col' => first_data.string_col, 'integer_col' => first_data.integer_col, 'type' => data_api.name.classify })
+      expect(json).to eq({ 'id' => first_data.id, 'string_col' => first_data.string_col, 'integer_col' => first_data.integer_col, '_type' => data_api.name })
 
       second_data = another_data_api.data_model.second
       get "/api/v1/#{another_data_api.path}/#{second_data.integer_col}.json"

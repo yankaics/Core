@@ -42,10 +42,11 @@ module APIResourceFieldsettable
     #
     def fieldset_for(resource, root: false, permitted_fields: [], show_all_permitted_fields_by_default: false, default_fields: [])
       @fieldset ||= Hashie::Mash.new
+      @meta ||= Hashie::Mash.new
 
       # put the fields in place
       if params[:fields].is_a? Hash
-        @fieldset[resource] = params[:fields][resource] || params[:fields][resource.to_s.camelize]
+        @fieldset[resource] = params[:fields][resource] || params[:fields][resource]
       elsif root
         @fieldset[resource] = params[:fields]
       end

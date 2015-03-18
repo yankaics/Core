@@ -5,6 +5,8 @@ set_inclusion :user_email
 object @user_email
 attributes(*fieldset[:user_email])
 
-node :type do
-  :UserEmail
+node :_type do
+  :user_email
 end
+
+extends('extensions/meta_data', locals: { self_resource: :user_email })

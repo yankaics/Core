@@ -7,10 +7,16 @@ set_inclusion :organization, default_includes: [:departments]
 
 set_inclusion_field :organization, :departments, :department_codes
 
+node :id do |org|
+  org.code
+end
+
 attributes(*fieldset[:organization])
 
 extends('extensions/includable_childs', locals: { self_resource: :organization })
 
-node :type do
-  :Organization
+node :_type do
+  :organization
 end
+
+extends('extensions/meta_data', locals: { self_resource: :organization })

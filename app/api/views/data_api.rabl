@@ -10,6 +10,8 @@ end
 
 attributes(*fieldset[@resource_name])
 
-node :type do
-  @resource_name.to_s.classify
+node :_type do
+  @resource_name
 end
+
+extends('extensions/meta_data', locals: { self_resource: @resource_name })
