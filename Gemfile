@@ -59,6 +59,8 @@ gem 'factory_girl_rails', '~> 4.5.0'
 gem 'active_model_serializers', '~> 0.8.0'
 gem 'paper_trail', '~> 3.0.6'
 
+gem 'kaminari'
+
 # Create human-friendly IDs for models
 gem 'friendly_id', '~> 5.1.0'
 gem 'babosa'

@@ -62,14 +62,15 @@ ActiveRecord::Schema.define(version: 20150315182743) do
   add_index "data_api_versions", ["item_id", "item_type"], name: "index_data_api_versions_on_item_id_and_item_type"
 
   create_table "data_apis", force: true do |t|
-    t.string   "name",                             null: false
-    t.string   "path",                             null: false
+    t.string   "name",                                  null: false
+    t.string   "path",                                  null: false
     t.string   "organization_code"
+    t.string   "primary_key",       default: "id",      null: false
     t.text     "schema"
-    t.string   "primary_key",       default: "id", null: false
     t.text     "has"
+    t.string   "default_order",     default: "id DESC", null: false
     t.string   "database_url"
-    t.boolean  "maintain_schema",   default: true, null: false
+    t.boolean  "maintain_schema",   default: true,      null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

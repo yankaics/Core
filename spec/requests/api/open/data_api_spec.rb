@@ -47,6 +47,30 @@ describe "Open Data API" do
       expect(response.body).not_to include(last_data.string_col)
       expect(response.body).to include(last_data.text_col)
     end
+
+    it "is paginated" do
+      get "/api/v1/#{data_api.path}.json?per_page=10&page=1"
+      expect(response).to be_success
+      expect(response.headers['Link']).to include("/api/v1/#{data_api.path}.json?per_page=10&page=2")
+      expect(response.headers['Link']).to include("/api/v1/#{data_api.path}.json?per_page=10&page=4")
+      expect(response.body).to include(data_api.data_model.last.string_col)
+      expect(response.body).not_to include(data_api.data_model.first.string_col)
+
+      get "/api/v1/#{data_api.path}.json?per_page=10&page=2"
+      expect(response).to be_success
+      expect(response.headers['Link']).to include("/api/v1/#{data_api.path}.json?per_page=10&page=1")
+      expect(response.headers['Link']).to include("/api/v1/#{data_api.path}.json?per_page=10&page=3")
+      expect(response.headers['Link']).to include("/api/v1/#{data_api.path}.json?per_page=10&page=4")
+      expect(response.body).not_to include(data_api.data_model.last.string_col)
+      expect(response.body).not_to include(data_api.data_model.first.string_col)
+
+      get "/api/v1/#{data_api.path}.json?per_page=5&page=5"
+      expect(response).to be_success
+      expect(response.headers['Link']).to include("/api/v1/#{data_api.path}.json?per_page=5&page=1")
+      expect(response.headers['Link']).to include("/api/v1/#{data_api.path}.json?per_page=5&page=4")
+      expect(response.headers['Link']).to include("/api/v1/#{data_api.path}.json?per_page=5&page=6")
+      expect(response.headers['Link']).to include("/api/v1/#{data_api.path}.json?per_page=5&page=7")
+    end
   end
 
   describe "single resource" do
