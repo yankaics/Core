@@ -4,7 +4,13 @@ class CreateDataApis < ActiveRecord::Migration
       t.string :name, null: false
       t.string :path, null: false
       t.string :organization_code
+
       t.text :schema
+      t.string :primary_key, null: false, default: 'id'
+      t.text :has
+
+      t.string :database_url
+      t.boolean :maintain_schema, null: false, default: true
 
       t.timestamps
     end

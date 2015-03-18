@@ -1,4 +1,4 @@
-class CreateDataApiVersions < ActiveRecord::Migration
+class CreateDataAPIVersions < ActiveRecord::Migration
   def change
     create_table :data_api_versions do |t|
       t.integer  :item_id,   null: false

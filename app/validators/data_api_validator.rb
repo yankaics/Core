@@ -1,10 +1,6 @@
 class DataAPIValidator < ActiveModel::Validator
   def validate(record)
-    record.errors[:base] << "The name should start with an alphabet!" unless record.name.present? && record.name[0].match(/[a-z]/)
-    record.errors[:base] << "The name should only contains a-z 0-9 and baselines!" unless record.name.present? && record.name.match(/^[a-z0-9_]+$/)
-    record.errors[:base] << "The path is not valid!" unless record.path.present? && record.path.match(/^[a-z0-9_]+(\/[a-z0-9_]+)?(\/[a-z0-9_]+)?$/)
-
-    reserved_column_names = %w()
+    reserved_column_names = %w(id)
     used_column_uuids = []
 
     record.schema.each do |name, column|

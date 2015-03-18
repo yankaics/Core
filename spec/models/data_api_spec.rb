@@ -12,6 +12,29 @@ RSpec.describe DataAPI, type: :model do
     its(:schema) { is_expected.to be_a(HashWithIndifferentAccess) }
   end
 
+  describe ".find_by_path" do
+    let!(:a_api) { create(:data_api, path: 'path/to/a/api') }
+    let!(:another_api) { create(:data_api, path: 'path/to/another/api') }
+
+    it "returns matching data_api by a resource collection path" do
+      data_api = DataAPI.find_by_path('path/to/a/api')
+      expect(data_api).to eq(a_api)
+      expect(data_api.single_data_id).to be_blank
+      data_api = DataAPI.find_by_path('path/to/another/api')
+      expect(data_api).to eq(another_api)
+      expect(data_api.single_data_id).to be_blank
+    end
+
+    it "returns matching data_api containing single_data_id by a single resource path" do
+      data_api = DataAPI.find_by_path('path/to/a/api/some_id')
+      expect(data_api).to eq(a_api)
+      expect(data_api.single_data_id).to eq('some_id')
+      data_api = DataAPI.find_by_path('path/to/another/api/yet_another_id')
+      expect(data_api).to eq(another_api)
+      expect(data_api.single_data_id).to eq('yet_another_id')
+    end
+  end
+
   describe "DataAPI #data_model" do
     subject(:model) { create(:data_api).data_model }
 
@@ -45,7 +68,7 @@ RSpec.describe DataAPI, type: :model do
       expect(data_api).to be_valid
       data_api = build(:data_api, path: 'a/b/c')
       expect(data_api).to be_valid
-      data_api = build(:data_api, path: 'a/b/c/d')
+      data_api = build(:data_api, path: 'a/b/c/d/e/f/g/h')
       expect(data_api).not_to be_valid
       data_api = build(:data_api, path: 'A/B')
       expect(data_api).not_to be_valid
@@ -62,10 +85,8 @@ RSpec.describe DataAPI, type: :model do
     end
 
     it "should not be valid if schema column used a reserved name" do
-      # data_api = build(:data_api, schema: { created_at: { type: 'string' } })
-      # expect(data_api).not_to be_valid
-      # data_api = build(:data_api, schema: { updated_at: { type: 'string' } })
-      # expect(data_api).not_to be_valid
+      data_api = build(:data_api, schema: { id: { type: 'string' } })
+      expect(data_api).not_to be_valid
     end
 
     it "should not be valid if type of existing schema column has changed" do

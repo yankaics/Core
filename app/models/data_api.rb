@@ -1,4 +1,5 @@
 class DataAPI < ActiveRecord::Base
+  attr_accessor :single_data_id
   has_paper_trail class_name: 'DataAPIVersion'
 
   COLUMN_TYPES = %w(string integer float boolean text datetime)
@@ -12,8 +13,8 @@ class DataAPI < ActiveRecord::Base
 
   validates_with DataAPIValidator
   validates :name, :path, presence: true
-  validates :name, format: { with: /\A[a-z0-9_]+\z/ }
-  validates :path, format: { with: /\A[a-z0-9_]+(\/[a-z0-9_]+)?(\/[a-z0-9_]+)?\z/ }
+  validates :name, format: { with: /\A[a-z][a-z0-9_]*\z/ }
+  validates :path, format: { with: /\A[a-z0-9_]+(\/[a-z0-9_]+){0,4}\z/ }
 
   after_find :reset_data_model_if_needed, :inspect_data_model
   before_validation :convert_schema_hash_to_hash_with_indifferent_access, :remove_blank_columns, :generate_uuid_for_new_columns, :set_type_for_new_columns, :check_organization_code
@@ -28,6 +29,17 @@ class DataAPI < ActiveRecord::Base
     else
       @database_url = ENV['API_DATABASE_URL']
     end
+  end
+
+  def self.find_by_path(path)
+    singular_path = path.match(/(?<path>.+)\/(?<id>[^\/]+)\z/)
+    if singular_path
+      data_api = DataAPI.find_by(path: [path, singular_path[:path]])
+      data_api.single_data_id = singular_path[:id] if data_api.present? && data_api.path != path
+    else
+      data_api = DataAPI.find_by(path: path)
+    end
+    data_api
   end
 
   module Models
@@ -77,11 +89,16 @@ class DataAPI < ActiveRecord::Base
     establish_connection DataAPI.database_url
     self.abstract_class = true
     self.primary_key = :id
+    self.inheritance_column = nil
 
     cattr_accessor :updated_at
 
     # validates :uid, presence: true
     # validates :uid, uniqueness: true
+  end
+
+  def columns
+    schema.map { |k, v| k.to_sym }
   end
 
   def get_database_url
