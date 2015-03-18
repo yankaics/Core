@@ -5,7 +5,10 @@ class API::Open < API
 
   route :any, '*path' do
     @request_path = params.path
+    # remove format extension in path
     @request_path.slice!(/\..+$/)
+    # remove versioning in path
+    @request_path.slice!(/^v1\//)
 
     if false
 

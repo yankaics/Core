@@ -17,9 +17,17 @@ describe "Open Data API" do
                                             datetime_col: { type: 'datetime' } })
   end
 
+  it "can be accessed with no versioning info provided" do
+    get "/api/v1/#{data_api.path}.json"
+    versioned_response = response
+    get "/api/#{data_api.path}.json"
+    unversioned_response = response
+    expect(versioned_response.body).to eq(unversioned_response.body)
+  end
+
   describe "resource collection" do
     it "returns datas" do
-      get "/api/#{data_api.path}.json"
+      get "/api/v1/#{data_api.path}.json"
       expect(response).to be_success
       json = JSON.parse(response.body)
       last_data = data_api.data_model.last
@@ -28,13 +36,13 @@ describe "Open Data API" do
 
     it "is fieldsettable" do
       last_data = another_data_api.data_model.last
-      get "/api/#{another_data_api.path}.json?fields=string_col,integer_col"
+      get "/api/v1/#{another_data_api.path}.json?fields=string_col,integer_col"
       expect(response).to be_success
       expect(response.body).to include(last_data.string_col)
       expect(response.body).to include("#{last_data.integer_col}")
       expect(response.body).not_to include(last_data.text_col)
 
-      get "/api/#{another_data_api.path}.json?fields=text_col"
+      get "/api/v1/#{another_data_api.path}.json?fields=text_col"
       expect(response).to be_success
       expect(response.body).not_to include(last_data.string_col)
       expect(response.body).to include(last_data.text_col)
@@ -44,26 +52,26 @@ describe "Open Data API" do
   describe "single resource" do
     it "returns a data" do
       first_data = data_api.data_model.first
-      get "/api/#{data_api.path}/#{first_data.id}.json"
+      get "/api/v1/#{data_api.path}/#{first_data.id}.json"
       expect(response).to be_success
       json = JSON.parse(response.body)
       expect(json).to eq({ 'id' => first_data.id, 'string_col' => first_data.string_col, 'integer_col' => first_data.integer_col, 'type' => data_api.name.classify })
 
       second_data = another_data_api.data_model.second
-      get "/api/#{another_data_api.path}/#{second_data.integer_col}.json"
+      get "/api/v1/#{another_data_api.path}/#{second_data.integer_col}.json"
       expect(response).to be_success
       expect(response.body).to include(second_data.text_col)
     end
 
     it "is fieldsettable" do
       last_data = another_data_api.data_model.last
-      get "/api/#{another_data_api.path}/#{last_data.integer_col}.json?fields=string_col,integer_col"
+      get "/api/v1/#{another_data_api.path}/#{last_data.integer_col}.json?fields=string_col,integer_col"
       expect(response).to be_success
       expect(response.body).to include(last_data.string_col)
       expect(response.body).to include("#{last_data.integer_col}")
       expect(response.body).not_to include(last_data.text_col)
 
-      get "/api/#{another_data_api.path}/#{last_data.integer_col}.json?fields=text_col"
+      get "/api/v1/#{another_data_api.path}/#{last_data.integer_col}.json?fields=text_col"
       expect(response).to be_success
       expect(response.body).not_to include(last_data.string_col)
       expect(response.body).to include(last_data.text_col)
