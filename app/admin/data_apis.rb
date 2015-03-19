@@ -33,7 +33,7 @@ ActiveAdmin.register DataAPI do
     end
 
     def data_api_params
-      p = [:name, :path]
+      p = [:name, :path, :primary_key, :default_order, :database_url, :maintain_schema]
       p.concat [:organization_code, :organization] if current_admin.root?
       params.require(:data_api).slice(*p).permit(p)
     end
@@ -50,7 +50,7 @@ ActiveAdmin.register DataAPI do
   scope :local, if: proc { current_admin.root? }
 
   permit_params do
-    params = [:name, :path, :schema]
+    params = [:name, :path, :primary_key, :schema, :has, :default_order, :database_url, :maintain_schema]
     params.concat [:organization_code, :organization] if current_admin.root?
     params
   end
@@ -68,6 +68,21 @@ ActiveAdmin.register DataAPI do
     column(:name) { |data_api| link_to data_api.name, admin_data_api_path(data_api) }
     column(:path)
     column(:organization) { |data_api| data_api.organization.blank? ? nil : link_to(data_api.organization_code, admin_organization_path(data_api.organization)) } if current_admin.root?
+    column(:maintain_schema)
+    id_column
+    column(:manage) { |data_api| link_to '管理資料集', admin_data_api_data_api_data_path(data_api_id: data_api.id) }
+    actions
+  end
+
+  index as: :detailed_table do
+    selectable_column
+    column(:name) { |data_api| link_to data_api.name, admin_data_api_path(data_api) }
+    column(:path)
+    column(:organization) { |data_api| data_api.organization.blank? ? nil : link_to(data_api.organization_code, admin_organization_path(data_api.organization)) } if current_admin.root?
+    column(:maintain_schema)
+    column(:primary_key)
+    column(:default_order)
+    column(:database_url) { |data_api| code { data_api.database_url } }
     id_column
     column(:manage) { |data_api| link_to '管理資料集', admin_data_api_data_api_data_path(data_api_id: data_api.id) }
     actions
@@ -78,7 +93,11 @@ ActiveAdmin.register DataAPI do
       row(:name)
       row(:path)
       row(:organization) if current_admin.root?
-      row(:schema)
+      row(:primary_key)
+      row(:schema) { |data_api| code { data_api.schema } }
+      row(:default_order)
+      row(:maintain_schema)
+      row(:database_url) { |data_api| code { data_api.database_url } }
       row(:id)
       row(:created_at)
       row(:updated_at)
@@ -115,6 +134,9 @@ ActiveAdmin.register DataAPI do
       f.input :name
       f.input :path
       f.input :organization_code, as: :select, collection: options_for_select(Organization.all_for_select, data_api.organization_code) if current_admin.root?
+
+      f.input :primary_key, hint: "必須是存在的欄位名稱"
+      f.input :default_order, hint: "必須使用存在的欄位名稱"
     end
 
     panel '資料綱要' do
@@ -152,6 +174,11 @@ ActiveAdmin.register DataAPI do
           end
         end
       end
+    end
+
+    f.inputs "進階資料庫連線資訊" do
+      f.input :database_url, hint: "如資料存放在外部資料庫，可在此欄填寫其資料庫網址，支援 PostgreSQL ('postgresql://USER:PASSWORD@HOST:PORT/NAME') 以及 MySQL ('mysql://USER:PASSWORD@HOST:PORT/NAME')，留空表示使用系統的資料庫"
+      f.input :maintain_schema, hint: "若取消自動維護資料表，則需要手動確保資料庫綱要與設定一致，否則會在存取資料時發生錯誤，關閉此功能而又開啟、或搬遷到新資料庫，也需手動設定資料表"
     end
 
     f.actions

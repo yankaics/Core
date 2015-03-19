@@ -15,6 +15,7 @@ class DataAPI < ActiveRecord::Base
   validates :name, :path, presence: true
   validates :name, format: { with: /\A[a-z][a-z0-9_]*\z/ }
   validates :path, format: { with: /\A[a-z0-9_]+(\/[a-z0-9_]+){0,4}\z/ }
+  validates :database_url, format: { with: /\A(postgresql:\/\/)|(mysql:\/\/)|(sqlite3:db\/)/ }, allow_blank: true
 
   after_find :reset_data_model_if_needed, :inspect_data_model
   before_validation :convert_schema_hash_to_hash_with_indifferent_access, :remove_blank_columns, :generate_uuid_for_new_columns, :set_type_for_new_columns, :check_organization_code
@@ -102,7 +103,7 @@ class DataAPI < ActiveRecord::Base
   end
 
   def get_database_url
-    DataAPI.database_url
+    database_url || DataAPI.database_url
   end
 
   def schema_from_array(columns)
@@ -118,7 +119,11 @@ class DataAPI < ActiveRecord::Base
     return Models.const_get(name.classify) if Models.const_defined?(name.classify)
     Models.const_set(name.classify, Class.new(DataAPI::Model))
     m = Models.const_get(name.classify)
-    m.establish_connection get_database_url
+    begin
+      m.establish_connection get_database_url
+    rescue ActiveRecord::ActiveRecordError => e
+      Rails.logger.error e
+    end
     m.table_name = name
     m.updated_at = updated_at
     m
@@ -130,9 +135,13 @@ class DataAPI < ActiveRecord::Base
 
   def reset_data_model_const
     Models.send(:remove_const, name.classify) if Models.const_defined?(name.classify)
-    data_model.establish_connection get_database_url
-    data_model.connection.schema_cache.clear!
-    data_model.reset_column_information
+    begin
+      data_model.establish_connection get_database_url
+      data_model.connection.schema_cache.clear!
+      data_model.reset_column_information
+    rescue ActiveRecord::ActiveRecordError => e
+      Rails.logger.error e
+    end
   end
 
   def reset_data_model_if_needed
@@ -161,6 +170,7 @@ class DataAPI < ActiveRecord::Base
   end
 
   def create_db_table
+    return unless maintain_schema
     migration = new_migration
 
     migration.create_table name do |t|
@@ -177,6 +187,7 @@ class DataAPI < ActiveRecord::Base
   end
 
   def change_db_table
+    return unless maintain_schema
     migration = new_migration
     previous_version = DataAPI.find(id)
     old_table_name = previous_version.name
@@ -235,7 +246,10 @@ class DataAPI < ActiveRecord::Base
       @db_url = db_url
 
       def connection
-        DataAPI::Model.establish_connection @db_url
+        begin
+          DataAPI::Model.establish_connection @db_url
+        rescue ActiveRecord::AdapterNotSpecified
+        end
         DataAPI::Model.connection
       end
     end

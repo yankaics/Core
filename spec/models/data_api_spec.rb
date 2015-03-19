@@ -1,6 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe DataAPI, type: :model do
+  after(:all) do
+    test_api_mt_db = Rails.root.join('db', 'test_api_mt.sqlite3')
+    File.delete(test_api_mt_db) if File.exist?(test_api_mt_db)
+  end
+
   it { should belong_to(:organization) }
   it { should serialize(:schema) }
   it { should validate_presence_of(:name) }
@@ -95,15 +100,40 @@ RSpec.describe DataAPI, type: :model do
       data_api.schema[:attr2][:type] = 'string'
       expect(data_api).not_to be_valid
     end
+
+    it "should not be valid if maintain_schema turned off while using system database" do
+      data_api = create(:data_api, schema: { attr1: { type: 'string' }, attr2: { type: 'text' } })
+      expect(data_api).to be_valid
+      data_api.maintain_schema = false
+      expect(data_api).not_to be_valid
+      data_api.database_url = 'sqlite3:db/test_api_test.sqlite3'
+      expect(data_api).to be_valid
+    end
+
+    it "should not be valid if having invalid database_url" do
+      data_api = create(:data_api, schema: { attr1: { type: 'string' }, attr2: { type: 'text' } })
+      expect(data_api).to be_valid
+      data_api.database_url = 'sqlite3://tmp/'
+      expect(data_api).not_to be_valid
+      data_api.database_url = 'sqlite3:db/test_api_mt.sqlite3'
+      expect(data_api).to be_valid
+      data_api.database_url = 'http://colorgy.dev'
+      expect(data_api).not_to be_valid
+      data_api.database_url = 'postgresql://USER:PASSWORD@HOST:PORT/NAME'
+      expect(data_api).to be_valid
+      data_api.database_url = 'mysql://USER:PASSWORD@HOST:PORT/NAME'
+      expect(data_api).to be_valid
+    end
   end
 
   with_versioning do
-    let!(:data_api) do
+    let(:data_api) do
       create(:data_api, schema: { string_attr: { type: 'string' },
                                   text_attr: { type: 'text' },
                                   datetime_attr: { type: 'datetime' },
                                   boolean_attr: { type: 'boolean' } })
     end
+    let(:outer_data_api) { create(:data_api, :with_data, database_url: 'sqlite3:db/test_api_mt.sqlite3') }
 
     context "on create" do
       it "creates the corresponding database table" do
@@ -113,6 +143,16 @@ RSpec.describe DataAPI, type: :model do
         expect(model.inspect).to include('datetime_attr: datetime')
         expect(model.inspect).to include('boolean_attr: boolean')
         expect(model.inspect).to include('text_attr: text')
+      end
+
+      context "using outer database with maintain_schema off" do
+        it "does not create the outer database schema" do
+          new_outer_data_api = build(:data_api, maintain_schema: false, database_url: 'sqlite3:db/test_api_mt.sqlite3')
+          new_outer_data_api.save!
+          new_outer_data_api.data_model.connection
+          expect(new_outer_data_api.data_model.inspect).not_to include('string')
+          expect { new_outer_data_api.data_model.last }.to raise_error
+        end
       end
     end
 
@@ -169,6 +209,18 @@ RSpec.describe DataAPI, type: :model do
         data_api.data_model.connection
         expect(data_api.data_model.inspect).to include('new_string_attr: string')
         expect(data_api.data_model.inspect).to include('new_text_attr: text')
+      end
+
+      context "using outer database with maintain_schema off" do
+        it "does not change the outer database schema" do
+          outer_data_api.maintain_schema = false
+          outer_data_api.schema[:new_string_attr] = { type: 'string' }
+          outer_data_api.save!
+          outer_data_api.data_model.connection
+          expect(outer_data_api.data_model.inspect).not_to include('new_string_attr')
+          sample_data = outer_data_api.data_model.first
+          expect { sample_data.new_string_attr }.to raise_error
+        end
       end
     end
 

@@ -4,9 +4,9 @@ class DataAPIValidator < ActiveModel::Validator
     used_column_uuids = []
 
     record.schema.each do |name, column|
-      record.errors[:base] << "The schema column name '#{name}' is reserved!" if reserved_column_names.include?(name)
-      record.errors[:base] << "The schema column '#{name}' has duplicated uuid!" if used_column_uuids.include?(column[:uuid])
-      record.errors[:base] << "The schema column '#{name}' has invalid type!" unless DataAPI::COLUMN_TYPES.include?(column[:type])
+      record.errors[:schema] << "The schema column name '#{name}' is reserved!" if reserved_column_names.include?(name)
+      record.errors[:schema] << "The schema column '#{name}' has duplicated uuid!" if used_column_uuids.include?(column[:uuid])
+      record.errors[:schema] << "The schema column '#{name}' has invalid type!" unless DataAPI::COLUMN_TYPES.include?(column[:type])
       used_column_uuids << column[:uuid]
     end
 
@@ -15,8 +15,20 @@ class DataAPIValidator < ActiveModel::Validator
       current_columns = Hash[record.schema.map { |k, v| v[:name] = k; [v[:uuid], v] }]
 
       current_columns.each do |uuid, column|
-        record.errors[:base] << "The type of a existing column should not be changed!" if old_columns[uuid].present? && old_columns[uuid][:type] != column[:type]
+        record.errors[:schema] << "The type of a existing column should not be changed!" if old_columns[uuid].present? && old_columns[uuid][:type] != column[:type]
       end
     end
+
+    record.errors[:maintain_schema] << "This can not be turned off while using system database!" if record.database_url.blank? && !record.maintain_schema
+
+    # if record.database_url.present?
+    #   begin
+    #     record.data_model.establish_connection record.database_url
+    #     record.data_model.connection.schema_cache.clear!
+    #     record.data_model.reset_column_information
+    #   rescue ActiveRecord::ActiveRecordError => e
+    #     record.errors[:database_url] << "Error connecting database!"
+    #   end
+    # end
   end
 end
