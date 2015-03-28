@@ -52,8 +52,8 @@ class User < ActiveRecord::Base
   validates :name, presence: true, on: :update
   validates_associated :emails, :unconfirmed_emails
 
-  before_create :build_data
-  before_validation :ensure_user_has_valid_primary_identity
+  before_create :generate_uuid, :build_data
+  before_validation :generate_uuid, :ensure_user_has_valid_primary_identity
   after_touch :save!
   after_save :clear_association_cache
 
@@ -83,6 +83,23 @@ class User < ActiveRecord::Base
     !primary_identity_id.blank?
   end
 
+  def generate_uuid
+    return if uuid.present?
+    regenerate_uuid(true)
+  end
+
+  def regenerate_uuid(random = true)
+    if random
+      base = SecureRandom.random_bytes(16)
+    else
+      base = Digest::MD5.digest("#{ENV['APP_URL']}#{id}")
+    end
+    ary = base.unpack("NnnnnN")
+    ary[2] = (ary[2] & 0x0fff) | 0x4000
+    ary[3] = (ary[3] & 0x3fff) | 0x8000
+    self.uuid = "%08x-%04x-%04x-%04x-%04x%08x" % ary
+  end
+
   def avatar_url
     external_avatar_url
   end
@@ -104,6 +121,7 @@ class User < ActiveRecord::Base
 
   PUBLIC_ATTRS = [
     :id,
+    :uuid,
     :username,
     :name,
     :avatar_url,

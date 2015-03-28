@@ -19,6 +19,8 @@ describe "Me API" do
       expect(response).to be_success
       json = JSON.parse(response.body)
       expect(json['name']).to eq @token.resource_owner.name
+      expect(json['id']).not_to be_blank
+      expect(json['uuid']).not_to be_blank
       expect(json).not_to have_key 'email'
       expect(json).not_to have_key 'updated_at'
       expect(json).not_to have_key 'fbid'

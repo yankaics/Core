@@ -79,6 +79,10 @@ RSpec.describe User, :type => :model do
       it { is_expected.not_to be_confirmed }
       its(:data) { is_expected.to be_an(Object) }
       its(:gender) { is_expected.to eq('unspecified') }
+      it "is expected to have an unique uuid" do
+        expect(user.uuid).not_to be_blank
+        expect(user.uuid).not_to eq(create(:user).uuid)
+      end
     end
 
     context "after confirmed" do
