@@ -382,7 +382,7 @@ GEM
     rdoc (4.2.0)
       json (~> 1.4)
     react-source (0.12.2)
-    redcarpet (3.2.2)
+    redcarpet (3.2.3)
     ref (1.0.5)
     remote_syslog_logger (1.0.3)
       syslog_protocol
