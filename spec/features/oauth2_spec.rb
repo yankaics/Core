@@ -314,7 +314,8 @@ feature "OAuth 2.0", :type => :feature do
               "expires_at": 1000000000,
               "is_valid": true,
               "scopes": [
-                "public_profile"
+                "public_profile",
+                "email"
               ],
               "user_id": "1234567890"
             }
@@ -336,6 +337,16 @@ feature "OAuth 2.0", :type => :feature do
         .to_return(body: <<-eos
           {
             "id": "1234567890",
+            "name": "Facebook User",
+            "email": "user@facebook.com",
+            "gender": "male"
+          }
+        eos
+      )
+      stub_request(:get, "https://graph.facebook.com/me?access_token=#{fbtoken_of_other_app}&fields=id,name,email,gender")
+        .to_return(body: <<-eos
+          {
+            "id": "0987654321",
             "name": "Facebook User",
             "email": "user@facebook.com",
             "gender": "male"
@@ -371,6 +382,28 @@ feature "OAuth 2.0", :type => :feature do
           }
         eos
       )
+      stub_request(:get, "https://graph.facebook.com/me?access_token=#{fbtoken_of_other_app}&fields=id,name,link,picture.height(500).width(500),cover&locale=#{I18n.locale}")
+        .to_return(body: <<-eos
+          {
+            "id": "0987654321",
+            "name": "Facebook User",
+            "link": "https://www.facebook.com/app_scoped_user_id/1234567890/",
+            "picture": {
+              "data": {
+                "height": 720,
+                "is_silhouette": false,
+                "url": "",
+                "width": 720
+              }
+            },
+            "cover": {
+              "id": "0",
+              "offset_y": 0,
+              "source": ""
+            }
+          }
+        eos
+      )
 
       # Resource Owner Facebook Access Token Grant, POST to the endpoint to get a token
       page.driver.post(<<-URL.squish.delete(' ')
@@ -383,8 +416,10 @@ feature "OAuth 2.0", :type => :feature do
 
       response = JSON.parse(page.body)
       expect(response).to have_key 'access_token'
+      access_token = response['access_token']
+      user = Doorkeeper::AccessToken.find_by(token: access_token).resource_owner
 
-      # Fail if access token is owned by other app
+      # If access token is owned by other app
       page.driver.post(<<-URL.squish.delete(' ')
         /oauth/token?
         grant_type=password&
@@ -394,8 +429,12 @@ feature "OAuth 2.0", :type => :feature do
       )
 
       response = JSON.parse(page.body)
-      expect(response).not_to have_key 'access_token'
-      expect(response).to have_key 'error'
+      expect(response).to have_key 'access_token'
+      expect(response).not_to have_key 'error'
+      access_token = response['access_token']
+      user2 = Doorkeeper::AccessToken.find_by(token: access_token).resource_owner
+
+      expect(user2).to eq(user)
 
       # Fail if an invalid access token is provided
       page.driver.post(<<-URL.squish.delete(' ')

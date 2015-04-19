@@ -104,7 +104,7 @@ Doorkeeper.configure do
       token_info = debug_token_connection.parsed_response
       token_info = JSON.parse(token_info) if token_info.is_a?(String)
 
-      if token_info['data'].is_a?(Hash) && token_info['data']['app_id'] == ENV['FB_APP_ID']
+      if token_info['data'].is_a?(Hash)
         get_access_connection = HTTParty.get(
           <<-eos.squish.delete(' ')
             https://graph.facebook.com/me?
@@ -117,21 +117,40 @@ Doorkeeper.configure do
         access = JSON.parse(access) if access.is_a?(String)
 
         if access['id'].present?
-          facebook_auth = {
-            uid: access['id'],
-            credentials: {
-              token: params[:password]
-            },
-            info: {
-              email: access['email'],
-              name: access['name']
-            },
-            extra: {
-              raw_info: {
-                gender: access['gender']
+          # the access token is owned by this app, provide full information
+          if token_info['data']['app_id'] == ENV['FB_APP_ID']
+            facebook_auth = {
+              uid: access['id'],
+              credentials: {
+                token: params[:password]
+              },
+              info: {
+                email: access['email'],
+                name: access['name']
+              },
+              extra: {
+                raw_info: {
+                  gender: access['gender']
+                }
               }
             }
-          }
+          # the access token is not owned by this app, provide limited information
+          else
+            facebook_auth = {
+              credentials: {
+                token: params[:password]
+              },
+              info: {
+                email: access['email'],
+                name: access['name']
+              },
+              extra: {
+                raw_info: {
+                  gender: access['gender']
+                }
+              }
+            }
+          end
 
           u = User.from_facebook(facebook_auth)
           u
