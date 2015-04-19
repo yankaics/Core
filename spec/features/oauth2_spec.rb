@@ -279,5 +279,136 @@ feature "OAuth 2.0", :type => :feature do
 
       Timecop.return
     end
+
+    # Resource Owner Facebook Access Token Grant
+    scenario "Resource Owner Facebook Access Token Grant" do
+      fbtoken = 'facebook_access_token'
+      fbtoken_of_other_app = 'facebook_access_token_of_other_app'
+
+      # Stub requests to Facebook
+      stub_request(:get, "https://graph.facebook.com/debug_token?access_token=#{fbtoken}&input_token=#{fbtoken}")
+        .to_return(body: <<-eos
+          {
+            "data": {
+              "app_id": "#{ENV['FB_APP_ID']}",
+              "application": "Colorgy",
+              "expires_at": 1000000000,
+              "is_valid": true,
+              "scopes": [
+                "public_profile",
+                "basic_info",
+                "email",
+                "user_friends"
+              ],
+              "user_id": "1234567890"
+            }
+          }
+        eos
+      )
+      stub_request(:get, "https://graph.facebook.com/debug_token?access_token=#{fbtoken_of_other_app}&input_token=#{fbtoken_of_other_app}")
+        .to_return(body: <<-eos
+          {
+            "data": {
+              "app_id": "some_other_app",
+              "application": "Colorgy",
+              "expires_at": 1000000000,
+              "is_valid": true,
+              "scopes": [
+                "public_profile"
+              ],
+              "user_id": "1234567890"
+            }
+          }
+        eos
+      )
+      stub_request(:get, "https://graph.facebook.com/debug_token?access_token=invalid_token&input_token=invalid_token")
+        .to_return(body: <<-eos
+          {
+            "error": {
+              "message": "Invalid OAuth access token.",
+              "type": "OAuthException",
+              "code": 190
+            }
+          }
+        eos
+      )
+      stub_request(:get, "https://graph.facebook.com/me?access_token=#{fbtoken}&fields=id,name,email,gender")
+        .to_return(body: <<-eos
+          {
+            "id": "1234567890",
+            "name": "Facebook User",
+            "email": "user@facebook.com",
+            "gender": "male"
+          }
+        eos
+      )
+      stub_request(:get, "https://graph.facebook.com/me?access_token=#{fbtoken}&fields=id,name,link,picture.height(500).width(500),cover,devices,friends&locale=#{I18n.locale}")
+        .to_return(body: <<-eos
+          {
+            "id": "1234567890",
+            "name": "Facebook User",
+            "link": "https://www.facebook.com/app_scoped_user_id/1234567890/",
+            "picture": {
+              "data": {
+                "height": 720,
+                "is_silhouette": false,
+                "url": "",
+                "width": 720
+              }
+            },
+            "cover": {
+              "id": "0",
+              "offset_y": 0,
+              "source": ""
+            },
+            "devices": [],
+            "friends": {
+              "data": [],
+              "summary": {
+                "total_count": 0
+              }
+            }
+          }
+        eos
+      )
+
+      # Resource Owner Facebook Access Token Grant, POST to the endpoint to get a token
+      page.driver.post(<<-URL.squish.delete(' ')
+        /oauth/token?
+        grant_type=password&
+        username=facebook:access_token&
+        password=#{fbtoken}
+        URL
+      )
+
+      response = JSON.parse(page.body)
+      expect(response).to have_key 'access_token'
+
+      # Fail if access token is owned by other app
+      page.driver.post(<<-URL.squish.delete(' ')
+        /oauth/token?
+        grant_type=password&
+        username=facebook:access_token&
+        password=#{fbtoken_of_other_app}
+        URL
+      )
+
+      response = JSON.parse(page.body)
+      expect(response).not_to have_key 'access_token'
+      expect(response).to have_key 'error'
+
+      # Fail if an invalid access token is provided
+      page.driver.post(<<-URL.squish.delete(' ')
+        /oauth/token?
+        grant_type=password&
+        username=facebook:access_token&
+        password=invalid_token
+        URL
+      )
+
+      response = JSON.parse(page.body)
+      expect(response).not_to have_key 'access_token'
+      expect(response).to have_key 'error'
+    end
   end
 end

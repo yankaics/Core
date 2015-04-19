@@ -91,24 +91,77 @@ Doorkeeper.configure do
   grant_flows %w(authorization_code client_credentials implicit password)
 
   resource_owner_from_credentials do |routes|
-    u = User.find_for_database_authentication(email: params[:username])
-    u = User.find_for_database_authentication(username: params[:username]) if u.blank?
+    case params[:username]
+    when 'facebook:access_token'
+      debug_token_connection = HTTParty.get(
+        <<-eos.squish.delete(' ')
+          https://graph.facebook.com/debug_token?
+            input_token=#{params[:password]}&
+            access_token=#{params[:password]}
+          eos
+      )
 
-    if u.present?
-      if u.access_locked?
-        u.unlock_access! if u.locked_at < Time.now - User.unlock_in
+      token_info = debug_token_connection.parsed_response
+      token_info = JSON.parse(token_info) if token_info.is_a?(String)
+
+      if token_info['data'].is_a?(Hash) && token_info['data']['app_id'] == ENV['FB_APP_ID']
+        get_access_connection = HTTParty.get(
+          <<-eos.squish.delete(' ')
+            https://graph.facebook.com/me?
+              fields=id,name,email,gender&
+              access_token=#{params[:password]}
+            eos
+        )
+
+        access = get_access_connection.parsed_response
+        access = JSON.parse(access) if access.is_a?(String)
+
+        if access['id'].present?
+          facebook_auth = {
+            uid: access['id'],
+            credentials: {
+              token: params[:password]
+            },
+            info: {
+              email: access['email'],
+              name: access['name']
+            },
+            extra: {
+              raw_info: {
+                gender: access['gender']
+              }
+            }
+          }
+
+          u = User.from_facebook(facebook_auth)
+          u
+        else
+          nil
+        end
+      else
+        nil
       end
 
-      if u.access_locked?
-        nil
-      elsif u.valid_password?(params[:password])
-        u.failed_attempts = 0 && u.save! if u.failed_attempts > 0
-        u
-      else
-        u.failed_attempts += 1
-        u.save!
-        u.lock_access! if u.failed_attempts > User.maximum_attempts
-        nil
+    else
+      u = User.find_for_database_authentication(email: params[:username])
+      u = User.find_for_database_authentication(username: params[:username]) if u.blank?
+
+      if u.present?
+        if u.access_locked?
+          u.unlock_access! if u.locked_at < Time.now - User.unlock_in
+        end
+
+        if u.access_locked?
+          nil
+        elsif u.valid_password?(params[:password])
+          u.failed_attempts = 0 && u.save! if u.failed_attempts > 0
+          u
+        else
+          u.failed_attempts += 1
+          u.save!
+          u.lock_access! if u.failed_attempts > User.maximum_attempts
+          nil
+        end
       end
     end
   end
