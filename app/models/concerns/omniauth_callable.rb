@@ -30,7 +30,8 @@ module OmniauthCallable
 
       return false if auth[:info][:email].blank? || auth[:info][:name].blank?
 
-      user = where(email: auth[:info][:email]).first_or_create! do |new_user|
+      user = where(fbemail: auth[:info][:email]).first || where(email: auth[:info][:email]).first_or_create! do |new_user|
+        new_user.fbemail = auth[:info][:email]
         new_user.fbid = auth[:uid]
         new_user.password = Devise.friendly_token[0, 20]
         new_user.name = auth[:info][:name]

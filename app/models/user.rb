@@ -108,6 +108,10 @@ class User < ActiveRecord::Base
     external_cover_photo_url
   end
 
+  def fb_linked?
+    fbemail.present?
+  end
+
   private
 
   def ensure_user_has_valid_primary_identity
