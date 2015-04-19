@@ -8,6 +8,7 @@ FactoryGirl.define do
     sequence(:email) { |n| "#{Faker::Internet.user_name}#{n}@example.com" }
     password { Faker::Internet.password }
     password_confirmation { password }
+    username { Faker::Internet.user_name }
     name { Faker::Name.name }
     mobile nil
 

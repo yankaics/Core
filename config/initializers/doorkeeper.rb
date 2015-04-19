@@ -90,6 +90,29 @@ Doorkeeper.configure do
   #
   grant_flows %w(authorization_code client_credentials implicit password)
 
+  resource_owner_from_credentials do |routes|
+    u = User.find_for_database_authentication(email: params[:username])
+    u = User.find_for_database_authentication(username: params[:username]) if u.blank?
+
+    if u.present?
+      if u.access_locked?
+        u.unlock_access! if u.locked_at < Time.now - User.unlock_in
+      end
+
+      if u.access_locked?
+        nil
+      elsif u.valid_password?(params[:password])
+        u.failed_attempts = 0 && u.save! if u.failed_attempts > 0
+        u
+      else
+        u.failed_attempts += 1
+        u.save!
+        u.lock_access! if u.failed_attempts > User.maximum_attempts
+        nil
+      end
+    end
+  end
+
   # Under some circumstances you might want to have applications auto-approved,
   # so that the user skips the authorization step.
   # For example if dealing with trusted a application.
@@ -100,6 +123,8 @@ Doorkeeper.configure do
   # WWW-Authenticate Realm (default "Doorkeeper").
   realm ENV['APP_NAME']
 end
+
+Doorkeeper.configuration.token_grant_types << "password"
 
 # require Rails.root.join('app', 'models', 'concerns', 'oauth_application') unless defined? OAuthApplication
 module OAuthApplication

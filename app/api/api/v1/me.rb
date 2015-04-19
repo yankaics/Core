@@ -24,7 +24,7 @@ class API::V1::Me < API::V1
       permitted_attrs += User::FB_ATTRS if scopes.include? :facebook
       permitted_attrs += User::INFO_ATTRS if scopes.include? :info
       permitted_attrs += User::IDENTITY_ATTRS if scopes.include? :identity
-      permitted_attrs += User::CORE_ATTRS if current_app.core_app?
+      permitted_attrs += User::CORE_ATTRS if current_app.present? && current_app.core_app?
 
       fieldset_for :user, root: true, permitted_fields: permitted_attrs,
                           show_all_permitted_fields_by_default: true

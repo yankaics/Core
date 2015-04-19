@@ -44,7 +44,7 @@ module APIGuard
       fail OAuth::MissingTokenError if token_string.blank?
       fail OAuth::TokenNotFoundError if (@access_token = find_access_token(token_string)).nil?
 
-      if current_application.core_app?
+      if current_application.present? && current_application.core_app?
         @access_token.scopes = all_scopes.join(' ')
         @scopes = all_scopes
       end
