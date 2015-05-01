@@ -244,6 +244,16 @@ module OAuthAccessToken
   def use_refresh_token?
     !!@use_refresh_token && scopes.include?('offline_access') && application_id.present?
   end
+
+  private
+
+  def generate_refresh_token
+    write_attribute :refresh_token, SecureRandom.hex(127)
+  end
+
+  def generate_token
+    self.token = SecureRandom.hex(64)
+  end
 end
 
 Doorkeeper::AccessToken.send :include, OAuthAccessToken
