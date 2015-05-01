@@ -45,6 +45,8 @@ RSpec.shared_examples "Implicit Grant Flow" do
     visit "/api/v1/me"
     response = JSON.parse(page.body)
     expect(response).to have_key 'error'
+
+    Timecop.return
   end
 
   scenario "Grant Code expires on Authorization Code Grant" do
@@ -78,5 +80,7 @@ RSpec.shared_examples "Implicit Grant Flow" do
     response = JSON.parse(page.body)
     expect(response).not_to have_key 'access_token'
     expect(response).to have_key 'error'
+
+    Timecop.return
   end
 end
