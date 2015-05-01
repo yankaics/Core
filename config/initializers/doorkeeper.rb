@@ -32,7 +32,7 @@ Doorkeeper.configure do
   # reuse_access_token
 
   # Issue access tokens with refresh token (disabled by default)
-  # use_refresh_token
+  use_refresh_token
 
   # Provide support for an owner to be assigned to each registered application (disabled by default)
   # Optional parameter :confirmation => true (default false) if you want to enforce ownership of
@@ -198,7 +198,6 @@ end
 
 Doorkeeper.configuration.token_grant_types << "password"
 
-# require Rails.root.join('app', 'models', 'concerns', 'oauth_application') unless defined? OAuthApplication
 module OAuthApplication
   extend ActiveSupport::Concern
 
@@ -239,6 +238,11 @@ module OAuthAccessToken
 
   included do
     belongs_to :resource_owner, class_name: :User
+  end
+
+  # Override the use_refresh_token? method to issue refresh token only if the scope contains 'offline_access'
+  def use_refresh_token?
+    !!@use_refresh_token && scopes.include?('offline_access') && application_id.present?
   end
 end
 

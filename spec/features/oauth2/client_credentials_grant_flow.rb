@@ -15,6 +15,7 @@ RSpec.shared_examples "Client Credentials Grant Flow" do
 
     response = JSON.parse(page.body)
     expect(response).to have_key 'access_token'
+    expect(response).not_to have_key 'refresh_token'
     access_token = response['access_token']
 
     # test the access token
@@ -32,6 +33,7 @@ RSpec.shared_examples "Client Credentials Grant Flow" do
 
     response = JSON.parse(page.body)
     expect(response).to have_key 'access_token'
+    expect(response).not_to have_key 'refresh_token'
     access_token = response['access_token']
 
     # test the access token

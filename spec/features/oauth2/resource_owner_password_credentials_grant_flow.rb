@@ -18,6 +18,7 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
 
     response = JSON.parse(page.body)
     expect(response).to have_key 'access_token'
+    expect(response).not_to have_key 'refresh_token'
     access_token = response['access_token']
 
     # test if the scope of access token is as expect
@@ -43,6 +44,7 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
 
     response = JSON.parse(page.body)
     expect(response).to have_key 'access_token'
+    expect(response).not_to have_key 'refresh_token'
 
     # This grant flow will fail if wrong credentials are provided
     page.driver.post(<<-URL.squish.delete(' ')
@@ -84,6 +86,7 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
 
     response = JSON.parse(page.body)
     expect(response).to have_key 'access_token'
+    expect(response).not_to have_key 'refresh_token'
     access_token = response['access_token']
 
     # calling the API with a valid token should return corresponding data
@@ -133,8 +136,53 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
     Timecop.return
   end
 
-  # Resource Owner Facebook Access Token Grant
-  scenario "Resource Owner Facebook Access Token Grant" do
+  scenario "Resource Owner Password Credentials Grant with Refresh Token (offline_access)" do
+    # An refresh token will not be issued if the client is not verified
+    scope = %w(public offline_access)
+
+    page.driver.post(<<-URL.squish.delete(' ')
+      /oauth/token?
+      grant_type=password&
+      username=#{@user.email}&
+      password=#{@user.password}&
+      scope=#{scope.join('%20')}
+      URL
+    )
+
+    response = JSON.parse(page.body)
+    expect(response).to have_key 'access_token'
+    expect(response).not_to have_key 'refresh_token'
+
+    # An refresh token will not be issued if the client is verified
+    page.driver.post(<<-URL.squish.delete(' ')
+      /oauth/token?
+      grant_type=password&
+      client_id=#{@app.uid}&
+      client_secret=#{@app.secret}&
+      username=#{@user.email}&
+      password=#{@user.password}&
+      scope=#{scope.join('%20')}
+      URL
+    )
+
+    response = JSON.parse(page.body)
+    expect(response).to have_key 'access_token'
+    expect(response).to have_key 'refresh_token'
+    access_token = response['access_token']
+    refresh_token = response['refresh_token']
+
+    # client requests for a new access token with the refresh token
+    page.driver.post "/oauth/token", grant_type: 'refresh_token',
+                                     refresh_token: refresh_token
+    response = JSON.parse(page.body)
+    expect(response).to have_key 'access_token'
+    expect(response).to have_key 'refresh_token'
+    access_token = response['access_token']
+    refresh_token = response['refresh_token']
+  end
+
+  # Resource Owner Facebook Access Token Credentials Grant
+  scenario "Resource Owner Facebook Access Token Credentials Grant" do
     fbtoken = 'facebook_access_token'
     fbtoken_of_other_app = 'facebook_access_token_of_other_app'
 
