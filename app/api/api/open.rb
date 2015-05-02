@@ -2,6 +2,7 @@ class API::Open < API
   include APIGuard
   include APIResourceFieldsettable
   include APIResourceIncludable
+  include APIResourceSortable
 
   route :any, '*path' do
     @request_path = params.path
@@ -10,6 +11,7 @@ class API::Open < API
     # remove versioning in path
     @request_path.slice!(/^v1\//)
 
+    # Find if there is a matching TransferAPI
     if false
 
     # Find if there is a matching DataAPI
@@ -32,9 +34,11 @@ class API::Open < API
 
       # If getting a resourse collection
       else
-        @resources = resource_collection.order(@data_api.default_order).page(params[:page] || 1).per(params[:per_page] || 20)
+        sortable(default_order: @data_api.default_order)
+        @resources = resource_collection.order(sort).page(params[:page] || 1).per(params[:per_page] || 20)
 
         page_size = @resources.size
+        page_size = 1 if page_size < 1
         total_count = @resources.total_count
         pages_count = (total_count + page_size - 1) / page_size
         current_page = (params[:page] || 1).to_i

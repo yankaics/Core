@@ -16,6 +16,18 @@ describe "Open Data API" do
                                             text_col: { type: 'text' },
                                             datetime_col: { type: 'datetime' } })
   end
+  let(:yet_another_data_api) do
+    data_api = create(:data_api, path: 'path/to/yet_another_data_api',
+                                 default_order: 'a ASC',
+                                 schema: { a: { type: 'string' },
+                                           b: { type: 'string' },
+                                           c: { type: 'string' } })
+    data_api.data_model.create!(a: '1', b: 'alpha', c: 'alpha')
+    data_api.data_model.create!(a: '2', b: 'alpha', c: 'beta')
+    data_api.data_model.create!(a: '3', b: 'beta', c: 'alpha')
+    data_api.data_model.create!(a: '4', b: 'beta', c: 'beta')
+    data_api
+  end
 
   it "can be accessed with no versioning info provided" do
     get "/api/v1/#{data_api.path}.json"
@@ -70,6 +82,28 @@ describe "Open Data API" do
       expect(response.headers['Link']).to include("/api/v1/#{data_api.path}.json?per_page=5&page=4")
       expect(response.headers['Link']).to include("/api/v1/#{data_api.path}.json?per_page=5&page=6")
       expect(response.headers['Link']).to include("/api/v1/#{data_api.path}.json?per_page=5&page=7")
+    end
+
+    it "is sortable" do
+      get "/api/v1/#{yet_another_data_api.path}.json"
+      expect(response).to be_success
+      response_data = JSON.parse(response.body)
+      expect(response_data.map { |v| v['a'] }).to eq(["1", "2", "3", "4"])
+
+      get "/api/v1/#{yet_another_data_api.path}.json?sort=b,-a"
+      expect(response).to be_success
+      response_data = JSON.parse(response.body)
+      expect(response_data.map { |v| v['a'] }).to eq(["2", "1", "4", "3"])
+
+      get "/api/v1/#{yet_another_data_api.path}.json?sort_by=-b,c"
+      expect(response).to be_success
+      response_data = JSON.parse(response.body)
+      expect(response_data.map { |v| v['a'] }).to eq(["3", "4", "1", "2"])
+
+      get "/api/v1/#{yet_another_data_api.path}.json?sort_by=c%2C+-b+%27+%5C%22+%21%40%23%24%25%5E%26%2A"
+      expect(response).to be_success
+      response_data = JSON.parse(response.body)
+      expect(response_data.map { |v| v['a'] }).to eq(["3", "1", "4", "2"])
     end
   end
 
