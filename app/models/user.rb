@@ -115,7 +115,7 @@ class User < ActiveRecord::Base
   # Validate and save the updates after touched
   def validate_after_touch
     reload
-    validate
+    valid?
     save! if changed?
   end
 

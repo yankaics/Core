@@ -44,7 +44,7 @@ class UserEmail < ActiveRecord::Base
   end
 
   def send_confirmation_instructions
-    UserEmailMailer.confirm(self).deliver_now
+    UserEmailMailer.confirm(self).deliver
   end
 
   def resend_confirmation_instructions
