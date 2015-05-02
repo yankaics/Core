@@ -28,6 +28,30 @@ describe "Open Data API" do
     data_api.data_model.create!(a: '4', b: 'beta', c: 'beta')
     data_api
   end
+  let(:user) do
+    create(:user, :confirmed, :with_identity)
+  end
+  let(:user2) do
+    create(:user, :confirmed, :with_identity)
+  end
+  let(:private_user_data_api) do
+    data_api = create(:data_api, path: 'path/to/private_user_data_api',
+                                 public: false,
+                                 schema: { user_id: { type: 'string' },
+                                           user_uuid: { type: 'string' },
+                                           user_email: { type: 'string' },
+                                           user_uid: { type: 'string' } })
+    data_api.data_model.create!(user_id: user.id, user_uuid: user.uuid, user_email: user.email, user_uid: user.uid)
+    data_api.data_model.create!(user_id: user2.id, user_uuid: user2.uuid, user_email: user2.email, user_uid: user2.uid)
+    data_api
+  end
+  let(:not_accessible_data_api) do
+    create(:data_api, path: 'path/to/private_user_data_api',
+                             accessible: false,
+                             schema: { a: { type: 'string' },
+                                       b: { type: 'string' },
+                                       c: { type: 'string' } })
+  end
 
   it "can be accessed with no versioning info provided" do
     get "/api/v1/#{data_api.path}.json"
@@ -35,6 +59,24 @@ describe "Open Data API" do
     get "/api/#{data_api.path}.json"
     unversioned_response = response
     expect(versioned_response.body).to eq(unversioned_response.body)
+  end
+
+  describe "unaccessible (not-opened) API" do
+    it "is not accessible" do
+      get "/api/v1/#{not_accessible_data_api.path}.json"
+      expect(response).not_to be_success
+      json = JSON.parse(response.body)
+      expect(json).to have_key('error')
+    end
+  end
+
+  describe "private API" do
+    it "is not accessible by public URL" do
+      get "/api/v1/#{private_user_data_api.path}.json"
+      expect(response).not_to be_success
+      json = JSON.parse(response.body)
+      expect(json).to have_key('error')
+    end
   end
 
   describe "resource collection" do

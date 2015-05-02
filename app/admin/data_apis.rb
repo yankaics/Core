@@ -33,7 +33,7 @@ ActiveAdmin.register DataAPI do
     end
 
     def data_api_params
-      p = [:name, :path, :primary_key, :default_order, :database_url, :maintain_schema]
+      p = [:accessible, :public, :name, :path, :primary_key, :default_order, :database_url, :maintain_schema]
       p.concat [:organization_code, :organization] if current_admin.root?
       params.require(:data_api).slice(*p).permit(p)
     end
@@ -67,6 +67,8 @@ ActiveAdmin.register DataAPI do
     selectable_column
     column(:name) { |data_api| link_to data_api.name, admin_data_api_path(data_api) }
     column(:path)
+    column(:accessible)
+    column(:public)
     column(:organization) { |data_api| data_api.organization.blank? ? nil : link_to(data_api.organization_code, admin_organization_path(data_api.organization)) } if current_admin.root?
     column(:maintain_schema)
     id_column
@@ -78,6 +80,8 @@ ActiveAdmin.register DataAPI do
     selectable_column
     column(:name) { |data_api| link_to data_api.name, admin_data_api_path(data_api) }
     column(:path)
+    column(:accessible)
+    column(:public)
     column(:organization) { |data_api| data_api.organization.blank? ? nil : link_to(data_api.organization_code, admin_organization_path(data_api.organization)) } if current_admin.root?
     column(:maintain_schema)
     column(:primary_key)
@@ -90,6 +94,8 @@ ActiveAdmin.register DataAPI do
 
   show do
     attributes_table do
+      row(:accessible)
+      row(:public)
       row(:name)
       row(:path)
       row(:organization) if current_admin.root?
@@ -131,6 +137,8 @@ ActiveAdmin.register DataAPI do
 
   form do |f|
     f.inputs "基本資訊" do
+      f.input :accessible
+      f.input :public
       f.input :name
       f.input :path
       f.input :organization_code, as: :select, collection: options_for_select(Organization.all_for_select, data_api.organization_code) if current_admin.root?

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150419230220) do
+ActiveRecord::Schema.define(version: 20150502172221) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace"
@@ -73,11 +73,19 @@ ActiveRecord::Schema.define(version: 20150419230220) do
     t.boolean  "maintain_schema",   default: true,      null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "accessible",        default: false,     null: false
+    t.boolean  "public",            default: false,     null: false
+    t.boolean  "owned_by_user",     default: false,     null: false
+    t.string   "owner_primary_key"
+    t.string   "owner_foreign_key"
   end
 
+  add_index "data_apis", ["accessible"], name: "index_data_apis_on_accessible"
   add_index "data_apis", ["name"], name: "index_data_apis_on_name", unique: true
   add_index "data_apis", ["organization_code"], name: "index_data_apis_on_organization_code"
+  add_index "data_apis", ["owned_by_user"], name: "index_data_apis_on_owned_by_user"
   add_index "data_apis", ["path"], name: "index_data_apis_on_path", unique: true
+  add_index "data_apis", ["public"], name: "index_data_apis_on_public"
 
   create_table "departments", force: :cascade do |t|
     t.string   "organization_code",           null: false

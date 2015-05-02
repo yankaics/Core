@@ -1,8 +1,10 @@
 FactoryGirl.define do
   factory :data_api, class: DataAPI do
+    accessible true
+    public true
     sequence(:name) { |n| "api_#{SecureRandom.urlsafe_base64(4).underscore}#{n}" }
     path { name }
-    organization { nil }
+    organization nil
     schema { { name: { type: 'string' }, text: { type: 'text' } } }
 
     trait :with_data do

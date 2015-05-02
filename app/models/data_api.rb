@@ -32,13 +32,21 @@ class DataAPI < ActiveRecord::Base
     end
   end
 
-  def self.find_by_path(path)
+  def self.find_by_path(path, private: false)
     singular_path = path.match(/(?<path>.+)\/(?<id>[^\/]+)\z/)
     if singular_path
-      data_api = DataAPI.find_by(path: [path, singular_path[:path]])
+      if private
+        data_api = DataAPI.find_by(path: [path, singular_path[:path]], accessible: true)
+      else
+        data_api = DataAPI.find_by(path: [path, singular_path[:path]], public: true, accessible: true)
+      end
       data_api.single_data_id = singular_path[:id] if data_api.present? && data_api.path != path
     else
-      data_api = DataAPI.find_by(path: path)
+      if private
+        data_api = DataAPI.find_by(path: path, accessible: true)
+      else
+        data_api = DataAPI.find_by(path: path, public: true, accessible: true)
+      end
     end
     data_api
   end
