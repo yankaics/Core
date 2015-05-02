@@ -141,7 +141,7 @@ RSpec.describe UserEmail, :type => :model do
         user_email.destroy
         user.reload
         expect(user.identities.count).to eq(0)
-        expect(UserIdentity.exists?(user_identity)).to be false
+        expect(UserIdentity.exists?(user_identity.id)).to be false
       end
     end
 
@@ -158,7 +158,7 @@ RSpec.describe UserEmail, :type => :model do
         user_email.destroy
         user.reload
         expect(user.identities.count).to eq(0)
-        expect(UserIdentity.exists?(user_identity)).to be true
+        expect(UserIdentity.exists?(user_identity.id)).to be true
         user_identity.reload
         expect(user_identity.user_id).to be nil
       end
