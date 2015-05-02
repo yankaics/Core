@@ -9,6 +9,10 @@ RSpec.describe User, :type => :model do
   it { should have_many(:organizations) }
   it { should have_many(:departments) }
 
+  it { should have_many(:access_grants) }
+  it { should have_many(:access_tokens) }
+  it { should have_many(:oauth_applications) }
+
   it { should respond_to(:organization, :organization_code, :department, :department_code) }
 
   it { should validate_presence_of(:name).on(:update) }

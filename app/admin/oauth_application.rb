@@ -19,11 +19,11 @@ ActiveAdmin.register Doorkeeper::Application do
     column :name do |app|
       link_to app.name, admin_doorkeeper_application_path(app)
     end
-    column :owner_type do |app|
+    column :type do |app|
       if app.owner_type == 'User'
         status_tag('User', :class => 'User')
       else
-        status_tag(app.owner_type, :class => app.owner_type)
+        status_tag('Core', :class => 'Core')
       end
     end
     column :owner
@@ -45,6 +45,7 @@ ActiveAdmin.register Doorkeeper::Application do
       f.input :owner_id
     end
     f.inputs "Credentials" do
+      f.input :uid
       f.input :secret
       f.input :redirect_uri
     end

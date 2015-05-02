@@ -191,6 +191,16 @@ ActiveAdmin.register User do
       end
     end if current_admin.root?
 
+    panel '授權的應用程式' do
+      table_for Doorkeeper::Application.authorized_for(user) do
+        column(:id) { |app| link_to app.id, admin_doorkeeper_application_path(app) }
+        column(:name)
+        column(:type)
+        column(:description)
+        column(:app_url)
+      end
+    end if current_admin.root?
+
     panel '細項' do
       attributes_table_for user do
         row(:encrypted_password)

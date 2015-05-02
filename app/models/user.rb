@@ -26,8 +26,8 @@ class User < ActiveRecord::Base
            primary_key: :code, foreign_key: :department_code
   belongs_to :primary_identity, class_name: :UserIdentity
   has_many :oauth_applications, class_name: 'Doorkeeper::Application', as: :owner
-  has_many :access_grants, class_name: 'Doorkeeper::AccessGrant', as: :resource_owner
-  has_many :access_tokens, class_name: 'Doorkeeper::AccessToken', as: :resource_owner
+  has_many :access_grants, class_name: 'Doorkeeper::AccessGrant', foreign_key: :resource_owner_id
+  has_many :access_tokens, class_name: 'Doorkeeper::AccessToken', foreign_key: :resource_owner_id
 
   delegate :organization, :organization_code,
            :department, :department_code, :uid, :identity,
