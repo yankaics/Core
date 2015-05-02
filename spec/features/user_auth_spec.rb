@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-feature "User Auth", :type => :feature do
+feature "User Auth", :type => :feature, :retry => 3 do
   before do
     stub_request(:get, "https://graph.facebook.com/me?access_token=mock_token&fields=id,name,link,picture.height(500).width(500),cover,devices,friends&locale=zh-TW")
       .to_return(:status => 200, :body => (<<-eod

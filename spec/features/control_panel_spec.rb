@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-feature "Control Panel", :type => :feature do
+feature "Control Panel", :type => :feature, :retry => 3 do
   scenario "Admin signs in" do
     admin_credentials = { username: 'test_admin', password: 'password' }
     admin = create(:admin, admin_credentials)
