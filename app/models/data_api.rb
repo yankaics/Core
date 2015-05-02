@@ -9,7 +9,7 @@ class DataAPI < ActiveRecord::Base
 
   belongs_to :organization, primary_key: :code, foreign_key: :organization_code
 
-  serialize :schema, HashWithIndifferentAccess
+  serialize :schema, Hash
 
   validates_with DataAPIValidator
   validates :name, :path, presence: true
@@ -18,7 +18,7 @@ class DataAPI < ActiveRecord::Base
   validates :database_url, format: { with: /\A(postgresql:\/\/)|(mysql:\/\/)|(sqlite3:db\/)/ }, allow_blank: true
 
   after_find :reset_data_model_if_needed, :inspect_data_model
-  before_validation :convert_schema_hash_to_hash_with_indifferent_access, :remove_blank_columns, :generate_uuid_for_new_columns, :set_type_for_new_columns, :check_organization_code
+  before_validation :stringify_schema_keys, :remove_blank_columns, :generate_uuid_for_new_columns, :set_type_for_new_columns, :check_organization_code
   after_create :create_db_table
   before_update :reset_data_model_const, :change_db_table
   after_destroy :drop_db_table
@@ -107,11 +107,12 @@ class DataAPI < ActiveRecord::Base
   end
 
   def schema_from_array(columns)
-    self.schema = HashWithIndifferentAccess.new
+    self.schema = {}
     columns.each do |column|
-      next if !column.is_a?(Hash) || column[:name].blank?
-      self.schema[column[:name]] = column
-      self.schema[column[:name]].except!(:name)
+      column.stringify_keys!
+      next if !column.is_a?(Hash) || column['name'].blank?
+      self.schema[column['name']] = column
+      self.schema[column['name']].except!('name')
     end
   end
 
@@ -153,19 +154,19 @@ class DataAPI < ActiveRecord::Base
   end
 
   def remove_blank_columns
-    self.schema ||= HashWithIndifferentAccess.new
+    self.schema ||= {}
     schema.delete_if { |k, v| v.blank? }
   end
 
   def generate_uuid_for_new_columns
     schema.each do |k, v|
-      v[:uuid] = SecureRandom.uuid if v[:uuid].blank? || v[:uuid].length < 30
+      v['uuid'] = SecureRandom.uuid if v['uuid'].blank? || v['uuid'].length < 30
     end
   end
 
   def set_type_for_new_columns
     schema.each do |k, v|
-      v[:type] = :string if v[:type].blank?
+      v['type'] = :string if v['type'].blank?
     end
   end
 
@@ -177,7 +178,7 @@ class DataAPI < ActiveRecord::Base
       # t.string :uid, null: false
 
       schema.each do |k, v|
-        t.send(v[:type], k)
+        t.send(v['type'], k)
       end
 
       # t.timestamps
@@ -197,37 +198,37 @@ class DataAPI < ActiveRecord::Base
       migration.rename_table old_table_name, current_table_name
     end
 
-    old_columns = Hash[previous_version.schema.map { |k, v| v[:name] = k; [v[:uuid], v] }]
-    current_columns = Hash[schema.map { |k, v| v[:name] = k; [v[:uuid], v] }]
+    old_columns = Hash[previous_version.schema.map { |k, v| v['name'] = k; [v['uuid'], v] }]
+    current_columns = Hash[schema.map { |k, v| v['name'] = k; [v['uuid'], v] }]
 
-    deleted_columns = HashWithIndifferentAccess.new
+    deleted_columns = {}
 
     old_columns.each do |k, v|
       deleted_columns[k] = v unless current_columns.key?(k)
     end
 
     deleted_columns.each do |uuid, column|
-      migration.remove_column name, column[:name]
+      migration.remove_column name, column['name']
     end
 
-    new_columns = HashWithIndifferentAccess.new
+    new_columns = {}
 
     current_columns.each do |k, v|
       new_columns[k] = v unless old_columns.key?(k)
     end
 
     new_columns.each do |uuid, column|
-      migration.add_column name, column[:name], column[:type]
+      migration.add_column name, column['name'], column['type']
     end
 
-    renamed_columns = HashWithIndifferentAccess.new
+    renamed_columns = {}
 
     current_columns.each do |k, v|
-      renamed_columns[k] = v if old_columns[k].present? && v[:name] != old_columns[k][:name]
+      renamed_columns[k] = v if old_columns[k].present? && v['name'] != old_columns[k][:name]
     end
 
     renamed_columns.each do |uuid, column|
-      migration.rename_column name, old_columns[uuid][:name], current_columns[uuid][:name]
+      migration.rename_column name, old_columns[uuid]['name'], current_columns[uuid]['name']
     end
 
     reset_data_model_const
@@ -236,6 +237,15 @@ class DataAPI < ActiveRecord::Base
   def drop_db_table
     migration = new_migration
     migration.drop_table name
+  end
+
+  def stringify_schema_keys
+    self.schema ||= {}
+    schema.stringify_keys!
+    schema.each_pair do |_, v|
+      v ||= {}
+      v.stringify_keys!
+    end
   end
 
   private
@@ -258,10 +268,5 @@ class DataAPI < ActiveRecord::Base
 
   def check_organization_code
     self.organization_code = nil if organization_code.blank?
-  end
-
-  def convert_schema_hash_to_hash_with_indifferent_access
-    return if schema.is_a? HashWithIndifferentAccess
-    self.schema = HashWithIndifferentAccess.new(schema)
   end
 end

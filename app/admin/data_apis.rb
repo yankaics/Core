@@ -107,14 +107,14 @@ ActiveAdmin.register DataAPI do
       table(class: 'data_api_schema_table') do
         thead do
           th { '欄位名稱' }
-          th { '欄位型態' }
+          th { '欄位型別' }
         end
         tbody do
           data_api.schema.each do |name, column|
             tr do
               td { name }
               td do
-                code { column[:type] }
+                code { column['type'] }
               end
             end
           end
@@ -143,19 +143,19 @@ ActiveAdmin.register DataAPI do
       table(class: 'data_api_schema_table editable') do
         thead do
           th { '欄位名稱' }
-          th { '欄位型態' }
+          th { '欄位型別' }
           th { '增加/刪除' }
         end
         tbody do
           data_api.schema.each do |name, column|
             tr do
-              td { text_field :name, class: :name, id: "data_api_schema_#{column[:uuid]}_name", name: "data_api[schema][#{column[:uuid]}][name]", value: name }
+              td { text_field :name, class: :name, id: "data_api_schema_#{column['uuid']}_name", name: "data_api[schema][#{column['uuid']}][name]", value: name }
               td do
-                code { column[:type] }
-                hidden_field :name, id: "data_api_schema_#{column[:uuid]}_type", name: "data_api[schema][#{column[:uuid]}][type]", value: column[:type]
+                code { column['type'] }
+                hidden_field :name, id: "data_api_schema_#{column['uuid']}_type", name: "data_api[schema][#{column['uuid']}][type]", value: column['type']
               end
               td do
-                hidden_field :name, id: "data_api_schema_#{column[:uuid]}_name", name: "data_api[schema][#{column[:uuid]}][uuid]", value: column[:uuid]
+                hidden_field :name, id: "data_api_schema_#{column['uuid']}_name", name: "data_api[schema][#{column['uuid']}][uuid]", value: column['uuid']
                 a(class: 'delete') { '-' }
               end
             end

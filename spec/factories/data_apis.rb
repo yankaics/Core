@@ -18,7 +18,7 @@ FactoryGirl.define do
           values[t] = []
 
           data_api.schema.each_pair do |name, column|
-            case column[:type]
+            case column['type']
             when 'string'
               values[t] << "#{Faker::Hacker.noun}#{t}"
             when 'integer'

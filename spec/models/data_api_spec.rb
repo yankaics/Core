@@ -14,7 +14,7 @@ RSpec.describe DataAPI, type: :model do
   describe "instance" do
     subject(:data_api) { create(:data_api) }
 
-    its(:schema) { is_expected.to be_a(HashWithIndifferentAccess) }
+    its(:schema) { is_expected.to be_a(Hash) }
   end
 
   describe ".find_by_path" do
@@ -97,7 +97,7 @@ RSpec.describe DataAPI, type: :model do
     it "should not be valid if type of existing schema column has changed" do
       data_api = create(:data_api, schema: { attr1: { type: 'string' }, attr2: { type: 'text' } })
       expect(data_api).to be_valid
-      data_api.schema[:attr2][:type] = 'string'
+      data_api.schema['attr2']['type'] = 'string'
       expect(data_api).not_to be_valid
     end
 
@@ -180,10 +180,10 @@ RSpec.describe DataAPI, type: :model do
         data_api.data_model.connection
         expect(data_api.data_model.inspect).to include('string_attr: string')
         expect(data_api.data_model.inspect).to include('text_attr: text')
-        data_api.schema[:hi_string] = data_api.schema[:string_attr]
-        data_api.schema[:string_attr] = nil
-        data_api.schema[:hi_text] = data_api.schema[:text_attr]
-        data_api.schema[:text_attr] = nil
+        data_api.schema['hi_string'] = data_api.schema['string_attr']
+        data_api.schema['string_attr'] = nil
+        data_api.schema['hi_text'] = data_api.schema['text_attr']
+        data_api.schema['text_attr'] = nil
         data_api.save
         data_api.data_model.connection
         expect(data_api.data_model.inspect).to include('hi_string: string')
@@ -194,8 +194,8 @@ RSpec.describe DataAPI, type: :model do
         data_api.data_model.connection
         expect(data_api.data_model.inspect).to include('string_attr: string')
         expect(data_api.data_model.inspect).to include('text_attr: text')
-        data_api.schema[:string_attr] = nil
-        data_api.schema[:text_attr] = nil
+        data_api.schema['string_attr'] = nil
+        data_api.schema['text_attr'] = nil
         data_api.save
         data_api.data_model.connection
         expect(data_api.data_model.inspect).not_to include('string_attr: string')
@@ -203,8 +203,8 @@ RSpec.describe DataAPI, type: :model do
       end
 
       it "adds the added column in database" do
-        data_api.schema[:new_string_attr] = { type: 'string' }
-        data_api.schema[:new_text_attr] = { type: 'text' }
+        data_api.schema['new_string_attr'] = { type: 'string' }
+        data_api.schema['new_text_attr'] = { type: 'text' }
         data_api.save
         data_api.data_model.connection
         expect(data_api.data_model.inspect).to include('new_string_attr: string')
@@ -214,7 +214,7 @@ RSpec.describe DataAPI, type: :model do
       context "using outer database with maintain_schema off" do
         it "does not change the outer database schema" do
           outer_data_api.maintain_schema = false
-          outer_data_api.schema[:new_string_attr] = { type: 'string' }
+          outer_data_api.schema['new_string_attr'] = { type: 'string' }
           outer_data_api.save!
           outer_data_api.data_model.connection
           expect(outer_data_api.data_model.inspect).not_to include('new_string_attr')
@@ -240,13 +240,13 @@ RSpec.describe DataAPI, type: :model do
         array = [{ name: 'string', type: 'string' }, { name: 'text', type: 'text' }]
         data_api.schema_from_array(array)
 
-        expect(data_api.schema[:string]).to eq({ 'type' => 'string' })
-        expect(data_api.schema[:text]).to eq({ 'type' => 'text' })
+        expect(data_api.schema['string']).to eq({ 'type' => 'string' })
+        expect(data_api.schema['text']).to eq({ 'type' => 'text' })
 
         data_api.save!
 
-        expect(data_api.schema).to have_key(:string)
-        expect(data_api.schema).to have_key(:text)
+        expect(data_api.schema).to have_key('string')
+        expect(data_api.schema).to have_key('text')
       end
     end
   end
