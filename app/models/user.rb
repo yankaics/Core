@@ -26,8 +26,8 @@ class User < ActiveRecord::Base
            primary_key: :code, foreign_key: :department_code
   belongs_to :primary_identity, class_name: :UserIdentity
   has_many :oauth_applications, class_name: 'Doorkeeper::Application', as: :owner
-  has_many :access_grants, class_name: 'Doorkeeper::AccessGrant', as: :resource_owner
-  has_many :access_tokens, class_name: 'Doorkeeper::AccessToken', as: :resource_owner
+  has_many :access_grants, class_name: 'Doorkeeper::AccessGrant', foreign_key: :resource_owner_id
+  has_many :access_tokens, class_name: 'Doorkeeper::AccessToken', foreign_key: :resource_owner_id
 
   delegate :organization, :organization_code,
            :department, :department_code, :uid, :identity,
@@ -52,9 +52,9 @@ class User < ActiveRecord::Base
   validates :name, presence: true, on: :update
   validates_associated :emails, :unconfirmed_emails
 
-  before_create :build_data
-  before_validation :ensure_user_has_valid_primary_identity
-  after_touch :save!
+  before_create :generate_uuid, :build_data
+  before_validation :generate_uuid, :ensure_user_has_valid_primary_identity
+  after_touch :validate_after_touch
   after_save :clear_association_cache
 
   def self.scoped(org_code)
@@ -83,12 +83,40 @@ class User < ActiveRecord::Base
     !primary_identity_id.blank?
   end
 
+  def generate_uuid
+    return if uuid.present?
+    regenerate_uuid(true)
+  end
+
+  def regenerate_uuid(random = true)
+    if random
+      base = SecureRandom.random_bytes(16)
+    else
+      base = Digest::MD5.digest("#{ENV['APP_URL']}#{id}")
+    end
+    ary = base.unpack("NnnnnN")
+    ary[2] = (ary[2] & 0x0fff) | 0x4000
+    ary[3] = (ary[3] & 0x3fff) | 0x8000
+    self.uuid = "%08x-%04x-%04x-%04x-%04x%08x" % ary
+  end
+
   def avatar_url
     external_avatar_url
   end
 
   def cover_photo_url
     external_cover_photo_url
+  end
+
+  def fb_linked?
+    fbemail.present?
+  end
+
+  # Validate and save the updates after touched
+  def validate_after_touch
+    reload
+    valid?
+    save! if changed?
   end
 
   private
@@ -104,6 +132,7 @@ class User < ActiveRecord::Base
 
   PUBLIC_ATTRS = [
     :id,
+    :uuid,
     :username,
     :name,
     :avatar_url,

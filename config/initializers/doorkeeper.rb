@@ -32,7 +32,7 @@ Doorkeeper.configure do
   # reuse_access_token
 
   # Issue access tokens with refresh token (disabled by default)
-  # use_refresh_token
+  use_refresh_token
 
   # Provide support for an owner to be assigned to each registered application (disabled by default)
   # Optional parameter :confirmation => true (default false) if you want to enforce ownership of
@@ -90,6 +90,101 @@ Doorkeeper.configure do
   #
   grant_flows %w(authorization_code client_credentials implicit password)
 
+  resource_owner_from_credentials do |routes|
+    case params[:username]
+    when 'facebook:access_token'
+      debug_token_connection = HTTParty.get(
+        <<-eos.squish.delete(' ')
+          https://graph.facebook.com/debug_token?
+            input_token=#{params[:password]}&
+            access_token=#{params[:password]}
+          eos
+      )
+
+      token_info = debug_token_connection.parsed_response
+      token_info = JSON.parse(token_info) if token_info.is_a?(String)
+
+      if token_info['data'].is_a?(Hash)
+        get_access_connection = HTTParty.get(
+          <<-eos.squish.delete(' ')
+            https://graph.facebook.com/me?
+              fields=id,name,email,gender&
+              access_token=#{params[:password]}
+            eos
+        )
+
+        access = get_access_connection.parsed_response
+        access = JSON.parse(access) if access.is_a?(String)
+
+        if access['id'].present?
+          # the access token is owned by this app, provide full information
+          if token_info['data']['app_id'] == ENV['FB_APP_ID']
+            facebook_auth = {
+              uid: access['id'],
+              credentials: {
+                token: params[:password]
+              },
+              info: {
+                email: access['email'],
+                name: access['name']
+              },
+              extra: {
+                raw_info: {
+                  gender: access['gender']
+                }
+              }
+            }
+          # the access token is not owned by this app, provide limited information
+          else
+            facebook_auth = {
+              credentials: {
+                token: params[:password]
+              },
+              info: {
+                email: access['email'],
+                name: access['name']
+              },
+              extra: {
+                raw_info: {
+                  gender: access['gender']
+                }
+              }
+            }
+          end
+
+          u = User.from_facebook(facebook_auth)
+          u
+        else
+          nil
+        end
+      else
+        nil
+      end
+
+    else
+      u = User.find_for_database_authentication(email: params[:username])
+      u = User.find_for_database_authentication(username: params[:username]) if u.blank?
+
+      if u.present?
+        if u.access_locked?
+          u.unlock_access! if u.locked_at < Time.now - User.unlock_in
+        end
+
+        if u.access_locked?
+          nil
+        elsif u.valid_password?(params[:password])
+          u.failed_attempts = 0 && u.save! if u.failed_attempts > 0
+          u
+        else
+          u.failed_attempts += 1
+          u.save!
+          u.lock_access! if u.failed_attempts > User.maximum_attempts
+          nil
+        end
+      end
+    end
+  end
+
   # Under some circumstances you might want to have applications auto-approved,
   # so that the user skips the authorization step.
   # For example if dealing with trusted a application.
@@ -101,7 +196,8 @@ Doorkeeper.configure do
   realm ENV['APP_NAME']
 end
 
-# require Rails.root.join('app', 'models', 'concerns', 'oauth_application') unless defined? OAuthApplication
+Doorkeeper.configuration.token_grant_types << "password"
+
 module OAuthApplication
   extend ActiveSupport::Concern
 
@@ -142,6 +238,21 @@ module OAuthAccessToken
 
   included do
     belongs_to :resource_owner, class_name: :User
+  end
+
+  # Override the use_refresh_token? method to issue refresh token only if the scope contains 'offline_access'
+  def use_refresh_token?
+    !!@use_refresh_token && scopes.include?('offline_access') && application_id.present?
+  end
+
+  private
+
+  def generate_refresh_token
+    write_attribute :refresh_token, SecureRandom.hex(127)
+  end
+
+  def generate_token
+    self.token = SecureRandom.hex(64)
   end
 end
 

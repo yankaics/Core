@@ -9,6 +9,10 @@ RSpec.describe User, :type => :model do
   it { should have_many(:organizations) }
   it { should have_many(:departments) }
 
+  it { should have_many(:access_grants) }
+  it { should have_many(:access_tokens) }
+  it { should have_many(:oauth_applications) }
+
   it { should respond_to(:organization, :organization_code, :department, :department_code) }
 
   it { should validate_presence_of(:name).on(:update) }
@@ -79,6 +83,10 @@ RSpec.describe User, :type => :model do
       it { is_expected.not_to be_confirmed }
       its(:data) { is_expected.to be_an(Object) }
       its(:gender) { is_expected.to eq('unspecified') }
+      it "is expected to have an unique uuid" do
+        expect(user.uuid).not_to be_blank
+        expect(user.uuid).not_to eq(create(:user).uuid)
+      end
     end
 
     context "after confirmed" do

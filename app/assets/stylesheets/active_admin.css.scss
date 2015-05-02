@@ -34,6 +34,17 @@
 	}
 }
 
+.status_tag {
+
+	&.user {
+		background: #70c579;
+	}
+
+	&.core {
+		background: #a970c5;
+	}
+}
+
 .select2-container {
 	min-width: 52px;
 }

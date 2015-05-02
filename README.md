@@ -8,6 +8,7 @@ Core
 
 The core API server & authentication system.
 
+
 ## Development Setup
 
 Just run:
@@ -17,6 +18,11 @@ $ ./bin/setup
 ```
 
 You may want to change the app's default environment variables, which lays in `.env`.
+
+
+## Chat
+
+[![Join the chat at https://gitter.im/colorgy/Core](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/colorgy/Core?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
 ## Contributing

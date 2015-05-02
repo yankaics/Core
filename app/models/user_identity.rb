@@ -57,8 +57,9 @@ class UserIdentity < ActiveRecord::Base
     self.original_department = department
   end
 
+  # Link manually created identiy to a user that has the corresponding verified email
   def link_to_user
-    return if true && email_pattern_id  # don't care about generated identities
+    return if email_pattern_id.present?  # don't care about generated identities
     user_email = UserEmail.confirmed.find_by(email: email)
     if user_email
       self.user = user_email.user
@@ -67,10 +68,12 @@ class UserIdentity < ActiveRecord::Base
     end
   end
 
+  # Is this a generated (by EmailPattern) identity?
   def generated?
     email_pattern_id.present?
   end
 
+  # Is this the primary identity of the owner?
   def primary?
     user.primary_identity_id == id
   end
