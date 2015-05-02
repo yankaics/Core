@@ -33,7 +33,7 @@ ActiveAdmin.register DataAPI do
     end
 
     def data_api_params
-      p = [:accessible, :public, :name, :path, :primary_key, :default_order, :database_url, :maintain_schema]
+      p = [:accessible, :public, :name, :path, :primary_key, :default_order, :database_url, :maintain_schema, :owned_by_user, :owner_primary_key, :owner_foreign_key]
       p.concat [:organization_code, :organization] if current_admin.root?
       params.require(:data_api).slice(*p).permit(p)
     end
@@ -49,12 +49,6 @@ ActiveAdmin.register DataAPI do
   scope :global, if: proc { current_admin.root? }
   scope :local, if: proc { current_admin.root? }
 
-  permit_params do
-    params = [:name, :path, :primary_key, :schema, :has, :default_order, :database_url, :maintain_schema]
-    params.concat [:organization_code, :organization] if current_admin.root?
-    params
-  end
-
   filter :name
   filter :path
   filter :created_at
@@ -69,6 +63,7 @@ ActiveAdmin.register DataAPI do
     column(:path)
     column(:accessible)
     column(:public)
+    column(:owned_by_user)
     column(:organization) { |data_api| data_api.organization.blank? ? nil : link_to(data_api.organization_code, admin_organization_path(data_api.organization)) } if current_admin.root?
     column(:maintain_schema)
     id_column
@@ -82,11 +77,14 @@ ActiveAdmin.register DataAPI do
     column(:path)
     column(:accessible)
     column(:public)
+    column(:owned_by_user)
     column(:organization) { |data_api| data_api.organization.blank? ? nil : link_to(data_api.organization_code, admin_organization_path(data_api.organization)) } if current_admin.root?
     column(:maintain_schema)
     column(:primary_key)
     column(:default_order)
     column(:database_url) { |data_api| code { data_api.database_url } }
+    column(:owner_primary_key)
+    column(:owner_foreign_key)
     id_column
     column(:manage) { |data_api| link_to '管理資料集', admin_data_api_data_api_data_path(data_api_id: data_api.id) }
     actions
@@ -104,6 +102,9 @@ ActiveAdmin.register DataAPI do
       row(:default_order)
       row(:maintain_schema)
       row(:database_url) { |data_api| code { data_api.database_url } }
+      row(:owned_by_user)
+      row(:owner_primary_key)
+      row(:owner_foreign_key)
       row(:id)
       row(:created_at)
       row(:updated_at)
@@ -145,6 +146,12 @@ ActiveAdmin.register DataAPI do
 
       f.input :primary_key, hint: "必須是存在的欄位名稱"
       f.input :default_order, hint: "必須使用存在的欄位名稱"
+    end
+
+    f.inputs "資源擁有者" do
+      f.input :owned_by_user
+      f.input :owner_primary_key, as: :select, collection: options_for_select(DataAPI::OWNER_PRIMARY_KEYS, data_api.owner_primary_key)
+      f.input :owner_foreign_key, hint: "必須是存在的欄位名稱"
     end
 
     panel '資料綱要' do

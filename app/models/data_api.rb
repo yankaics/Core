@@ -3,6 +3,7 @@ class DataAPI < ActiveRecord::Base
   has_paper_trail class_name: 'DataAPIVersion'
 
   COLUMN_TYPES = %w(string integer float boolean text datetime)
+  OWNER_PRIMARY_KEYS = %w(id uuid email uid)
 
   scope :global, -> { where(organization_code: nil) }
   scope :local, -> { where.not(organization_code: nil) }
@@ -16,6 +17,8 @@ class DataAPI < ActiveRecord::Base
   validates :name, format: { with: /\A[a-z][a-z0-9_]*\z/ }
   validates :path, format: { with: /\A[a-z0-9_]+(\/[a-z0-9_]+){0,4}\z/ }
   validates :database_url, format: { with: /\A(postgresql:\/\/)|(mysql:\/\/)|(sqlite3:db\/)/ }, allow_blank: true
+  validates :owner_primary_key, presence: true, inclusion: { in: OWNER_PRIMARY_KEYS }, if: :has_owner?
+  validates :owner_foreign_key, presence: true, if: :has_owner?
 
   after_find :reset_data_model_if_needed, :inspect_data_model
   before_validation :stringify_schema_keys, :remove_blank_columns, :generate_uuid_for_new_columns, :set_type_for_new_columns, :check_organization_code
@@ -133,8 +136,26 @@ class DataAPI < ActiveRecord::Base
     rescue ActiveRecord::ActiveRecordError => e
       Rails.logger.error e
     end
+    m.cattr_accessor(:organization_code)
+    m.organization_code = organization_code
     m.table_name = name
     m.updated_at = updated_at
+
+    if owned_by_user
+      case owner_primary_key
+      when 'id'
+        m.belongs_to :owner, class_name: User, primary_key: :id, foreign_key: owner_foreign_key
+      when 'uuid'
+        m.belongs_to :owner, class_name: User, primary_key: :uuid, foreign_key: owner_foreign_key
+      when 'email'
+        m.belongs_to :owner, class_name: User, primary_key: :email, foreign_key: owner_foreign_key
+      when 'uid'
+        m.belongs_to :owner_identity, ->(o) { where(organization_code: o.class.organization_code) },
+                     class_name: UserIdentity, primary_key: :uid, foreign_key: owner_foreign_key
+        m.has_one :owner, class_name: :User, through: :owner_identity, source: :user
+      end
+    end
+
     m
   end
 
@@ -254,6 +275,10 @@ class DataAPI < ActiveRecord::Base
       v ||= {}
       v.stringify_keys!
     end
+  end
+
+  def has_owner?
+    owned_by_user
   end
 
   private

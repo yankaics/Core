@@ -43,16 +43,44 @@ RSpec.describe DataAPI, type: :model do
   describe "DataAPI #data_model" do
     subject(:model) { create(:data_api).data_model }
 
-    # it "should require uid to be set" do
-    #   expect(model.new(uid: nil)).not_to be_valid
-    #   expect(model.new(uid: 'val')).to be_valid
-    # end
+    context "owned by user" do
+      let(:user) do
+        create(:user, :confirmed, :with_identity)
+      end
+      let(:user2) do
+        create(:user, :confirmed, :with_identity)
+      end
+      let(:data_api_owned_by_user) do
+        data_api = create(:data_api, path: 'path/to/data_api_owned_by_user',
+                                     organization_code: user.organization_code,
+                                     owned_by_user: true,
+                                     owner_primary_key: 'id',
+                                     owner_foreign_key: 'user_id',
+                                     schema: { user_id: { type: 'string' },
+                                               user_uuid: { type: 'string' },
+                                               user_email: { type: 'string' },
+                                               user_uid: { type: 'string' } })
+        data_api.data_model.create!(user_id: user.id, user_uuid: user.uuid, user_email: user.email, user_uid: user.uid)
+        data_api.data_model.create!(user_id: user2.id, user_uuid: user2.uuid, user_email: user2.email, user_uid: user2.uid)
+        data_api
+      end
+      subject(:model) { data_api_owned_by_user.data_model }
 
-    # it "should require unique value for uid" do
-    #   model.create(uid: 'val')
-    #   expect(model.new(uid: 'val')).not_to be_valid
-    #   expect(model.new(uid: 'other_val')).to be_valid
-    # end
+      it "should belong to owner" do
+        expect(model.first.owner).to eq(user)
+        expect(model.last.owner).to eq(user2)
+      end
+
+      it "should belong to owner through uuid" do
+        data_api_owned_by_user.owner_primary_key = 'uid'
+        data_api_owned_by_user.owner_foreign_key = 'user_uid'
+        data_api_owned_by_user.save!
+        model = data_api_owned_by_user.data_model
+
+        expect(model.first.owner).to eq(user)
+        expect(model.last.owner).not_to eq(user2)
+      end
+    end
   end
 
   context "with invalid attributes" do
@@ -123,6 +151,21 @@ RSpec.describe DataAPI, type: :model do
       expect(data_api).to be_valid
       data_api.database_url = 'mysql://USER:PASSWORD@HOST:PORT/NAME'
       expect(data_api).to be_valid
+    end
+
+    it "should not be valid if owned by user but has invalid owner_primary_key or owner_foreign_key" do
+      data_api = create(:data_api, schema: { attr1: { type: 'string' }, attr2: { type: 'text' } })
+      data_api.owned_by_user = true
+      expect(data_api).not_to be_valid
+      data_api.owner_primary_key = 'uuid'
+      data_api.owner_foreign_key = 'attr1'
+      expect(data_api).to be_valid
+      data_api.owner_primary_key = 'uuid'
+      data_api.owner_foreign_key = 'invalid_attr'
+      expect(data_api).not_to be_valid
+      data_api.owner_primary_key = 'invalid_attr'
+      data_api.owner_foreign_key = 'attr1'
+      expect(data_api).not_to be_valid
     end
   end
 

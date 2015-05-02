@@ -22,6 +22,10 @@ class DataAPIValidator < ActiveModel::Validator
       end
     end
 
+    if record.owner_foreign_key.present?
+      record.errors[:owner_foreign_key] << "The owner_foreign_key column name \"#{record.owner_foreign_key}\" does not exist on the schema!" if !record.schema.keys.include?(record.owner_foreign_key)
+    end
+
     record.errors[:maintain_schema] << "This can not be turned off while using system database!" if record.database_url.blank? && !record.maintain_schema
 
     # if record.database_url.present?
