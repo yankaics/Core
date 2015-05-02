@@ -141,7 +141,7 @@ RSpec.describe UserEmail, :type => :model do
         user_email.destroy
         user.reload
         expect(user.identities.count).to eq(0)
-        expect(UserIdentity.exists?(user_identity)).to be false
+        expect(UserIdentity.exists?(user_identity.id)).to be false
       end
     end
 
@@ -158,7 +158,7 @@ RSpec.describe UserEmail, :type => :model do
         user_email.destroy
         user.reload
         expect(user.identities.count).to eq(0)
-        expect(UserIdentity.exists?(user_identity)).to be true
+        expect(UserIdentity.exists?(user_identity.id)).to be true
         user_identity.reload
         expect(user_identity.user_id).to be nil
       end
@@ -183,16 +183,19 @@ RSpec.describe UserEmail, :type => :model do
     end
 
     context "with an old generated identity" do
-      let(:email) { e = create(:user_email, email: 'b10132023@mail.ntust.edu.tw'); e.confirm!; e }
-      let(:user) { email.user }
       before do
+        # suppose we don't have an detailed Email Pattern for students of NTUST in the past
         create(:ntust_organization)
         EmailPattern.where(corresponded_identity: UserIdentity::IDENTITIES[:student]).destroy_all
         expect(user.organization_code).to eq('NTUST')
         expect(user.identity).to eq('staff')
       end
 
+      let(:email) { e = create(:user_email, email: 'b10132023@mail.ntust.edu.tw'); e.confirm!; e }
+      let(:user) { email.user }
+
       it "re-identifies itself" do
+        # we don't have an Email Pattern for students of NTUST before, but now we did
         create(:ntust_student_email_pattern)
 
         email.re_identify!

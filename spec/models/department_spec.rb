@@ -62,13 +62,13 @@ RSpec.describe Department, :type => :model do
     end
 
     it "destroys its departments while destroyed" do
-      expect(Organization.exists?(@org)).to eq true
-      expect(Department.exists?(@dep_2)).to eq true
-      expect(Department.exists?(@dep_1)).to eq false
-      expect(Department.exists?(@dep_1_1)).to eq false
-      expect(Department.exists?(@dep_1_2)).to eq false
-      expect(Department.exists?(@dep_1_3)).to eq false
-      expect(Department.exists?(@dep_1_1_1)).to eq false
+      expect(Organization.exists?(@org.id)).to eq true
+      expect(Department.exists?(@dep_2.id)).to eq true
+      expect(Department.exists?(@dep_1.id)).to eq false
+      expect(Department.exists?(@dep_1_1.id)).to eq false
+      expect(Department.exists?(@dep_1_2.id)).to eq false
+      expect(Department.exists?(@dep_1_3.id)).to eq false
+      expect(Department.exists?(@dep_1_1_1.id)).to eq false
     end
   end
 end

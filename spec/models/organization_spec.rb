@@ -68,21 +68,21 @@ RSpec.describe Organization, :type => :model do
     end
 
     it "deletes its departments while destroyed" do
-      expect(Organization.exists?(@org)).to be false
-      expect(Department.exists?(@dep_1)).to be false
-      expect(Department.exists?(@dep_2)).to be false
-      expect(Department.exists?(@dep_1_1)).to be false
-      expect(Department.exists?(@dep_1_2)).to be false
-      expect(Department.exists?(@dep_1_3)).to be false
-      expect(Department.exists?(@dep_1_1_1)).to be false
+      expect(Organization.exists?(@org.id)).to be false
+      expect(Department.exists?(@dep_1.id)).to be false
+      expect(Department.exists?(@dep_2.id)).to be false
+      expect(Department.exists?(@dep_1_1.id)).to be false
+      expect(Department.exists?(@dep_1_2.id)).to be false
+      expect(Department.exists?(@dep_1_3.id)).to be false
+      expect(Department.exists?(@dep_1_1_1.id)).to be false
     end
 
     it "deletes its email_patterns while destroyed" do
-      expect(EmailPattern.exists?(@ep)).to be false
+      expect(EmailPattern.exists?(@ep.id)).to be false
     end
 
     # it "deletes its user_identities while destroyed" do
-    #   expect(UserIdentity.exists?(@ui)).to be false
+    #   expect(UserIdentity.exists?(@ui.id)).to be false
     # end
   end
 end

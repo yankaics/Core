@@ -54,7 +54,7 @@ class User < ActiveRecord::Base
 
   before_create :generate_uuid, :build_data
   before_validation :generate_uuid, :ensure_user_has_valid_primary_identity
-  after_touch :save!
+  after_touch :validate_after_touch
   after_save :clear_association_cache
 
   def self.scoped(org_code)
@@ -110,6 +110,13 @@ class User < ActiveRecord::Base
 
   def fb_linked?
     fbemail.present?
+  end
+
+  # Validate and save the updates after touched
+  def validate_after_touch
+    reload
+    valid?
+    save! if changed?
   end
 
   private
