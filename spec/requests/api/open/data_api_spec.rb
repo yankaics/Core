@@ -37,10 +37,15 @@ describe "Open Data API" do
   let(:private_user_data_api) do
     data_api = create(:data_api, path: 'path/to/private_user_data_api',
                                  public: false,
+                                 owned_by_user: true,
+                                 owner_primary_key: 'id',
+                                 owner_foreign_key: 'user_id',
+                                 organization_code: user.organization_code,
                                  schema: { user_id: { type: 'string' },
                                            user_uuid: { type: 'string' },
                                            user_email: { type: 'string' },
-                                           user_uid: { type: 'string' } })
+                                           user_uid: { type: 'string' },
+                                           data: { type: 'text' } })
     data_api.data_model.create!(user_id: user.id, user_uuid: user.uuid, user_email: user.email, user_uid: user.uid)
     data_api.data_model.create!(user_id: user2.id, user_uuid: user2.uuid, user_email: user2.email, user_uid: user2.uid)
     data_api
@@ -147,6 +152,45 @@ describe "Open Data API" do
       response_data = JSON.parse(response.body)
       expect(response_data.map { |v| v['a'] }).to eq(["3", "1", "4", "2"])
     end
+
+    it "can have a owner" do
+      private_user_data_api.public = true
+      private_user_data_api.save!
+
+      get "/api/v1/#{private_user_data_api.path}.json"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json.last['owner']).to eq(user.id.to_s)
+
+      get "/api/v1/#{private_user_data_api.path}.json?include=owner"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json.first['owner']).to have_key('name')
+      expect(json.first['owner']).not_to have_key('email')
+      expect(json.last['owner']['name']).to eq(user.name)
+
+      private_user_data_api.owner_primary_key = 'uuid'
+      private_user_data_api.owner_foreign_key = 'user_uuid'
+      private_user_data_api.save!
+
+      get "/api/v1/#{private_user_data_api.path}.json"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json.last['owner']).to eq(user.uuid)
+
+      get "/api/v1/#{private_user_data_api.path}.json?include=owner&fields=owner"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json.first['owner']).to have_key('name')
+      expect(json.first['owner']).not_to have_key('email')
+      expect(json.last['owner']['name']).to eq(user.name)
+
+      get "/api/v1/#{private_user_data_api.path}.json?include=owner&fields[#{private_user_data_api.name}]=owner&fields[user]=username,uuid,avatar_url"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json.first['owner']).to have_key('username')
+      expect(json.first).not_to have_key('data')
+    end
   end
 
   describe "single resource" do
@@ -175,6 +219,58 @@ describe "Open Data API" do
       expect(response).to be_success
       expect(response.body).not_to include(last_data.string_col)
       expect(response.body).to include(last_data.text_col)
+    end
+
+    it "can have a owner" do
+      private_user_data_api.public = true
+      private_user_data_api.save!
+
+      first_data = private_user_data_api.data_model.first
+      last_data = private_user_data_api.data_model.last
+
+      get "/api/v1/#{private_user_data_api.path}/#{first_data.id}.json"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json['owner']).to eq(user.id.to_s)
+
+      get "/api/v1/#{private_user_data_api.path}/#{last_data.id}.json"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json['owner']).to eq(user2.id.to_s)
+
+      get "/api/v1/#{private_user_data_api.path}/#{first_data.id}.json?include=owner"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json['owner']['username']).to eq(user.username)
+
+      get "/api/v1/#{private_user_data_api.path}/#{last_data.id}.json?include=owner"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json['owner']['username']).to eq(user2.username)
+
+      private_user_data_api.owner_primary_key = 'uid'
+      private_user_data_api.owner_foreign_key = 'user_uid'
+      private_user_data_api.save!
+
+      get "/api/v1/#{private_user_data_api.path}/#{first_data.id}.json"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json['owner']).to eq(user.uid)
+
+      get "/api/v1/#{private_user_data_api.path}/#{last_data.id}.json"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json['owner']).to eq(user2.uid)
+
+      get "/api/v1/#{private_user_data_api.path}/#{first_data.id}.json?include=owner"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json['owner']['username']).to eq(user.username)
+
+      get "/api/v1/#{private_user_data_api.path}/#{last_data.id}.json?include=owner"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json['owner']).to be_nil
     end
   end
 end

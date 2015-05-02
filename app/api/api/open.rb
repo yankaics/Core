@@ -19,11 +19,30 @@ class API::Open < API
       @resource_name = @data_api.name.to_sym
       @resource_columns = @data_api.columns
       @resource_primary_key = @data_api.primary_key
-      fieldset_for @resource_name, permitted_fields: @resource_columns,
+      @resource_fields = @resource_columns
+      @resource_fields << :id
+
+      # List all the includable fields
+      @includable_fields = []
+      @includable_fields << :owner if @data_api.has_owner?
+      @resource_fields << :owner if @data_api.has_owner?
+
+      fieldset_for @resource_name, permitted_fields: @resource_fields,
                                    show_all_permitted_fields_by_default: true,
                                    root: true
-      # inclusion_for @resource_name, root: true
-      resource_collection = @data_api.data_model.select(fieldset(@resource_name) + [@resource_primary_key])
+      inclusion_for @resource_name, root: true
+
+      if @data_api.has_owner?
+        fieldset_for :user, permitted_fields: User::PUBLIC_ATTRS,
+                            show_all_permitted_fields_by_default: true
+      end
+
+      # Scope the collection
+      select = fieldset(@resource_name)
+      fieldset_select = (fieldset(@resource_name) + [@resource_primary_key])
+      fieldset_select.delete(:owner)
+      fieldset_select << @data_api.owner_foreign_key if @data_api.has_owner? && fieldset(@resource_name).include?(:owner)
+      resource_collection = @data_api.data_model.select(fieldset_select)
 
       # If getting a single resourse
       if @data_api.single_data_id.present?

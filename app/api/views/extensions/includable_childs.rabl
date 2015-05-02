@@ -13,7 +13,8 @@ unless @inclusion_field[locals[:self_resource]].blank?
         if obj.try(i_field[:id_field]).present?
           obj.try(i_field[:id_field])
         else
-          nil
+          fk = obj.class.try("#{i_field[:field]}_foreign_key")
+          obj.try(fk) if fk.present?
         end
       end
       type = (i_field[:class_name] || i_field[:field]).to_s.singularize

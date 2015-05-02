@@ -142,6 +142,11 @@ class DataAPI < ActiveRecord::Base
     m.updated_at = updated_at
 
     if owned_by_user
+      m.cattr_accessor(:owner_primary_key)
+      m.owner_primary_key = owner_primary_key
+      m.cattr_accessor(:owner_foreign_key)
+      m.owner_foreign_key = owner_foreign_key
+
       case owner_primary_key
       when 'id'
         m.belongs_to :owner, class_name: User, primary_key: :id, foreign_key: owner_foreign_key
@@ -253,7 +258,7 @@ class DataAPI < ActiveRecord::Base
     renamed_columns = {}
 
     current_columns.each do |k, v|
-      renamed_columns[k] = v if old_columns[k].present? && v['name'] != old_columns[k][:name]
+      renamed_columns[k] = v if old_columns[k].present? && v['name'] != old_columns[k]['name']
     end
 
     renamed_columns.each do |uuid, column|

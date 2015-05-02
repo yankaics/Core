@@ -45,7 +45,7 @@ module APIResourceIncludable
     # View Helper to set the inclusion details.
     #
     def set_inclusion_field(self_resource, field, id_field, class_name: nil, url: nil)
-      return if (@fieldset.present? && !@fieldset[self_resource].include?(field))
+      return if (@fieldset.present? && @fieldset[self_resource].present? && !@fieldset[self_resource].include?(field))
 
       @inclusion_field ||= {}
       @inclusion_field[self_resource] ||= []
@@ -56,7 +56,7 @@ module APIResourceIncludable
         url: url
       }
       @inclusion_field[self_resource] << field_data
-      @fieldset[self_resource].delete(field)
+      @fieldset[self_resource].delete(field) if @fieldset[self_resource].present?
     end
 
     ##
