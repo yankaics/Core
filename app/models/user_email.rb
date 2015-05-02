@@ -70,7 +70,6 @@ class UserEmail < ActiveRecord::Base
         identity = user.identities.create!(pattern_identity)
         identity.update(department_code: department_code) unless department_code.blank?
       end
-      user.touch
     end
   end
 
