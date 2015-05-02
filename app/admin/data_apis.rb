@@ -98,7 +98,7 @@ ActiveAdmin.register DataAPI do
       row(:path)
       row(:organization) if current_admin.root?
       row(:primary_key)
-      row(:schema) { |data_api| code { data_api.schema } }
+      row(:schema) { |data_api| pre { JSON.pretty_generate(data_api.schema) } }
       row(:default_order)
       row(:maintain_schema)
       row(:database_url) { |data_api| code { data_api.database_url } }
