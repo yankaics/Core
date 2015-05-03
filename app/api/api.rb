@@ -10,6 +10,10 @@ class API < Grape::API
   formatter :json, Grape::Formatter::Rabl
   formatter :xml, Grape::Formatter::Rabl
 
+  before do
+    @request_path = "#{@namespace}#{params.path}"
+  end
+
   mount API::V1
 
   documentation_settings = {
@@ -29,4 +33,6 @@ class API < Grape::API
   end
 
   add_swagger_documentation(documentation_settings)
+
+  mount API::Open
 end

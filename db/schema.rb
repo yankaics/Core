@@ -11,9 +11,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150419230220) do
+ActiveRecord::Schema.define(version: 20150502172221) do
 
-  create_table "active_admin_comments", force: true do |t|
+  create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace"
     t.text     "body"
     t.string   "resource_id",   null: false
@@ -28,7 +28,7 @@ ActiveRecord::Schema.define(version: 20150419230220) do
   add_index "active_admin_comments", ["namespace"], name: "index_active_admin_comments_on_namespace"
   add_index "active_admin_comments", ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id"
 
-  create_table "admins", force: true do |t|
+  create_table "admins", force: :cascade do |t|
     t.string   "username",                 default: "", null: false
     t.string   "email",                    default: "", null: false
     t.string   "encrypted_password",       default: "", null: false
@@ -50,7 +50,44 @@ ActiveRecord::Schema.define(version: 20150419230220) do
   add_index "admins", ["unlock_token"], name: "index_admins_on_unlock_token", unique: true
   add_index "admins", ["username"], name: "index_admins_on_username", unique: true
 
-  create_table "departments", force: true do |t|
+  create_table "data_api_versions", force: :cascade do |t|
+    t.integer  "item_id",    null: false
+    t.string   "item_type",  null: false
+    t.string   "event",      null: false
+    t.string   "whodunnit"
+    t.text     "object"
+    t.datetime "created_at"
+  end
+
+  add_index "data_api_versions", ["item_id", "item_type"], name: "index_data_api_versions_on_item_id_and_item_type"
+
+  create_table "data_apis", force: :cascade do |t|
+    t.string   "name",                                  null: false
+    t.string   "path",                                  null: false
+    t.string   "organization_code"
+    t.string   "primary_key",       default: "id",      null: false
+    t.text     "schema"
+    t.text     "has"
+    t.string   "default_order",     default: "id DESC", null: false
+    t.string   "database_url"
+    t.boolean  "maintain_schema",   default: true,      null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.boolean  "accessible",        default: false,     null: false
+    t.boolean  "public",            default: false,     null: false
+    t.boolean  "owned_by_user",     default: false,     null: false
+    t.string   "owner_primary_key"
+    t.string   "owner_foreign_key"
+  end
+
+  add_index "data_apis", ["accessible"], name: "index_data_apis_on_accessible"
+  add_index "data_apis", ["name"], name: "index_data_apis_on_name", unique: true
+  add_index "data_apis", ["organization_code"], name: "index_data_apis_on_organization_code"
+  add_index "data_apis", ["owned_by_user"], name: "index_data_apis_on_owned_by_user"
+  add_index "data_apis", ["path"], name: "index_data_apis_on_path", unique: true
+  add_index "data_apis", ["public"], name: "index_data_apis_on_public"
+
+  create_table "departments", force: :cascade do |t|
     t.string   "organization_code",           null: false
     t.string   "code",                        null: false
     t.string   "name",                        null: false
@@ -61,12 +98,14 @@ ActiveRecord::Schema.define(version: 20150419230220) do
     t.datetime "updated_at"
   end
 
+  add_index "departments", ["code"], name: "index_departments_on_code"
   add_index "departments", ["organization_code"], name: "index_departments_on_organization_code"
+  add_index "departments", ["parent_code"], name: "index_departments_on_parent_code"
 
-  create_table "email_patterns", force: true do |t|
-    t.integer  "priority",                                             default: 100,   null: false
+  create_table "email_patterns", force: :cascade do |t|
+    t.integer  "priority",                                   limit: 3, default: 100,   null: false
     t.string   "organization_code",                                                    null: false
-    t.integer  "corresponded_identity",                      limit: 2,                 null: false
+    t.integer  "corresponded_identity",                      limit: 1,                 null: false
     t.string   "email_regexp",                                                         null: false
     t.text     "uid_postparser"
     t.text     "department_code_postparser"
@@ -79,7 +118,10 @@ ActiveRecord::Schema.define(version: 20150419230220) do
     t.boolean  "skip_confirmation",                                    default: false, null: false
   end
 
-  create_table "friendly_id_slugs", force: true do |t|
+  add_index "email_patterns", ["organization_code"], name: "index_email_patterns_on_organization_code"
+  add_index "email_patterns", ["priority"], name: "index_email_patterns_on_priority"
+
+  create_table "friendly_id_slugs", force: :cascade do |t|
     t.string   "slug",                      null: false
     t.integer  "sluggable_id",              null: false
     t.string   "sluggable_type", limit: 50
@@ -92,7 +134,7 @@ ActiveRecord::Schema.define(version: 20150419230220) do
   add_index "friendly_id_slugs", ["sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_id"
   add_index "friendly_id_slugs", ["sluggable_type"], name: "index_friendly_id_slugs_on_sluggable_type"
 
-  create_table "oauth_access_grants", force: true do |t|
+  create_table "oauth_access_grants", force: :cascade do |t|
     t.integer  "resource_owner_id", null: false
     t.integer  "application_id",    null: false
     t.string   "token",             null: false
@@ -105,7 +147,7 @@ ActiveRecord::Schema.define(version: 20150419230220) do
 
   add_index "oauth_access_grants", ["token"], name: "index_oauth_access_grants_on_token", unique: true
 
-  create_table "oauth_access_tokens", force: true do |t|
+  create_table "oauth_access_tokens", force: :cascade do |t|
     t.integer  "resource_owner_id"
     t.integer  "application_id"
     t.string   "token",             null: false
@@ -120,7 +162,7 @@ ActiveRecord::Schema.define(version: 20150419230220) do
   add_index "oauth_access_tokens", ["resource_owner_id"], name: "index_oauth_access_tokens_on_resource_owner_id"
   add_index "oauth_access_tokens", ["token"], name: "index_oauth_access_tokens_on_token", unique: true
 
-  create_table "oauth_applications", force: true do |t|
+  create_table "oauth_applications", force: :cascade do |t|
     t.string   "name",                                  null: false
     t.text     "description"
     t.string   "app_url"
@@ -149,7 +191,7 @@ ActiveRecord::Schema.define(version: 20150419230220) do
   add_index "oauth_applications", ["owner_id", "owner_type"], name: "index_oauth_applications_on_owner_id_and_owner_type"
   add_index "oauth_applications", ["uid"], name: "index_oauth_applications_on_uid", unique: true
 
-  create_table "organizations", force: true do |t|
+  create_table "organizations", force: :cascade do |t|
     t.string   "code"
     t.string   "name"
     t.string   "short_name"
@@ -159,7 +201,7 @@ ActiveRecord::Schema.define(version: 20150419230220) do
 
   add_index "organizations", ["code"], name: "index_organizations_on_code", unique: true
 
-  create_table "settings", force: true do |t|
+  create_table "settings", force: :cascade do |t|
     t.string   "var",                   null: false
     t.text     "value"
     t.integer  "thing_id"
@@ -170,12 +212,12 @@ ActiveRecord::Schema.define(version: 20150419230220) do
 
   add_index "settings", ["thing_type", "thing_id", "var"], name: "index_settings_on_thing_type_and_thing_id_and_var", unique: true
 
-  create_table "user_data", force: true do |t|
+  create_table "user_data", force: :cascade do |t|
     t.integer  "user_id",                                            null: false
-    t.integer  "gender",                      limit: 2, default: 0,  null: false
+    t.integer  "gender",                      limit: 1, default: 0,  null: false
     t.integer  "birth_year"
-    t.integer  "birth_month",                 limit: 2
-    t.integer  "birth_day",                   limit: 2
+    t.integer  "birth_month",                 limit: 1
+    t.integer  "birth_day",                   limit: 1
     t.string   "url",                                   default: "", null: false
     t.text     "brief",                                 default: "", null: false
     t.text     "motto",                                 default: "", null: false
@@ -190,7 +232,9 @@ ActiveRecord::Schema.define(version: 20150419230220) do
     t.text     "fb_friends"
   end
 
-  create_table "user_emails", force: true do |t|
+  add_index "user_data", ["user_id"], name: "index_user_data_on_user_id"
+
+  create_table "user_emails", force: :cascade do |t|
     t.integer  "user_id",              null: false
     t.string   "email",                null: false
     t.string   "confirmation_token"
@@ -202,8 +246,11 @@ ActiveRecord::Schema.define(version: 20150419230220) do
   end
 
   add_index "user_emails", ["confirmation_token"], name: "index_user_emails_on_confirmation_token", unique: true
+  add_index "user_emails", ["confirmed_at"], name: "index_user_emails_on_confirmed_at"
+  add_index "user_emails", ["email"], name: "index_user_emails_on_email"
+  add_index "user_emails", ["user_id"], name: "index_user_emails_on_user_id"
 
-  create_table "user_identities", force: true do |t|
+  create_table "user_identities", force: :cascade do |t|
     t.integer  "email_pattern_id"
     t.integer  "user_id"
     t.string   "email",                                                      null: false
@@ -222,7 +269,13 @@ ActiveRecord::Schema.define(version: 20150419230220) do
     t.boolean  "skip_confirmation",                          default: false, null: false
   end
 
-  create_table "users", force: true do |t|
+  add_index "user_identities", ["email"], name: "index_user_identities_on_email"
+  add_index "user_identities", ["email_pattern_id"], name: "index_user_identities_on_email_pattern_id"
+  add_index "user_identities", ["organization_code"], name: "index_user_identities_on_organization_code"
+  add_index "user_identities", ["uid"], name: "index_user_identities_on_uid"
+  add_index "user_identities", ["user_id"], name: "index_user_identities_on_user_id"
+
+  create_table "users", force: :cascade do |t|
     t.string   "email",                    default: "", null: false
     t.string   "encrypted_password",       default: "", null: false
     t.string   "reset_password_token"

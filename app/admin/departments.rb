@@ -1,5 +1,5 @@
 ActiveAdmin.register Department do
-  menu priority: 111, parent: "組織資料"
+  menu priority: 111, parent: 'organization'
   config.sort_order = :organization_code_asc, :code_asc
   config.per_page = 100
 

@@ -10,6 +10,9 @@ zh-TW:
       user: "使用者"
       doorkeeper_application: "應用程式"
       doorkeeper/application: "應用程式"
+      data_api: "資料集 API"
+      data_api/data: "資料集 API 資料"
+      data_api_data: "資料集 API 資料"
 
     attributes:
       user:
@@ -32,6 +35,20 @@ zh-TW:
           female: "女"
           other: "其他"
           unspecified: "未指定"
+      data_api:
+        accessible: "開放使用"
+        public: "公開"
+        name: "名稱"
+        path: "存取網址路徑"
+        organization: "所屬組織"
+        organization_code: "所屬組織"
+        primary_key: "主鍵"
+        default_order: "預設資料排序"
+        database_url: "Database URL"
+        maintain_schema: "自動維護資料表"
+        data_api/data: "資料集 API 資料"
+        data_api_data: "資料集 API 資料"
+        manage: "管理"
       organization:
         code: "代碼"
         code_cont: "代碼"

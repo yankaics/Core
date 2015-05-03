@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-feature "Control Panel", :type => :feature do
+feature "Control Panel", :type => :feature, :retry => 3 do
   scenario "Admin signs in" do
     admin_credentials = { username: 'test_admin', password: 'password' }
     admin = create(:admin, admin_credentials)
@@ -120,6 +120,204 @@ feature "Control Panel", :type => :feature do
         visit(my_account_path)
         expect(page).not_to have_content(@usr.name)
         expect(page).not_to have_content(@usr.email)
+      end
+    end
+  end
+
+  describe "Data API Control Panel" do
+    before(:all) { DatabaseCleaner.clean_with(:deletion) }
+    let(:api_data_stores_csv_file) do
+      Rails.root.join('spec', 'fixtures', 'files', 'api_data_stores.csv')
+    end
+
+    context "signed in as a root admin" do
+      before(:each) do
+        @admin = create(:admin)
+        login_as @admin, scope: :admin
+        visit(admin_data_apis_path)
+      end
+
+      scenario "Admin views a Data API", :js => true do
+        data_api = create(:data_api)
+        visit(current_path)
+        click_link data_api.name
+        expect(page).to have_content(data_api.name)
+        expect(page).to have_content(data_api.path)
+        data_api.schema.each do |k, v|
+          expect(page).to have_content(k)
+        end
+      end
+
+      scenario "Admin creates a Data API", :js => true do
+        click_link I18n.t(:'active_admin.new_model', model: I18n.t(:'activerecord.models.data_api'))
+
+        within("#main_content") do
+          fill_in 'data_api_name', with: "my_new_api"
+          fill_in 'data_api_path', with: "my_apis/my_new_api"
+
+          within(".data_api_schema_table") do
+            within("tbody tr:nth-child(1)") do
+              find('.name').set 'my_string'
+              find('.type').set 'string'
+            end
+            first('a.add').click
+            within("tbody tr:nth-child(2)") do
+              find('.name').set 'my_int'
+              find('.type').set 'integer'
+            end
+            first('a.add').click
+            within("tbody tr:nth-child(3)") do
+              find('.name').set 'unused_int'
+              find('.type').set 'integer'
+            end
+            first('a.add').click
+            within("tbody tr:nth-child(4)") do
+              find('.name').set 'my_bool'
+              find('.type').set 'boolean'
+            end
+            within("tbody tr:nth-child(3)") do
+              first('a.delete').click
+            end
+          end
+
+          first('#data_api_submit_action').find('input').click
+        end
+
+        expect(page).to have_content('my_int')
+        expect(page).to have_content('my_string')
+        expect(page).not_to have_content('unused_int')
+        expect(page).to have_content('my_bool')
+
+        data_api = DataAPI.last
+        data_api.data_model.create(my_int: 1, my_string: 'Hi', my_bool: true)
+
+        expect(data_api.data_model.last.my_int).to be_a(Integer)
+        expect(data_api.data_model.last.my_string).to be_a(String)
+        expect(data_api.data_model.last.my_bool).to be_a(TrueClass)
+      end
+
+      scenario "Admin updates a Data API", :js => true do
+        Timecop.scale(3600)
+
+        data_api = create(:data_api)
+        visit(edit_admin_data_api_path(data_api))
+
+        within("#main_content") do
+          fill_in 'data_api_name', with: "my_todo_list"
+          fill_in 'data_api_path', with: "my/todos"
+
+          within(".data_api_schema_table") do
+            within("tbody tr:nth-child(2)") do
+              first('a.delete').click
+            end
+            first('a.add').click
+            within("tbody tr:nth-child(2)") do
+              find('.name').set 'done'
+              find('.type').set 'boolean'
+            end
+          end
+          first('#data_api_submit_action').find('input').click
+        end
+
+        expect(page).to have_content('name')
+        expect(page).to have_content('done')
+
+        data_api = DataAPI.find(data_api.id)
+        data_api.data_model.create(name: 'sleep', done: false)
+
+        # Another test
+        data_api = create(:data_api)
+        visit(edit_admin_data_api_path(data_api))
+
+        within("#main_content") do
+          within(".data_api_schema_table") do
+            within("tbody tr:nth-child(2)") do
+              first('a.delete').click
+            end
+            first('a.add').click
+            within("tbody tr:nth-child(2)") do
+              find('.name').set 'my_awesome_attribute'
+              find('.type').set 'string'
+            end
+          end
+          first('#data_api_submit_action').find('input').click
+        end
+
+        expect(page).to have_content('my_awesome_attribute')
+
+        data_api = DataAPI.find(data_api.id)
+        data_api.data_model.create!(my_awesome_attribute: 'awesome')
+
+        # the data API data control panel should be updated too
+        visit(admin_data_api_data_api_data_path(data_api))
+        expect(page).to have_content('My Awesome Attribute')
+
+        Timecop.scale(1)
+        Timecop.return
+      end
+
+      scenario "Admin manages data of an Data API", :js => false do
+        data_api = create(:data_api, schema: { string: { type: 'string' }, text: { type: 'text' }, boolean: { type: 'boolean' } })
+        visit(admin_data_api_data_api_data_path data_api_id: data_api.id)
+        click_link I18n.t(:'active_admin.new_model', model: I18n.t(:'activerecord.models.data_api_data'))
+        fill_in 'data_api_data_string', with: "Hello World"
+        fill_in 'data_api_data_text', with: "Have a good day!"
+        check 'data_api_data_boolean'
+        find('input[type=submit]').click
+        expect(data_api.data_model.first.string).to eq("Hello World")
+        expect(data_api.data_model.first.text).to eq("Have a good day!")
+        expect(data_api.data_model.first.boolean).to be(true)
+        expect(page).to have_content("Hello World")
+        visit(admin_data_api_data_api_data_path data_api_id: data_api.id)
+        expect(page).to have_content("Hello World")
+      end
+
+      scenario "Admin imports data to an Data API", :js => false do
+        data_api = create(:data_api, name: 'stores', path: 'stores', schema: { code: { type: 'string', null: false, unique: true }, name: { type: 'string', null: false }, location_latitude: { type: 'string' }, location_longitude: { type: 'string' }, open_at: { type: 'integer' }, close_at: { type: 'integer' }, description: { type: 'text' } })
+        visit(import_admin_data_api_data_api_data_path data_api_id: data_api.id)
+        attach_file('active_admin_import_model_file', api_data_stores_csv_file)
+        find('input[type=submit]').click
+
+        expect(data_api.data_model.first.name).to eq('摩斯漢堡')
+        expect(data_api.data_model.second.location_latitude).to eq('25.022872')
+        expect(data_api.data_model.last.close_at).to eq(2399)
+      end
+    end
+
+    context "signed in as a scoped admin" do
+      before(:each) do
+        @admin = create(:admin, :scoped)
+        login_as @admin, scope: :admin
+        visit(admin_data_apis_path)
+      end
+
+      scenario "Admin can't view a global Data API", :js => true do
+        data_api = create(:data_api)
+        visit(current_path)
+        expect(page).not_to have_content(data_api.name)
+      end
+
+      scenario "Admin creates a Data API", :js => true do
+        click_link I18n.t(:'active_admin.new_model', model: I18n.t(:'activerecord.models.data_api'))
+
+        within("#main_content") do
+          fill_in 'data_api_name', with: "my_simple_api"
+          fill_in 'data_api_path', with: "my_apis/my_simple_api"
+
+          within(".data_api_schema_table") do
+            within("tbody tr:nth-child(1)") do
+              find('.name').set 'my_string'
+              find('.type').set 'string'
+            end
+          end
+
+          first('#data_api_submit_action').find('input').click
+        end
+
+        expect(page).to have_content('my_string')
+
+        data_api = DataAPI.last
+        expect(data_api.organization).to eq(@admin.organization)
       end
     end
   end

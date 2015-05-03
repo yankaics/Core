@@ -7,3 +7,15 @@ zh-TW:
         title: "帳號"
       password:
         title: "密碼"
+    comments:
+      body: "內文"
+      author: "作者"
+      title: "註記"
+      add: "新增註記"
+      resource: "資源"
+      no_comments_yet: "尚無註記"
+      title_content: "(%{count}) 則註記"
+      resource_type: "資源類型"
+      author_type: "作者身份"
+      errors:
+        empty_text: "註記儲存失敗，不允許空白的內容。"

@@ -6,7 +6,7 @@ Core
 [![Code Climate](https://img.shields.io/codeclimate/github/colorgy/Core.svg?style=flat)](https://codeclimate.com/github/colorgy/Core)
 [![Dependency Status](https://img.shields.io/gemnasium/colorgy/Core.svg?style=flat)](https://gemnasium.com/colorgy/Core)
 
-The core user authentication & management system.
+The core API server & authentication system.
 
 
 ## Development Setup

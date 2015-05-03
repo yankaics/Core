@@ -44,19 +44,22 @@ gem 'unicorn'
 # Loads environment variables from `.env`
 gem 'dotenv-rails', :groups => [:development, :test]
 
-gem 'active_model_serializers', '~> 0.8.0'
-
-# Handle settings by rails-settings-cached
-gem 'rails-settings-cached', github: 'Neson/rails-settings-cached'
-
-gem 'factory_girl_rails', '~> 4.5.0'
-
 # Add Slim support
 gem 'slim-rails'
 
 # Markdown parser
 gem 'redcarpet'
 gem 'rouge'
+
+# Handle settings by rails-settings-cached
+gem 'rails-settings-cached', github: 'Neson/rails-settings-cached'
+
+gem 'factory_girl_rails', '~> 4.5.0'
+
+gem 'active_model_serializers', '~> 0.8.0'
+gem 'paper_trail', '~> 3.0.6'
+
+gem 'kaminari'
 
 # Create human-friendly IDs for models
 gem 'friendly_id', '~> 5.1.0'
@@ -120,6 +123,7 @@ group :development, :test do
   gem 'spring-commands-rspec'
   gem 'shoulda-matchers', require: false
   gem 'rspec-its', require: false
+  gem 'rspec-retry', require: false
   gem 'simplecov', '~> 0.9.1', require: false
   gem 'coveralls', require: false
   gem 'codeclimate-test-reporter', require: false

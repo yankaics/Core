@@ -9,17 +9,21 @@ unless @inclusion_field[locals[:self_resource]].blank?
 
     # not to include child
     else
-      node i_field[:id] do |obj|
-        obj.send(i_field[:id])
+      node i_field[:field] do |obj|
+        if obj.try(i_field[:id_field]).present?
+          obj.try(i_field[:id_field])
+        else
+          fk = obj.class.try("#{i_field[:field]}_foreign_key")
+          obj.try(fk) if fk.present?
+        end
       end
-      node i_field[:field] do
-        type = (i_field[:class_name] || i_field[:field]).to_s.singularize.camelize
-        meta = {}
-        meta[:key] = i_field[:id]
-        meta[:type] = type
-        meta[:url] = i_field[:resource_url] unless i_field[:resource_url].blank?
-        meta
-      end
+      type = (i_field[:class_name] || i_field[:field]).to_s.singularize
+      @meta ||= {}
+      @meta[locals[:self_resource]] ||= {}
+      @meta[locals[:self_resource]][:relations] ||= {}
+      @meta[locals[:self_resource]][:relations][i_field[:field]] ||= {}
+      @meta[locals[:self_resource]][:relations][i_field[:field]][:type] = type
+      @meta[locals[:self_resource]][:relations][i_field[:field]][:url] = request.url.gsub(@request_path, "/#{i_field[:url]}") if i_field[:url].present? && @request_path.is_a?(String)
     end
   end
 end

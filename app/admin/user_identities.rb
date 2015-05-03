@@ -1,5 +1,5 @@
 ActiveAdmin.register UserIdentity do
-  menu priority: 113, parent: "組織資料"
+  menu priority: 113, parent: 'organization'
   config.sort_order = :organization_code_asc, :uid_asc
   config.per_page = 1000
 

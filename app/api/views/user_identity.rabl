@@ -5,6 +5,8 @@ set_inclusion :user_identity
 object @user_identity
 attributes(*fieldset[:user_identity])
 
-node :type do
-  :UserIdentity
+node :_type do
+  :user_identity
 end
+
+extends('extensions/meta_data', locals: { self_resource: :user_identity })

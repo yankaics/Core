@@ -6,6 +6,7 @@ RSpec.describe Organization, :type => :model do
   it { should have_many(:users) }
   it { should have_many(:departments) }
   it { should have_many(:email_patterns) }
+  it { should have_many(:data_apis) }
 
   it { should accept_nested_attributes_for(:departments) }
   it { should accept_nested_attributes_for(:email_patterns) }

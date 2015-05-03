@@ -6,10 +6,16 @@ set_inclusion :department
 
 set_inclusion_field :department, :departments, :department_codes
 
+node :id do |dep|
+  dep.code
+end
+
 attributes(*fieldset[:department])
 
 extends('extensions/includable_childs', locals: { self_resource: :department })
 
-node :type do
-  :Department
+node :_type do
+  :department
 end
+
+extends('extensions/meta_data', locals: { self_resource: :department })

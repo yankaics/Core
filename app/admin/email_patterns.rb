@@ -1,5 +1,5 @@
 ActiveAdmin.register EmailPattern do
-  menu priority: 112, parent: "組織資料"
+  menu priority: 112, parent: 'organization'
   config.sort_order = :organization_code_asc, :priority_asc
 
   scope_to(if: proc { current_admin.scoped? }) { current_admin.organization }

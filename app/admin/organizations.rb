@@ -1,5 +1,5 @@
 ActiveAdmin.register Organization do
-  menu priority: 110, parent: "組織資料", if: proc { current_admin.root? }
+  menu priority: 110, parent: 'organization', if: proc { current_admin.root? }
   config.sort_order = :code_asc
 
   scope_to(if: proc { current_admin.scoped? }) { current_admin }
