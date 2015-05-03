@@ -7,6 +7,7 @@
   "scripts": {
     "postdeploy": "bundle exec rake dev:prime"
   },
+  "success_url": "/admin",
   "env": {
     "APP_NAME": {
       "description": "The displayed name of this application.",

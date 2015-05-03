@@ -19,6 +19,32 @@ $ ./bin/setup
 
 You may want to change the app's default environment variables, which lays in `.env`.
 
+## Deploy
+
+This application is designed under The [Twelve-Factor App](http://12factor.net/) pattern, making its deployment and operations on cloud platforms easy.
+
+### Heroku
+
+Deploy to Heroku for testing with a click:
+
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+
+## Management
+
+Visit `http(s)://url_of_your_app/admin` to access the control panel. The default account and password is `admin` / `password`.
+
+You can also type $ `bin/rails c` <kbd>Enter</kbd> in the terminal to enter the rails console.
+
+Feel free to check out the [docs](https://github.com/colorgy/Core/wiki) for further information.
+
+## Testing
+
+Run the following command to execute all test suites:
+
+```bash
+$ bundle exec rake
+
+```
 
 ## Chat
 
