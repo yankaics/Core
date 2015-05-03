@@ -55,6 +55,8 @@ gem 'rouge'
 gem 'rails-settings-cached', github: 'Neson/rails-settings-cached'
 
 gem 'factory_girl_rails', '~> 4.5.0'
+gem 'faker'
+gem 'letter_opener'
 
 gem 'active_model_serializers', '~> 0.8.0'
 gem 'paper_trail', '~> 3.0.6'
@@ -111,7 +113,6 @@ group :development do
   gem 'better_errors', '~> 2.1.0'
   gem 'binding_of_caller', '~> 0.7.2'
   gem 'meta_request'
-  gem 'letter_opener'
   gem 'bullet'
   # gem 'guard-livereload', require: false
   # gem 'growl_notify', require: false
@@ -136,7 +137,6 @@ group :development, :test do
   gem 'formulaic'
   gem 'launchy'
   gem 'timecop'
-  gem 'faker'
 end
 
 # Logger and Monitoring Tools

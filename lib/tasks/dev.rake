@@ -4,7 +4,7 @@ namespace :dev do
   desc "Seed data for development environment"
   task prime: "db:setup" do
 
-    if Rails.env.development?
+    if Rails.env.development? || ENV['STAGING'].present?
       include FactoryGirl::Syntax::Methods
 
       ntust = create(:ntust_organization)
