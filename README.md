@@ -19,6 +19,7 @@ $ ./bin/setup
 
 You may want to change the app's default environment variables, which lays in `.env`.
 
+
 ## Deploy
 
 This application is designed under The [Twelve-Factor App](http://12factor.net/) pattern, making its deployment and operations on cloud platforms easy.
@@ -27,7 +28,8 @@ This application is designed under The [Twelve-Factor App](http://12factor.net/)
 
 Deploy to Heroku for testing with a click:
 
-[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
 
 ## Management
 
@@ -45,6 +47,7 @@ Run the following command to execute all test suites:
 $ bundle exec rake
 
 ```
+
 
 ## Chat
 
