@@ -1,0 +1,68 @@
+{
+  "name": "Core",
+  "description": "The core API server & authentication system for Colorgy.",
+  "addons": [
+    "heroku-postgresql:hobby-dev"
+  ],
+  "scripts": {
+    "postdeploy": "bundle exec rake dev:prime"
+  },
+  "env": {
+    "APP_NAME": {
+      "description": "The displayed name of this application.",
+      "value": "Colorgy on Heroku"
+    },
+    "APP_URL": {
+      "description": "Set this to the full URL (including 'https://') of your application.",
+      "value": "https://change.this.to/your/app.url"
+    },
+    "APP_ABOUT_URL": "https://change.this.to/your/about.url",
+    "APP_CONTACT_URL": "https://change.this.to/your/contact.url",
+    "SITE_SECRET": {
+      "description": "A secret key for verifying the integrity of signed SSO cookies. Should be same across all sites using this SSO service.",
+      "generator": "secret"
+    },
+    "SECRET_KEY_BASE": {
+      "description": "A base secret key for general use.",
+      "generator": "secret"
+    },
+    "PEPPER": {
+      "description": "A secret key to encrypt passwords.",
+      "generator": "secret"
+    },
+    "MAILER_SENDER": {
+      "description": "The sender ('from:') for outgoing emails.",
+      "value": "change_me@example.com"
+    },
+    "LOGGER": {
+      "description": "Which logger to use, can be 'default', 'stdout' or 'remote'.",
+      "value": "stdout"
+    },
+    "MAILER_DELIVERY_METHOD": {
+      "description": "Which Mailing Service to use, can be 'letter_opener' or 'mailgun'.",
+      "value": "letter_opener"
+    },
+    "SMS_DELIVERY_METHOD": {
+      "description": "Which SMS Service to use, can be 'test' or 'nexmo'.",
+      "value": "test"
+    },
+    "FB_APP_ID": {
+      "description": "Facebook Application ID.",
+      "value": "get_this_on https://developers.facebook.com/apps/"
+    },
+    "FB_APP_SECRET": {
+      "description": "Facebook Application Secret.",
+      "value": "get_this_on https://developers.facebook.com/apps/"
+    },
+    "URL_TLD": {
+      "description": "Set this to false to disable top-level domain (TLD) features, e.g. cross-domain cookies (should be 'false' when deployed to heroku).",
+      "required": false,
+      "value": "false"
+    },
+    "STAGING": {
+      "description": "Information of staging server (should not be blank if deployed to a staging server).",
+      "required": false,
+      "value": "heroku"
+    }
+  }
+}
