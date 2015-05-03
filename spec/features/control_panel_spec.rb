@@ -225,6 +225,33 @@ feature "Control Panel", :type => :feature, :retry => 3 do
         data_api = DataAPI.find(data_api.id)
         data_api.data_model.create(name: 'sleep', done: false)
 
+        # Another test
+        data_api = create(:data_api)
+        visit(edit_admin_data_api_path(data_api))
+
+        within("#main_content") do
+          within(".data_api_schema_table") do
+            within("tbody tr:nth-child(2)") do
+              first('a.delete').click
+            end
+            first('a.add').click
+            within("tbody tr:nth-child(2)") do
+              find('.name').set 'my_awesome_attribute'
+              find('.type').set 'string'
+            end
+          end
+          first('#data_api_submit_action').find('input').click
+        end
+
+        expect(page).to have_content('my_awesome_attribute')
+
+        data_api = DataAPI.find(data_api.id)
+        data_api.data_model.create!(my_awesome_attribute: 'awesome')
+
+        # the data API data control panel should be updated too
+        visit(admin_data_api_data_api_data_path(data_api))
+        expect(page).to have_content('My Awesome Attribute')
+
         Timecop.scale(1)
         Timecop.return
       end

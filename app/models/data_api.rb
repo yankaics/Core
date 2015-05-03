@@ -24,6 +24,7 @@ class DataAPI < ActiveRecord::Base
   before_validation :stringify_schema_keys, :remove_blank_columns, :generate_uuid_for_new_columns, :set_type_for_new_columns, :check_organization_code
   after_create :create_db_table
   before_update :reset_data_model_const, :change_db_table
+  after_update :reset_data_model_column_information
   after_destroy :drop_db_table
 
   def self.database_url
@@ -181,6 +182,10 @@ class DataAPI < ActiveRecord::Base
 
   def reset_data_model_if_needed
     reset_data_model_const if data_model.updated_at != updated_at
+  end
+
+  def reset_data_model_column_information
+    data_model.reset_column_information
   end
 
   def inspect_data_model
