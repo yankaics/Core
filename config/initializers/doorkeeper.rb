@@ -44,7 +44,7 @@ Doorkeeper.configure do
   # For more information go to
   # https://github.com/doorkeeper-gem/doorkeeper/wiki/Using-Scopes
   default_scopes  :public
-  optional_scopes :email, :account, :identity, :facebook, :info,
+  optional_scopes :email, :account, :identity, :facebook, :info, :api,
                   :notifications, :send_notification, :sms, :offline_access
 
   # Change the way client credentials are retrieved from the request object.

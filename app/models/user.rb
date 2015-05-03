@@ -136,8 +136,7 @@ class User < ActiveRecord::Base
     :username,
     :name,
     :avatar_url,
-    :cover_photo_url,
-    :gender
+    :cover_photo_url
   ]
 
   EMAIL_ATTRS = [
@@ -157,6 +156,7 @@ class User < ActiveRecord::Base
   ]
 
   INFO_ATTRS = [
+    :gender,
     :birth_day,
     :birth_month,
     :brief,

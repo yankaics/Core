@@ -48,6 +48,7 @@ module APIGuard
         @access_token.scopes = all_scopes.join(' ')
         @scopes = all_scopes
       end
+
       OAuth::AccessTokenValidationService.validate!(@access_token, scopes: scopes)
 
       @current_resource_owner = User.find(@access_token.resource_owner_id)

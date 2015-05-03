@@ -273,4 +273,87 @@ describe "Open Data API" do
       expect(json['owner']).to be_nil
     end
   end
+
+  describe "resourse owned by user" do
+    let(:access_token) { create(:oauth_access_token, scopes: 'api', resource_owner_id: user.id).token }
+    let(:access_token2) { create(:oauth_access_token, scopes: 'api', resource_owner_id: user2.id).token }
+
+    it "is not accessable without an valid access token" do
+      get "/api/v1/me/#{private_user_data_api.path}.json"
+      expect(response).not_to be_success
+      json = JSON.parse(response.body)
+      expect(json).to have_key('error')
+    end
+
+    it "is accessable with an valid access token" do
+      get "/api/v1/me/#{private_user_data_api.path}.json?access_token=#{access_token}&include=owner"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json[0]['owner']['uuid']).to eq(user.uuid)
+
+      # getting a single resource
+      get "/api/v1/me/#{private_user_data_api.path}/1.json?access_token=#{access_token}&include=owner"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json['owner']['uuid']).to eq(user.uuid)
+
+      get "/api/v1/me/#{private_user_data_api.path}/2.json?access_token=#{access_token2}&include=owner"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json['owner']['uuid']).to eq(user2.uuid)
+
+      # 404 when getting a single resource not owned by the corresponding user
+      get "/api/v1/me/#{private_user_data_api.path}/2.json?access_token=#{access_token}&include=owner"
+      expect(response).not_to be_success
+      json = JSON.parse(response.body)
+      expect(json).to have_key('error')
+
+      # With uuid association link (uuid as the primary key)
+      private_user_data_api.owner_primary_key = 'uuid'
+      private_user_data_api.owner_foreign_key = 'user_uuid'
+      private_user_data_api.save!
+
+      get "/api/v1/me/#{private_user_data_api.path}.json?access_token=#{access_token}&include=owner"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json[0]['owner']['uuid']).to eq(user.uuid)
+
+      # With email association link (email as the primary key)
+      private_user_data_api.owner_primary_key = 'email'
+      private_user_data_api.owner_foreign_key = 'user_email'
+      private_user_data_api.save!
+
+      get "/api/v1/me/#{private_user_data_api.path}.json?access_token=#{access_token}&include=owner"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json[0]['owner']['uuid']).to eq(user.uuid)
+
+      get "/api/v1/me/#{private_user_data_api.path}.json?access_token=#{access_token2}&include=owner"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json[0]['owner']['uuid']).to eq(user2.uuid)
+
+      # With uid association link (uid as the primary key)
+      private_user_data_api.owner_primary_key = 'uid'
+      private_user_data_api.owner_foreign_key = 'user_uid'
+      private_user_data_api.save!
+
+      get "/api/v1/me/#{private_user_data_api.path}.json?access_token=#{access_token}&include=owner"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json[0]['owner']['uuid']).to eq(user.uuid)
+
+      # it is not cross-organization available
+      get "/api/v1/me/#{private_user_data_api.path}.json?access_token=#{access_token2}&include=owner"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json).to be_blank
+
+      # getting a single resource
+      get "/api/v1/me/#{private_user_data_api.path}/1.json?access_token=#{access_token}&include=owner"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json['owner']['uuid']).to eq(user.uuid)
+    end
+  end
 end
