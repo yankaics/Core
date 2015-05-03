@@ -159,3 +159,5 @@ gem 'nprogress-rails', '~> 0.1.6.5'
 gem 'select2-rails', '~> 3.5.9'
 gem 'chosen-rails'
 gem 'bootstrap-sass'
+
+gem 'rails_stdout_logging', :require => false
