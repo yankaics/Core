@@ -49,6 +49,10 @@ feature "User Verificate", :type => :feature, :retry => 3 do
     # Find the confirmation_path in identity confirmation email
     confirmation_path = open_last_email.body.match(/user_emails\/confirmation\?confirmation_token=[^"]+/)
 
+    # Record the original_sst
+    visit('/refresh_sst')
+    original_sst = page.driver.cookies['_sst']
+
     # Record the original_identity_token
     visit('/refresh_it')
     original_identity_token = page.driver.cookies['_identity_token']
@@ -75,6 +79,9 @@ feature "User Verificate", :type => :feature, :retry => 3 do
     expect(@user_a1.organization_name).to eq '國立臺灣科技大學'
     expect(@user_a1.department_name).to eq '工商業設計系'
 
+    # The sst is expected to be refreshed by the way
+    expect(page.driver.cookies['_sst']).not_to eq(original_sst)
+
     # The identity_token is expected to bo refreshed by the way
     expect(page.driver.cookies['_identity_token']).not_to eq(original_identity_token)
 
@@ -100,6 +107,10 @@ feature "User Verificate", :type => :feature, :retry => 3 do
     new_email = @user_b2.unconfirmed_emails.last
     expect(new_email.email).to eq user_identity.email
 
+    # Record the original_sst
+    visit('/refresh_sst')
+    original_sst = page.driver.cookies['_sst']
+
     # Record the original_identity_token
     visit('/refresh_it')
     original_identity_token = page.driver.cookies['_identity_token']
@@ -117,6 +128,9 @@ feature "User Verificate", :type => :feature, :retry => 3 do
 
     # And links the corresponding identity
     expect(@user_b2.primary_identity).to eq user_identity
+
+    # The sst is expected to be refreshed by the way
+    expect(page.driver.cookies['_sst']).not_to eq(original_sst)
 
     # The identity_token is expected to bo refreshed by the way
     expect(page.driver.cookies['_identity_token']).not_to eq(original_identity_token)
@@ -161,6 +175,10 @@ feature "User Verificate", :type => :feature, :retry => 3 do
     # Find the confirmation_path in identity confirmation email
     confirmation_path = open_last_email.body.match(/user_emails\/confirmation\?confirmation_token=[^"]+/)
 
+    # Record the original_sst
+    visit('/refresh_sst')
+    original_sst = page.driver.cookies['_sst']
+
     # Record the original_identity_token
     visit('/refresh_it')
     original_identity_token = page.driver.cookies['_identity_token']
@@ -177,6 +195,9 @@ feature "User Verificate", :type => :feature, :retry => 3 do
     expect(@user_b1.primary_identity).to eq user_identity
     expect(@user_b1.organization_name).to eq '國立臺灣科技大學'
     expect(@user_b1.department_name).to eq '工商業設計系'
+
+    # The sst is expected to be refreshed by the way
+    expect(page.driver.cookies['_sst']).not_to eq(original_sst)
 
     # The identity_token is expected to bo refreshed by the way
     expect(page.driver.cookies['_identity_token']).not_to eq(original_identity_token)

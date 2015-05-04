@@ -3,6 +3,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
     @user = User.from_facebook(request.env["omniauth.auth"])
 
     if @user.present? && @user.valid?
+      SignonStatusTokenService.write_to_cookie(cookies, @user)
       SiteIdentityTokenService.create(cookies, @user)
 
       # if an invitation_code exists, activate the email for that user

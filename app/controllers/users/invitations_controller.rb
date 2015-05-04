@@ -4,6 +4,7 @@ class Users::InvitationsController < ApplicationController
     code = params[:code]
     if InvitationCodeService.verify(code)
       sign_out :user
+      SignonStatusTokenService.update_cookie(cookies, current_user)
       SiteIdentityTokenService.update(cookies, current_user)
       session[:invitation_code] = code
       session[:invitation_redirect_url] = params[:redirect_to]

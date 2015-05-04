@@ -1,4 +1,5 @@
 class Users::SessionsController < Devise::SessionsController
+  after_filter :refresh_signon_status_token, only: [:destroy, :new, :create]
   after_filter :refresh_site_identity_token, only: [:destroy, :new, :create]
   attr_accessor :can_redirect, :redirect_url, :redirect_url_query, :redirect_url_uri
 
@@ -69,10 +70,23 @@ class Users::SessionsController < Devise::SessionsController
     end
   end
 
+  # Refresh the sign-on status token (sst) in cookie
+  def refresh_sst
+    refresh_signon_status_token
+
+    check_redirect_to
+
+    if can_redirect
+      redirect_to redirect_url
+    else
+      redirect_to root_path
+    end
+  end
+
   private
 
   def check_redirect_to
-    core_domain = SiteIdentityTokenService.domain
+    core_domain = CoreRSAKeyService.domain
     self.redirect_url = params[:redirect_to] || request.env["HTTP_REFERER"]
 
     return unless redirect_url

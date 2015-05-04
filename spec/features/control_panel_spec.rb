@@ -61,6 +61,7 @@ feature "Control Panel", :type => :feature, :retry => 3 do
         first('.col-testing .login').click
         cookies = page.driver.request.cookies
         page.driver.post(testing_user_sessions_path(id: @usr.id))
+        expect(cookies['_sst']).to be_blank
         expect(cookies['_identity_token']).to be_blank
         visit(my_account_path)
         expect(page).not_to have_content(@usr.name)
@@ -73,6 +74,7 @@ feature "Control Panel", :type => :feature, :retry => 3 do
         first('.col-testing .login').click
         cookies = page.driver.request.cookies
         page.driver.post(testing_user_sessions_path(id: @usr.id))
+        expect(cookies['_sst']).not_to be_blank
         expect(cookies['_identity_token']).not_to be_blank
         visit(my_account_path)
         expect(page).to have_content(@usr.name)
@@ -116,6 +118,7 @@ feature "Control Panel", :type => :feature, :retry => 3 do
         end.to raise_error
 
         cookies = page.driver.request.cookies
+        expect(cookies['_sst']).to be_blank
         expect(cookies['_identity_token']).to be_blank
         visit(my_account_path)
         expect(page).not_to have_content(@usr.name)

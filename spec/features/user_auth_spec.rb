@@ -89,6 +89,12 @@ eod
     # Users should be redirected to the new email page after their first login
     expect(current_path).to eq new_my_account_email_path
 
+    # On background: sign-on status token (sst) cookie should be set
+    sst_string = page.driver.request.cookies['_sst']
+    sst = SignonStatusTokenService.decode(sst_string)
+    expect(sst['id']).to eq(user.id)
+    expect(sst['uuid']).to eq(user.uuid)
+
     # On background: identity_token cookie should be set
     # (ignoring the small time difference)
     if (page.driver.request.cookies['_identity_token'] !=
@@ -100,6 +106,10 @@ eod
 
     # After logout
     visit('/logout')
+
+    # On background: sign-on status token (sst) cookie should be cleared
+    expect(page.driver.request.cookies['_sst'])
+      .to be_blank
 
     # On background: identity_token cookie should be cleared
     expect(page.driver.request.cookies['_identity_token'])
@@ -122,6 +132,12 @@ eod
     # Old users should not be redirected to the new email page after login
     expect(current_path).not_to eq new_my_account_email_path
 
+    # On background: sign-on status token (sst) cookie should be set
+    sst_string = page.driver.request.cookies['_sst']
+    sst = SignonStatusTokenService.decode(sst_string)
+    expect(sst['id']).to eq(user.id)
+    expect(sst['uuid']).to eq(user.uuid)
+
     # On background: identity_token cookie should be set
     # (ignoring the small time difference)
     if (page.driver.request.cookies['_identity_token'] !=
@@ -133,6 +149,10 @@ eod
 
     # After logout
     visit('/logout')
+
+    # On background: sign-on status token (sst) cookie should be cleared
+    expect(page.driver.request.cookies['_sst'])
+      .to be_blank
 
     # On background: identity_token cookie should be cleared
     expect(page.driver.request.cookies['_identity_token'])
@@ -175,6 +195,14 @@ eod
 
     # expect(page).to ...
 
+    # On background: sign-on status token (sst) cookie should be set
+    sst_string = page.driver.request.cookies['_sst']
+    sst = SignonStatusTokenService.decode(sst_string)
+    expect(sst['id']).to eq(user.id)
+    expect(sst['uuid']).to eq(user.uuid)
+    expect(sst['updated_at']).to eq(user.updated_at.to_i)
+    expect(sst['updated_at']).to eq(user.updated_at.to_i)
+
     # On background: identity_token cookie should be maintained...
     if (page.driver.request.cookies['_identity_token'] !=
         SiteIdentityTokenService.generate(user))
@@ -184,6 +212,10 @@ eod
       .to eq SiteIdentityTokenService.generate(user)[0..-4]
 
     visit('/logout')
+
+    # On background: sign-on status token (sst) cookie should be cleared
+    expect(page.driver.request.cookies['_sst'])
+      .to be_blank
 
     # On background: identity_token cookie should be maintained...
     expect(page.driver.request.cookies['_identity_token'])
@@ -217,6 +249,10 @@ eod
     # The user should be redirected to the given path
     expect(current_path).to eq('/my_account/emails')
 
+    # On background: sign-on status token (sst) cookie should be set
+    expect(page.driver.request.cookies['_sst'])
+      .not_to be_blank
+
     expect(page.driver.request.cookies['_identity_token'])
       .not_to be_blank
   end
@@ -241,6 +277,10 @@ eod
 
     # The user should be redirected to the given path
     expect(current_path).to eq('/my_account/emails')
+
+    # On background: sign-on status token (sst) cookie should be set
+    expect(page.driver.request.cookies['_sst'])
+      .not_to be_blank
 
     expect(page.driver.request.cookies['_identity_token'])
       .not_to be_blank
@@ -268,6 +308,13 @@ eod
 
     # The user should be redirected to the given path
     expect(current_path).to eq('/my_account/emails')
+
+    # On background: sign-on status token (sst) cookie should be maintained because the user is automatically signed in
+    sst_string = page.driver.request.cookies['_sst']
+    sst = SignonStatusTokenService.decode(sst_string)
+    expect(sst['id']).to eq(@user.id)
+    expect(sst['uuid']).to eq(@user.uuid)
+    expect(sst['updated_at']).to eq(@user.updated_at.to_i)
 
     # On background: identity_token cookie should be maintained because the user is automatically signed in
     if (page.driver.request.cookies['_identity_token'] !=
@@ -318,12 +365,15 @@ eod
 
     # The created user can sign in
     login_as @user
+    visit(refresh_sst_path)
+    expect(page.driver.request.cookies['_sst']).not_to be_blank
     visit(refresh_it_path)
     expect(page.driver.request.cookies['_identity_token']).not_to be_blank
 
     # Go to the invitation URL and login (again. users should be signed out after clicking the invitation link)
     visit invitations_path(code: @invitation_code, redirect_to: '/my_account/emails')
     expect(page).to have_content(@identity.name)
+    expect(page.driver.request.cookies['_sst']).to be_blank
     expect(page.driver.request.cookies['_identity_token']).to be_blank
     within ".login" do
       fill_form(:user, user_login_credentials)
@@ -337,6 +387,8 @@ eod
     # The user should be redirected to the given path
     expect(current_path).to eq('/my_account/emails')
 
+    expect(page.driver.request.cookies['_sst'])
+      .not_to be_blank
     expect(page.driver.request.cookies['_identity_token'])
       .not_to be_blank
   end

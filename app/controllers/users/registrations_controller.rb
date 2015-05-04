@@ -18,6 +18,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
         end
         if resource.confirmed?
           sign_in resource
+          SignonStatusTokenService.update_cookie(cookies, current_user)
           SiteIdentityTokenService.update(cookies, current_user)
           redirect_to @redirect_url and return if @redirect_url
         else

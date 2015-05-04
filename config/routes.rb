@@ -22,6 +22,7 @@ Rails.application.routes.draw do
              }
 
   devise_scope :user do
+    get '/refresh_sst' => 'users/sessions#refresh_sst'
     get '/refresh_it' => 'users/sessions#refresh_it'
   end
 

@@ -20,8 +20,16 @@
     },
     "APP_ABOUT_URL": "https://change.this.to/your/about.url",
     "APP_CONTACT_URL": "https://change.this.to/your/contact.url",
+    "CORE_RSA_PRIVATE_KEY": {
+      "description": "A RSA secret key for signing things like sign-on status token.",
+      "value": "-----BEGIN RSA PRIVATE KEY-----\nMIICXAIBAAKBgQDauko6IGYjL3ia0Y0f/dDE6iHKmEmapsF0rSEarcIXuJJoIOpk\npoUSlOPjwSRvTfIs3YKSMICwaGyi39gVU5Qf3Yo2MfiavLzwui311x7OyG/tNraL\nxh2T7RhJrhlIEGkou3A0UkSGep2qUDREhT8w2TubqDHTZJ2Pv3fuvPdP2QIDAQAB\nAoGAAfL3Bl2Ti2y43mhPoaFZYufTNUL2JPKndqq0SNCTkjKK23KvpAX32ZqKDVWD\nRZqkNdIjf7n+65OCpFDqVAZSo5HVUQ35evLr6Ad9zISUH/X84z3X/AYu0CT+mp4X\nGGjO41HByuj/WCgHOaDvpJaMDTAtEoJHlkFjSGMy+Zov1qECQQD2VdBRTqvVV9Te\nj3/acHS+C02gZqm7vOWOVisV8LJToQQKAhMjuQSQGPxZLlfpuvNMaQ1xgP0mxOMt\nHcBV1iZXAkEA408v1Qg2nkC/MLxD2VSwyST2D6M6g9+pMbfE3YtvNFKbpKs0//e2\nyzpPNZbKVRllx3KxkPM7g08g9pOxZn99TwJAaOjdInOV3PNeFjcZJWe1YGah9ckj\nSnBFd5wdF2f+Gn29oaGGkzUty0zI1BZXnJRhH86xygA8UDGT6tf73NKqWwJBAOEc\nP+uCicyppG5YU/08USOydfjAlyeYbY/uRYl+F/BCSx+F6iQAp0eWhHE210P1tgUS\ngeVh7LM6vxNS6uHuKiMCQD8Jf3Npb0a+PySWpf63EEZIvsxEKB1CwrAV/yRS3HYp\nzc/NxP7A+t72jedM1OEHuVwygip8OPcWsXTBlIUo14k=\n-----END RSA PRIVATE KEY-----\n"
+    },
+    "CORE_RSA_PUBLIC_KEY": {
+      "description": "The corresponding public key of CORE_SECRET_KEY. This should also be distributed across all clients using this SSO service.",
+      "value": "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDauko6IGYjL3ia0Y0f/dDE6iHK\nmEmapsF0rSEarcIXuJJoIOpkpoUSlOPjwSRvTfIs3YKSMICwaGyi39gVU5Qf3Yo2\nMfiavLzwui311x7OyG/tNraLxh2T7RhJrhlIEGkou3A0UkSGep2qUDREhT8w2Tub\nqDHTZJ2Pv3fuvPdP2QIDAQAB\n-----END PUBLIC KEY-----\n"
+    },
     "SITE_SECRET": {
-      "description": "A secret key for verifying the integrity of signed SSO cookies. Should be same across all sites using this SSO service.",
+      "description": "A secret key for verifying the integrity of signed SSO cookies. Should be same across all clients using this SSO service.",
       "generator": "secret"
     },
     "SECRET_KEY_BASE": {
