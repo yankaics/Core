@@ -2,6 +2,7 @@ class Users::SessionsController < Devise::SessionsController
   after_filter :refresh_signon_status_token, only: [:destroy, :new, :create]
   after_filter :refresh_site_identity_token, only: [:destroy, :new, :create]
   attr_accessor :can_redirect, :redirect_url, :redirect_url_query, :redirect_url_uri
+  protect_from_forgery except: :destroy
 
   def new
     if session[:invitation_code].present?
