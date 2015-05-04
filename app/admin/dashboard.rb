@@ -21,7 +21,8 @@ ActiveAdmin.register_page "Dashboard" do
           ul do
             ENV.each do |key, value|
               if key =~ /key$/ || key =~ /secret/ || key =~ /pepper$/ ||
-                 key =~ /KEY$/ || key =~ /SECRET/ || key =~ /PEPPER$/ || key =~ /DATABASE/
+                 key =~ /KEY$/ || key =~ /SECRET/ || key =~ /PEPPER$/ ||
+                 key =~ /DATABASE/ || key =~ /SQL/
                 li "#{key}: #{value[0..7] + value.gsub(/..?.?/, '*')}"
               else
                 value = value[0..50] + '...' if value.length > 50
