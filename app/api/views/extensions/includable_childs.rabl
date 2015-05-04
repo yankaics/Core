@@ -17,7 +17,7 @@ unless @inclusion_field[locals[:self_resource]].blank?
           obj.try(fk) if fk.present?
         end
       end
-      type = (i_field[:class_name] || i_field[:field]).to_s.singularize
+      type = (i_field[:class_name] || i_field[:field]).to_s.underscore.singularize
       @meta ||= {}
       @meta[locals[:self_resource]] ||= {}
       @meta[locals[:self_resource]][:relations] ||= {}

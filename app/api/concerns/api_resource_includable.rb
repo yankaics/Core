@@ -38,7 +38,7 @@ module APIResourceIncludable
     def set_inclusion(resource, default_includes: [])
       @inclusion ||= {}
       @inclusion_field ||= {}
-      @inclusion[resource] = default_includes if !@inclusion[resource].is_a? Array
+      @inclusion[resource] = default_includes if @inclusion[resource].blank?
     end
 
     ##

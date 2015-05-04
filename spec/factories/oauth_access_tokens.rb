@@ -8,5 +8,9 @@ FactoryGirl.define do
     trait :admin do
       application { create(:oauth_application, :owned_by_admin) }
     end
+
+    trait :core do
+      application { create(:oauth_application, :owned_by_admin) }
+    end
   end
 end
