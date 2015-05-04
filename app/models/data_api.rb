@@ -31,6 +31,10 @@ class DataAPI < ActiveRecord::Base
     return @database_url if @database_url.present?
     if Rails.env.test?
       @database_url = "sqlite3:db/test_api.sqlite3"
+    elsif ENV['API_DATABASE_URL'].blank?
+      possible_databases = ENV.select { |k| k.match(/(SQL|DATABASE)_.*URL/) }.map { |_, v| v }
+      possible_databases.delete(ENV['DATABASE_URL'])
+      @database_url = possible_databases.first || ENV['DATABASE_URL']
     else
       @database_url = ENV['API_DATABASE_URL']
     end
