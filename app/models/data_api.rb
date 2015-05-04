@@ -185,7 +185,7 @@ class DataAPI < ActiveRecord::Base
   end
 
   def reset_data_model_if_needed
-    reset_data_model_const if data_model.updated_at != updated_at
+    reset_data_model_const if data_model.try(:updated_at) != updated_at
   end
 
   def reset_data_model_column_information
