@@ -174,7 +174,7 @@ class DataAPI < ActiveRecord::Base
   end
 
   def reset_data_model_const
-    Models.send(:remove_const, name.classify) if Models.const_defined?(name.classify)
+    Models.send(:remove_const, name.classify) if Object.const_defined? "DataAPI::Models::#{name.classify}"
     begin
       data_model.establish_connection get_database_url
       data_model.connection.schema_cache.clear!
