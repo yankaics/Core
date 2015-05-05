@@ -57,5 +57,17 @@ describe "Sign-on Status Token (SST) requests" do
         expect(response.cookies['_sst']).to be_blank
       end
     end
+
+    context "with redirect_to param setted" do
+      it "redirects users to the URL of the same top domain" do
+        get '/refresh_sst?redirect_to=http://awesome_service.colorgy.dev/welcome_back'
+        expect(response.body).to include('awesome_service.colorgy.dev/welcome_back')
+      end
+
+      it "will not redirect users to the URL with a different top domain" do
+        get '/refresh_sst?redirect_to=http://other_untrustworthy_sites.dev/welcome_back'
+        expect(response.body).not_to include('other_untrustworthy_sites')
+      end
+    end
   end
 end
