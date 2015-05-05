@@ -27,6 +27,9 @@ Rails.application.routes.draw do
     get '/refresh_it' => 'users/sessions#refresh_it'
   end
 
+  get '/_rsa.pub' => 'pages#rsa_public_key'
+  get '/_sst' => 'pages#sst'
+
   use_doorkeeper do
     controllers :authorizations => 'oauth/authorizations'
     controllers :applications => 'oauth/applications'

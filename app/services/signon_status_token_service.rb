@@ -29,6 +29,7 @@ module SignonStatusTokenService
 
     # Generate an sign-on status token for a specific user
     def generate(user)
+      return nil if user.blank?
       token_data = {
         iat: Time.now.to_i,
         exp: 5.days.from_now.to_i,
