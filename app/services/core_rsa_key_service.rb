@@ -1,7 +1,19 @@
 module CoreRSAKeyService
   class << self
     def private_key_string
-      @private_key_string ||= ENV['CORE_RSA_PRIVATE_KEY'].gsub(/\\n/, "\n")
+      @private_key_string ||= if ENV['CORE_RSA_PRIVATE_KEY_1'].present?
+
+                                ENV['CORE_RSA_PRIVATE_KEY'] = [
+                                  ENV['CORE_RSA_PRIVATE_KEY_1'],
+                                  ENV['CORE_RSA_PRIVATE_KEY_2'],
+                                  ENV['CORE_RSA_PRIVATE_KEY_3'],
+                                  ENV['CORE_RSA_PRIVATE_KEY_4']
+                                ].join
+
+                                ENV['CORE_RSA_PRIVATE_KEY'].gsub(/\\n/, "\n")
+                              else
+                                ENV['CORE_RSA_PRIVATE_KEY'].gsub(/\\n/, "\n")
+                              end
     end
 
     def public_key_string
