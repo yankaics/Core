@@ -23,12 +23,12 @@ Rails.application.routes.draw do
 
   devise_scope :user do
     delete 'logout' => 'users/sessions#destroy'
-    get '/refresh_sst' => 'users/sessions#refresh_sst'
     get '/refresh_it' => 'users/sessions#refresh_it'
   end
 
-  get '/_rsa.pub' => 'pages#rsa_public_key'
-  get '/_sst' => 'pages#sst'
+  get '/_rsa.pub' => 'sso#get_rsa_public_key'
+  get '/_sst' => 'sso#get_sst'
+  get '/refresh_sst' => 'sso#refresh_sst'
 
   use_doorkeeper do
     controllers :authorizations => 'oauth/authorizations'
