@@ -9,12 +9,6 @@ RSpec.describe Users::SessionsController, :type => :controller do
         @user.confirm!
         sign_in @user
       end
-
-      it "sets the identity_token in cookie" do
-        @request.env["devise.mapping"] = Devise.mappings[:user]
-        get :refresh_it
-        expect(response.cookies['_identity_token']).to eq SiteIdentityTokenService.generate(@user)
-      end
     end
 
     context "user not currently signed in" do
@@ -26,12 +20,6 @@ RSpec.describe Users::SessionsController, :type => :controller do
         get :refresh_it
         expect(response.cookies).to have_key '_identity_token'
         sign_out @user
-      end
-
-      it "clears the identity_token in cookie" do
-        @request.env["devise.mapping"] = Devise.mappings[:user]
-        get :refresh_it
-        expect(response.cookies['_identity_token']).to be_blank
       end
     end
   end

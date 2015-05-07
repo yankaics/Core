@@ -2,7 +2,6 @@ class Users::SessionsController < Devise::SessionsController
   include RedirectCheckingHelper
 
   after_filter :refresh_signon_status_token, only: [:destroy, :new, :create]
-  after_filter :refresh_site_identity_token, only: [:destroy, :new, :create]
   protect_from_forgery except: :destroy
 
   def new
@@ -56,19 +55,6 @@ class Users::SessionsController < Devise::SessionsController
       redirect_to redirect_url
     else
       respond_to_on_destroy
-    end
-  end
-
-  # Refresh the identity_token
-  def refresh_it
-    refresh_site_identity_token
-
-    check_redirect_to
-
-    if can_redirect
-      redirect_to redirect_url
-    else
-      redirect_to root_path
     end
   end
 end

@@ -53,10 +53,6 @@ feature "User Verificate", :type => :feature, :retry => 3 do
     visit('/refresh_sst')
     original_sst = page.driver.cookies['_sst']
 
-    # Record the original_identity_token
-    visit('/refresh_it')
-    original_identity_token = page.driver.cookies['_identity_token']
-
     # Visiting the confirmation_path should confirms that email
     expect do
       visit "/#{confirmation_path}"
@@ -81,9 +77,6 @@ feature "User Verificate", :type => :feature, :retry => 3 do
 
     # The sst is expected to be refreshed by the way
     expect(page.driver.cookies['_sst']).not_to eq(original_sst)
-
-    # The identity_token is expected to bo refreshed by the way
-    expect(page.driver.cookies['_identity_token']).not_to eq(original_identity_token)
 
     logout(:user)
   end
@@ -111,10 +104,6 @@ feature "User Verificate", :type => :feature, :retry => 3 do
     visit('/refresh_sst')
     original_sst = page.driver.cookies['_sst']
 
-    # Record the original_identity_token
-    visit('/refresh_it')
-    original_identity_token = page.driver.cookies['_identity_token']
-
     # Find the confirmation_path in identity confirmation email
     confirmation_path = open_last_email.body.match(/user_emails\/confirmation\?confirmation_token=[^"]+/)
 
@@ -131,9 +120,6 @@ feature "User Verificate", :type => :feature, :retry => 3 do
 
     # The sst is expected to be refreshed by the way
     expect(page.driver.cookies['_sst']).not_to eq(original_sst)
-
-    # The identity_token is expected to bo refreshed by the way
-    expect(page.driver.cookies['_identity_token']).not_to eq(original_identity_token)
 
     logout(:user)
   end
@@ -179,10 +165,6 @@ feature "User Verificate", :type => :feature, :retry => 3 do
     visit('/refresh_sst')
     original_sst = page.driver.cookies['_sst']
 
-    # Record the original_identity_token
-    visit('/refresh_it')
-    original_identity_token = page.driver.cookies['_identity_token']
-
     # Visiting the confirmation_path should confirms that email
     expect do
       visit "/#{confirmation_path}"
@@ -198,9 +180,6 @@ feature "User Verificate", :type => :feature, :retry => 3 do
 
     # The sst is expected to be refreshed by the way
     expect(page.driver.cookies['_sst']).not_to eq(original_sst)
-
-    # The identity_token is expected to bo refreshed by the way
-    expect(page.driver.cookies['_identity_token']).not_to eq(original_identity_token)
 
     logout(:user)
   end

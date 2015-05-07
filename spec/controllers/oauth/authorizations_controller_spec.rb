@@ -19,10 +19,6 @@ RSpec.describe OAuth::AuthorizationsController, :type => :controller do
         post :create, client_id: client.uid, response_type: 'token', redirect_uri: client.redirect_uri
       end
 
-      it "sets the identity_token in cookie" do
-        expect(response.cookies['_identity_token']).to eq SiteIdentityTokenService.generate(user)
-      end
-
       it "sets the sign-on status token (sst) in cookie" do
         sst_string = response.cookies['_sst']
         sst = SignonStatusTokenService.decode(sst_string)
@@ -34,10 +30,6 @@ RSpec.describe OAuth::AuthorizationsController, :type => :controller do
     describe "GET #new" do
       before do
         get :new, client_id: client.uid, response_type: 'token', redirect_uri: client.redirect_uri
-      end
-
-      it "sets the identity_token in cookie" do
-        expect(response.cookies['_identity_token']).to eq SiteIdentityTokenService.generate(user)
       end
 
       it "sets the sign-on status token (sst) in cookie" do

@@ -8,12 +8,4 @@ class ApplicationController < ActionController::Base
   def refresh_signon_status_token
     SignonStatusTokenService.update_cookie(cookies, current_user)
   end
-
-  def refresh_site_identity_token
-    if current_user
-      SiteIdentityTokenService.create(cookies, current_user)
-    else
-      SiteIdentityTokenService.destroy(cookies)
-    end
-  end
 end
