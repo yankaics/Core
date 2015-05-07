@@ -1,5 +1,7 @@
 language:
   - ruby
+sudo: false
+cache: bundler
 before_install:
   - "echo 'gem: --no-document' > ~/.gemrc"
   - export DISPLAY=:99.0
