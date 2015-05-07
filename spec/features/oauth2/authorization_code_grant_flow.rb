@@ -12,7 +12,7 @@ RSpec.shared_examples "Authorization Code Grant Flow" do
     # Authorization Code Grant
     state = 'awesome'
     redirect_uri = 'http://non-existing.oauth.testing.app/'
-    scope = %w(public identity)
+    scope = %w(public identity long_term)
 
     visit(<<-URL.squish.delete(' ')
       /oauth/authorize?
@@ -44,10 +44,15 @@ RSpec.shared_examples "Authorization Code Grant Flow" do
     expect(response).not_to have_key 'refresh_token'
     access_token = response['access_token']
 
+    # the access token will expire in 2 hours
+    # (long_term scope should be ignored since we are issuing an user token)
+    expect(response['expires_in']).to eq(7200)
+    expect(response['scope']).not_to include('long_term')
+
     # test if the scope of access token is as expect
     visit "/oauth/token/info?access_token=#{access_token}"
     response = JSON.parse(page.body)
-    expect(response['scopes']).to eq scope
+    expect(response['scopes']).to eq(scope - ['long_term'])
 
     # calling the API with a valid token should return corresponding data
     page.driver.browser.header 'Authorization', "Bearer #{access_token}"

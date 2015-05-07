@@ -44,8 +44,10 @@ Doorkeeper.configure do
   # For more information go to
   # https://github.com/doorkeeper-gem/doorkeeper/wiki/Using-Scopes
   default_scopes  :public
-  optional_scopes :email, :account, :identity, :facebook, :info, :api,
-                  :notifications, :send_notification, :sms, :offline_access
+  optional_scopes :email, :account, :identity, :facebook, :info,
+                  :read_notifications, :send_notification, :sms,
+                  :api,
+                  :offline_access, :long_term
 
   # Change the way client credentials are retrieved from the request object.
   # By default it retrieves first from the `HTTP_AUTHORIZATION` header, then
@@ -198,6 +200,7 @@ end
 
 Doorkeeper.configuration.token_grant_types << "password"
 
+# Custom OAuthApplication
 module OAuthApplication
   extend ActiveSupport::Concern
 
@@ -233,15 +236,20 @@ end
 
 Doorkeeper::Application.send :include, OAuthApplication
 
+# Custom OAuthAccessToken
 module OAuthAccessToken
   extend ActiveSupport::Concern
 
   included do
     belongs_to :resource_owner, class_name: :User
+    before_create :set_long_expires_in_if_long_term_token
   end
 
   # Override the use_refresh_token? method to issue refresh token only if the scope contains 'offline_access'
   def use_refresh_token?
+    if application_id.blank? && scopes.include?('offline_access')
+      self[:scopes].gsub!('offline_access', '')
+    end
     !!@use_refresh_token && scopes.include?('offline_access') && application_id.present?
   end
 
@@ -253,6 +261,16 @@ module OAuthAccessToken
 
   def generate_token
     self.token = SecureRandom.hex(64)
+  end
+
+  def set_long_expires_in_if_long_term_token
+    return unless scopes.include?('long_term')
+    # only give lone-term access to app tokens (resource_owner is blank)
+    if resource_owner_id.blank?
+      self[:expires_in] = 36_741_600  # 1 year and 2 months
+    else
+      self[:scopes].gsub!('long_term', '')
+    end
   end
 end
 
