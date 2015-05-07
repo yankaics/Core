@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 ruby '2.2.0'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.2.0'
+gem 'rails', '4.2.1'
 # Use sqlite3 or pg as the database for Active Record
 gem 'sqlite3', :groups => [:development, :test]
 gem 'pg'
@@ -75,12 +75,12 @@ gem 'grape-entity'
 gem 'grape-swagger'
 gem 'rack-cors', :require => 'rack/cors'
 gem 'grape-swagger-rails'
-gem 'rack-oauth2', '~> 1.0.10'
+gem 'rack-oauth2', '~> 1.1.1'
 
 gem 'devise', '~> 3.4.0'
 gem 'cancancan', '~> 1.10.0'
 gem 'omniauth-facebook', '~> 2.0.0'
-gem 'doorkeeper', '2.1.3'
+gem 'doorkeeper', '~> 2.2.0'
 gem 'httparty', '~> 0.13.1'
 
 gem 'validates_email_format_of'
@@ -88,7 +88,7 @@ gem 'validates_email_format_of'
 gem 'simple_form', '~> 3.1.0'
 
 # Wrappers for 3rd service APIs
-gem 'mailgunner', '~> 2.0.0'
+gem 'mailgunner', '~> 2.2.0'
 gem 'nexmo'
 
 # Make SEO-friendly meta tags and titles using meta-tags
@@ -99,7 +99,7 @@ gem 'activerecord-import', '~> 0.7.0'
 
 # Use ActiveAdmin as the administration framework
 gem 'activeadmin', github: 'activeadmin'
-gem 'active_admin_import' , '2.1.2'
+gem 'active_admin_import', '2.1.2'
 
 # Integrate swagger docs
 gem 'swagger-docs', '~> 0.1.8'
@@ -125,7 +125,7 @@ group :development, :test do
   gem 'shoulda-matchers', require: false
   gem 'rspec-its', require: false
   gem 'rspec-retry', require: false
-  gem 'simplecov', '~> 0.9.1', require: false
+  gem 'simplecov', '~> 0.10.0', require: false
   gem 'coveralls', require: false
   gem 'codeclimate-test-reporter', require: false
   gem 'selenium-webdriver'
@@ -151,7 +151,7 @@ gem 'hirb', :require => false
 gem 'hirb-unicode', :require => false
 
 # Assets related Gems
-gem 'react-rails', '~> 1.0.0.pre', github: 'reactjs/react-rails'
+gem 'react-rails', '~> 1.0'
 gem 'normalize-rails', '>= 3.0.1'
 gem 'modernizr-rails'
 # gem 'react-rails', '~> 1.0.0.pre', github: 'reactjs/react-rails'
