@@ -119,7 +119,7 @@ class DataAPI < ActiveRecord::Base
   end
 
   def get_database_url
-    database_url || DataAPI.database_url
+    database_url.present? ? database_url : DataAPI.database_url
   end
 
   def schema_from_array(columns)
