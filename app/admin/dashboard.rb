@@ -20,8 +20,8 @@ ActiveAdmin.register_page "Dashboard" do
           end
           ul do
             ENV.each do |key, value|
-              if key =~ /key$/ || key =~ /secret/ || key =~ /pepper$/ ||
-                 key =~ /KEY$/ || key =~ /SECRET/ || key =~ /PEPPER$/ ||
+              if key =~ /key/ || key =~ /secret/ || key =~ /pepper$/ ||
+                 key =~ /KEY/ || key =~ /SECRET/ || key =~ /PEPPER$/ ||
                  key =~ /DATABASE/ || key =~ /SQL/
                 li "#{key}: #{value[0..7] + value.gsub(/..?.?/, '*')}"
               else
