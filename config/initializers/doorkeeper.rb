@@ -93,13 +93,15 @@ Doorkeeper.configure do
   grant_flows %w(authorization_code client_credentials implicit password)
 
   resource_owner_from_credentials do |routes|
-    case params[:username]
+    username = params[:username] || params[:email]
+    password = params[:password] || params[:access_token] || params[:token]
+    case username
     when 'facebook:access_token'
       debug_token_connection = HTTParty.get(
         <<-eos.squish.delete(' ')
           https://graph.facebook.com/debug_token?
-            input_token=#{params[:password]}&
-            access_token=#{params[:password]}
+            input_token=#{password}&
+            access_token=#{password}
           eos
       )
 
@@ -111,7 +113,7 @@ Doorkeeper.configure do
           <<-eos.squish.delete(' ')
             https://graph.facebook.com/me?
               fields=id,name,email,gender&
-              access_token=#{params[:password]}
+              access_token=#{password}
             eos
         )
 
@@ -124,7 +126,7 @@ Doorkeeper.configure do
             facebook_auth = {
               uid: access['id'],
               credentials: {
-                token: params[:password]
+                token: password
               },
               info: {
                 email: access['email'],
@@ -140,7 +142,7 @@ Doorkeeper.configure do
           else
             facebook_auth = {
               credentials: {
-                token: params[:password]
+                token: password
               },
               info: {
                 email: access['email'],
@@ -164,8 +166,8 @@ Doorkeeper.configure do
       end
 
     else
-      u = User.find_for_database_authentication(email: params[:username])
-      u = User.find_for_database_authentication(username: params[:username]) if u.blank?
+      u = User.find_for_database_authentication(email: username)
+      u = User.find_for_database_authentication(username: username) if u.blank?
 
       if u.present?
         if u.access_locked?
@@ -174,7 +176,7 @@ Doorkeeper.configure do
 
         if u.access_locked?
           nil
-        elsif u.valid_password?(params[:password])
+        elsif u.valid_password?(password)
           u.failed_attempts = 0 && u.save! if u.failed_attempts > 0
           u
         else
@@ -275,3 +277,34 @@ module OAuthAccessToken
 end
 
 Doorkeeper::AccessToken.send :include, OAuthAccessToken
+
+# Custom OAuthPasswordAccessTokenRequest
+class Doorkeeper::OAuth::PasswordAccessTokenRequest
+  def initialize(server, credentials, resource_owner, parameters = {})
+    @server          = server
+    @resource_owner  = resource_owner
+    @credentials     = credentials
+    @original_scopes = parameters[:scope]
+
+    if credentials
+      @client = Doorkeeper::Application.by_uid_and_secret credentials.uid,
+                                                          credentials.secret
+    end
+  end
+
+  private
+
+  def before_successful_response
+    scope = scopes
+    verified_client = client
+
+    # limit the scope and nullify the client for issued access token for if
+    # authorized by a Facebook access token owned by other apps
+    if resource_owner.from == 'foreign_facebook'
+      scope = Doorkeeper::OAuth::Scopes.from_array(['public'])
+      verified_client = nil
+    end
+
+    find_or_create_access_token(verified_client, resource_owner.id, scope, server)
+  end
+end

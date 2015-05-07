@@ -192,6 +192,8 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
   scenario "Resource Owner Facebook Access Token Credentials Grant" do
     fbtoken = 'facebook_access_token'
     fbtoken_of_other_app = 'facebook_access_token_of_other_app'
+    scope = %w(public email)
+    @core_app = create(:oauth_application, :owned_by_admin, redirect_uri: "urn:ietf:wg:oauth:2.0:oob\nhttp://non-existing.oauth.testing.app/")
 
     # Stub requests to Facebook
     stub_request(:get, "https://graph.facebook.com/debug_token?access_token=#{fbtoken}&input_token=#{fbtoken}")
@@ -318,7 +320,8 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
       /oauth/token?
       grant_type=password&
       username=facebook:access_token&
-      password=#{fbtoken}
+      password=#{fbtoken}&
+      scope=#{scope.join('%20')}
       URL
     )
 
@@ -327,12 +330,24 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
     access_token = response['access_token']
     user = Doorkeeper::AccessToken.find_by(token: access_token).resource_owner
 
-    # If access token is owned by other app
+    # check the token
+    visit "/oauth/token/info?access_token=#{access_token}"
+    response = JSON.parse(page.body)
+    expect(response['scopes']).to eq(scope)
+
+    visit "/api/v1/me.json?access_token=#{access_token}"
+    response = JSON.parse(page.body)
+    expect(response).to have_key('email')
+
+    # If the provided Facebook access token is owned by other app
     page.driver.post(<<-URL.squish.delete(' ')
       /oauth/token?
       grant_type=password&
+      client_id=#{@core_app.uid}&
+      client_secret=#{@core_app.secret}&
       username=facebook:access_token&
-      password=#{fbtoken_of_other_app}
+      password=#{fbtoken_of_other_app}&
+      scope=#{scope.join('%20')}
       URL
     )
 
@@ -344,7 +359,16 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
 
     expect(user2).to eq(user)
 
-    # Fail if an invalid access token is provided
+    # check the token
+    visit "/oauth/token/info?access_token=#{access_token}"
+    response = JSON.parse(page.body)
+    expect(response['scopes']).to contain_exactly('public')
+
+    visit "/api/v1/me.json?access_token=#{access_token}"
+    response = JSON.parse(page.body)
+    expect(response).not_to have_key('email')
+
+    # Fail if an invalid Facebook access token is provided
     page.driver.post(<<-URL.squish.delete(' ')
       /oauth/token?
       grant_type=password&
