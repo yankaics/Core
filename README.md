@@ -24,16 +24,14 @@ You may want to change the app's default environment variables, which lays in `.
 
 This application is designed under The [Twelve-Factor App](http://12factor.net/) pattern, making its deployment and operations on cloud platforms easy.
 
-### Heroku
+### Deploy to Heroku
 
-Deploy to Heroku for testing with a click:
-
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+It's also aimed to be Heroku deployable: [![Deploy](https://neson.github.io/GitHub-Badges/deploy_to_heroku_xs.svg)](https://heroku.com/deploy)
 
 
 ## Management
 
-Visit `http(s)://url_of_your_app/admin` to access the control panel. The default account and password is `admin` / `password`.
+Visit `http(s)://url_of_your_app/admin` to access the control panel. The default account and password is `admin` / `password`. Please change it immediately after your first login by clicking your administration account name ("admin") located at the top-right corner.
 
 You can also type $ `bin/rails c` <kbd>Enter</kbd> in the terminal to enter the rails console.
 
