@@ -1,11 +1,26 @@
 Rails.application.routes.draw do
-  # API Documents
-  get '/api/docs.html' => 'api_docs#explore'
-
-  # APIs
+  # API and API Documents
   constraints subdomain: 'api' do
+    use_doorkeeper do
+      controllers :authorizations => 'oauth/authorizations'
+      controllers :applications => 'oauth/applications'
+    end
+
+    get '/docs.html' => 'api_docs#explore'
+    get '/docs/explorer.html' => 'api_docs#explore'
+    get '/api_docs/explorer/oauth_callbacks' => 'api_docs#explorer_oauth_callbacks'
+
     mount API => '/', as: '/'
   end
+
+  use_doorkeeper do
+    controllers :authorizations => 'oauth/authorizations'
+    controllers :applications => 'oauth/applications'
+  end
+
+  get '/api/docs.html' => 'api_docs#explore'
+  get '/api/docs/explorer.html' => 'api_docs#explore', as: :api_explorer
+  get '/api_docs/explorer/oauth_callbacks' => 'api_docs#explorer_oauth_callbacks'
 
   mount API => '/api'
 
@@ -61,11 +76,6 @@ Rails.application.routes.draw do
   # Developers
   scope '/developers' do
     resources :applications, :controller => 'oauth/applications'
-  end
-
-  use_doorkeeper do
-    controllers :authorizations => 'oauth/authorizations'
-    controllers :applications => 'oauth/applications'
   end
 
   # The priority is based upon order of creation: first created -> highest priority.

@@ -99,17 +99,37 @@ zh-TW:
         created_at: 'Created At'
         date_format: '%Y-%m-%d %H:%M:%S'
 
+    scope_names:
+      public: '公開資料'
+      email: 'email'
+      account: '帳號資料'
+      identity: '身份資料'
+      facebook: 'Facebook 帳號資料'
+      info: '個人資料'
+      friends: '好友名單'
+      read_notifications: '讀取通知'
+      send_notification: '傳送通知'
+      sms: '傳送簡訊'
+      api: '所有 API 讀取'
+      api_write: '所有 API 寫入'
+      offline_access: '離線存取'
+      long_term: '長期使用'
+
     scopes:
       public: '查看您公開的基本資訊'
-      email: '取得您的學校 email 信箱'
+      email: '取得您的個人 email 信箱'
+      account: '查看您的帳號資料'
+      identity: '取得學校身份資料'
       facebook: '取得您的 Facebook 帳號資料'
+      info: '取得您的個人資料'
       friends: '查看您的好友名單'
-      notification: '傳送通知給您'
-      school: '取得您的學籍資料'
-      profile: '取得您的個人資料'
+      read_notifications: '讀取您的通知'
+      send_notification: '傳送通知給您'
       sms: '傳送簡訊給您 (但不會得知您的手機號碼)'
+      api: '讀取所有屬於您的 API 資料'
+      api_write: '管理所有屬於您的 API 資料'
       offline_access: '隨時取用您的資料'
-      admin: '取得您的所有資料'
+      long_term: '長期使用'
 
     errors:
       messages:

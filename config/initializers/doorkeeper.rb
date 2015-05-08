@@ -258,6 +258,33 @@ module OAuthAccessToken
     before_create :set_long_expires_in_if_long_term_token
   end
 
+  # Return a hash of scopes
+  def self.scopes(locale = I18n.config.locale)
+    @scopes ||= {}
+    locale = locale.to_sym
+    return @scopes[locale] if @scopes[locale].present?
+
+    default_scopes = Hash[Doorkeeper.configuration.default_scopes.map do |scope|
+      [scope, {
+        name: I18n.t(scope, scope: 'doorkeeper.scope_names', locale: locale),
+        description: I18n.t(scope, scope: 'doorkeeper.scopes', locale: locale),
+        default: true
+      }]
+    end]
+
+    optional_scopes = Hash[Doorkeeper.configuration.optional_scopes.map do |scope|
+      [scope, {
+        name: I18n.t(scope, scope: 'doorkeeper.scope_names', locale: locale),
+        description: I18n.t(scope, scope: 'doorkeeper.scopes', locale: locale),
+        default: false
+      }]
+    end]
+
+    @scopes[locale] = ActiveSupport::HashWithIndifferentAccess.new(
+      default_scopes.merge(optional_scopes)
+    )
+  end
+
   # Override the use_refresh_token? method to issue refresh token only if the scope contains 'offline_access'
   def use_refresh_token?
     if application_id.blank? && scopes.include?('offline_access')
@@ -317,5 +344,35 @@ class Doorkeeper::OAuth::PasswordAccessTokenRequest
     end
 
     find_or_create_access_token(verified_client, resource_owner.id, scope, server)
+  end
+end
+
+# Custom Doorkeeper::OAuth
+module Doorkeeper
+  module OAuth
+    # Override the rules of redirect_uri validation to allow wildcard redirections
+    # and redirecting to the API Explorer authorization callback endpoint
+    module Helpers
+      module URIChecker
+        def self.matches?(url, client_url)
+          url, client_url = as_uri(url), as_uri(client_url)
+          return true if url.to_s =~ /^#{Regexp.escape(client_url.to_s)}/
+          false
+        end
+
+        def self.valid_for_authorization?(url, client_url)
+          return true if url == '/api_docs/explorer/oauth_callbacks'
+          valid?(url) && client_url.split.any? { |other_url| matches?(url, other_url) }
+        end
+      end
+    end
+
+    class PreAuthorization
+      def validate_redirect_uri
+        return false unless redirect_uri.present?
+        Helpers::URIChecker.native_uri?(redirect_uri) ||
+          Helpers::URIChecker.valid_for_authorization?(redirect_uri, client.redirect_uri)
+      end
+    end
   end
 end

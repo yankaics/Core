@@ -1,0 +1,26 @@
+Access Token Receivation
+
+<script type="text/javascript">
+  if (window.opener !== null && !window.opener.closed) {
+    var respondHashString = window.location.hash.substr(1);
+    var respondHashArray = respondHashString.split('&');
+    var params = respondHashArray.reduce(function(obj, v) {
+      var kv = v.split('=');
+      obj[kv[0]] = kv[1];
+      return obj;
+    }, {});
+
+    if (params.access_token) {
+      document.write('OK!');
+
+      window.opener.changeAccessToken(params.access_token);
+
+      document.write(' ...closing.');
+      window.close();
+
+    } else {
+      document.write('Failed!');
+      document.write(' Please try again.');
+    }
+  }
+</script>
