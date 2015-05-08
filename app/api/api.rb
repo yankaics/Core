@@ -29,7 +29,12 @@ class API < Grape::API
   }
 
   get "/" do
-    { documentation_url: "#{request.url}docs" }
+    request_url = URI.parse(request.url)
+    request_path_extname = request_url.path[/\..+$/]
+    request_path = request_url.path.gsub(/\..+$/, '')
+    request_url.path = request_path
+    redirect "#{request_url}docs.html", permanent: true if request_path_extname != '.json'
+    { documentation_url: "#{request_url}docs.json" }
   end
 
   add_swagger_documentation(documentation_settings)

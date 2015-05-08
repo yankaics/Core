@@ -4,6 +4,15 @@ RSpec.describe Doorkeeper::Application, :type => :model do
   it { should belong_to(:owner) }
   it { should validate_presence_of(:owner) }
 
+  describe ".explorer_app" do
+    subject(:explorer_app) { OAuthApplication.explorer_app }
+    it "returns the API Explorer app" do
+      expect(subject.uid).to eq('api_docs_api_explorer')
+      expect(subject.owner.username).to eq('api_docs_api_explorer_owner')
+      expect(subject.owner_type).to eq('User')
+    end
+  end
+
   context "created as an user application" do
     subject { create(:oauth_application) }
 

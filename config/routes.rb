@@ -1,12 +1,28 @@
 Rails.application.routes.draw do
+  # API Documents
+  get '/api/docs.html' => 'api_docs#explore'
+
+  # APIs
   constraints subdomain: 'api' do
     mount API => '/', as: '/'
   end
 
   mount API => '/api'
 
+  # Admin Control Panel
+  devise_for :admins, ActiveAdmin::Devise.config
+  ActiveAdmin.routes(self)
+  scope '/admin' do
+    resources :testing_user_sessions, :controller => 'admin/testing_user_sessions'
+  end
+
+  # Index Page
   root 'pages#index'
 
+  # Static Pages
+  get '/eula' => 'pages#eula'
+
+  # User
   devise_for :users,
              :controllers => {
                :sessions => "users/sessions",
@@ -26,21 +42,6 @@ Rails.application.routes.draw do
     get '/refresh_it' => 'users/sessions#refresh_it'
   end
 
-  get '/_rsa.pub' => 'sso#get_rsa_public_key'
-  get '/_sst' => 'sso#get_sst'
-  get '/refresh_sst' => 'sso#refresh_sst'
-
-  use_doorkeeper do
-    controllers :authorizations => 'oauth/authorizations'
-    controllers :applications => 'oauth/applications'
-  end
-
-  devise_for :admins, ActiveAdmin::Devise.config
-  ActiveAdmin.routes(self)
-  scope '/admin' do
-    resources :testing_user_sessions, :controller => 'admin/testing_user_sessions'
-  end
-
   resource :my_account, controller: 'users/my_account' do
     resources :emails, controller: 'users/emails'
   end
@@ -49,14 +50,23 @@ Rails.application.routes.draw do
   get '/user_emails/query_departments' => 'users/emails#query_departments'
   get '/user_emails/email_lookup' => 'users/emails#email_lookup'
 
+  get '/invitations' => 'users/invitations#receive'
+  get '/invitations/reject' => 'users/invitations#reject'
+
+  # SSO Endpoints
+  get '/_rsa.pub' => 'sso#get_rsa_public_key'
+  get '/_sst' => 'sso#get_sst'
+  get '/refresh_sst' => 'sso#refresh_sst'
+
+  # Developers
   scope '/developers' do
     resources :applications, :controller => 'oauth/applications'
   end
 
-  get '/eula' => 'pages#eula'
-
-  get '/invitations' => 'users/invitations#receive'
-  get '/invitations/reject' => 'users/invitations#reject'
+  use_doorkeeper do
+    controllers :authorizations => 'oauth/authorizations'
+    controllers :applications => 'oauth/applications'
+  end
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

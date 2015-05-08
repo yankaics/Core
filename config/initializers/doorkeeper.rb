@@ -213,7 +213,18 @@ module OAuthApplication
     before_create :set_initial_refresh_time
   end
 
-  module ClassMethods
+  # Returns the API Explorer app
+  def self.explorer_app
+    Doorkeeper::Application.where(uid: 'api_docs_api_explorer').first_or_create! do |app|
+      app.owner_type = 'User'
+      app.owner_id = User.where(username: 'api_docs_api_explorer_owner').first_or_create! do |user|
+        user.email = 'api_docs_api_explorer_owner@dev.null'
+        user.password = SecureRandom.urlsafe_base64(64).gsub(/[^a-zA-Z0-9]/, '0')
+      end.id
+      app.name = 'API Explorer'
+      app.description = 'API Explorer'
+      app.redirect_uri = 'urn:ietf:wg:oauth:2.0:oob'
+    end
   end
 
   def core_app?
