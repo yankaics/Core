@@ -24,13 +24,6 @@ Rails.application.routes.draw do
 
   mount API => '/api'
 
-  # Admin Control Panel
-  devise_for :admins, ActiveAdmin::Devise.config
-  ActiveAdmin.routes(self)
-  scope '/admin' do
-    resources :testing_user_sessions, :controller => 'admin/testing_user_sessions'
-  end
-
   # Index Page
   root 'pages#index'
 
@@ -76,6 +69,13 @@ Rails.application.routes.draw do
   # Developers
   scope '/developers' do
     resources :applications, :controller => 'oauth/applications'
+  end
+
+  # Admin Control Panel
+  devise_for :admins, ActiveAdmin::Devise.config
+  ActiveAdmin.routes(self)
+  scope '/admin' do
+    resources :testing_user_sessions, :controller => 'admin/testing_user_sessions'
   end
 
   # The priority is based upon order of creation: first created -> highest priority.
