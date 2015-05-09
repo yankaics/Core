@@ -27,6 +27,11 @@ class API < Grape::API
     { documentation_url: "#{request_url}docs.json" }
   end
 
+  desc "Ping the server"
+  get :ping do
+    { pong: true }
+  end
+
   include APIDocsExtended
 
   documentation_settings = {
