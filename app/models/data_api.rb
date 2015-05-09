@@ -245,8 +245,8 @@ class DataAPI < ActiveRecord::Base
       migration.rename_table old_table_name, current_table_name
     end
 
-    old_columns = Hash[previous_version.schema.map { |k, v| v['name'] = k; [v['uuid'], v] }]
-    current_columns = Hash[schema.map { |k, v| v['name'] = k; [v['uuid'], v] }]
+    old_columns = Hash[previous_version.schema.map { |k, v| [v['uuid'], v.merge('name' => k)] }]
+    current_columns = Hash[schema.map { |k, v| [v['uuid'], v.merge('name' => k)] }]
 
     deleted_columns = {}
 
@@ -254,7 +254,7 @@ class DataAPI < ActiveRecord::Base
       deleted_columns[k] = v unless current_columns.key?(k)
     end
 
-    deleted_columns.each do |uuid, column|
+    deleted_columns.each do |_uuid, column|
       migration.remove_column name, column['name']
     end
 
@@ -264,7 +264,7 @@ class DataAPI < ActiveRecord::Base
       new_columns[k] = v unless old_columns.key?(k)
     end
 
-    new_columns.each do |uuid, column|
+    new_columns.each do |_uuid, column|
       migration.add_column name, column['name'], column['type']
     end
 
@@ -274,7 +274,7 @@ class DataAPI < ActiveRecord::Base
       renamed_columns[k] = v if old_columns[k].present? && v['name'] != old_columns[k]['name']
     end
 
-    renamed_columns.each do |uuid, column|
+    renamed_columns.each do |uuid, _column|
       migration.rename_column name, old_columns[uuid]['name'], current_columns[uuid]['name']
     end
 

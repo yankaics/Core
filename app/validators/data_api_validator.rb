@@ -14,11 +14,11 @@ class DataAPIValidator < ActiveModel::Validator
     end
 
     if record.id.present? && old_record = DataAPI.find_by(id: record.id)
-      old_columns = Hash[old_record.schema.map { |k, v| v['name'] = k; [v['uuid'], v] }]
-      current_columns = Hash[record.schema.map { |k, v| v['name'] = k; [v['uuid'], v] }]
+      old_columns = Hash[old_record.schema.map { |_k, v| [v['uuid'], v] }]
+      current_columns = Hash[record.schema.map { |_k, v| [v['uuid'], v] }]
 
       current_columns.each do |uuid, column|
-        record.errors[:schema] << "The type of a existing column should not be changed!" if old_columns[uuid].present? && old_columns[uuid]['type'] != column['type']
+        record.errors[:schema] << "The type of a existing column should not be changed!" if record.maintain_schema && old_columns[uuid].present? && old_columns[uuid]['type'] != column['type']
       end
     end
 
@@ -33,6 +33,7 @@ class DataAPIValidator < ActiveModel::Validator
     #     record.data_model.establish_connection record.database_url
     #     record.data_model.connection.schema_cache.clear!
     #     record.data_model.reset_column_information
+    #     record.data_model.last
     #   rescue ActiveRecord::ActiveRecordError => e
     #     record.errors[:database_url] << "Error connecting database!"
     #   end

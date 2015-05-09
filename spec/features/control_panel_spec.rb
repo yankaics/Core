@@ -222,6 +222,13 @@ feature "Control Panel", :type => :feature, :retry => 3 do
           first('#data_api_submit_action').find('input').click
         end
 
+        expect(page).to have_content('schema')
+        expect(page).to have_content('name')
+        expect(page).to have_content('done')
+
+        # we need to confirm our changes
+        first('#data_api_submit_action').find('input').click
+
         expect(page).to have_content('name')
         expect(page).to have_content('done')
 
@@ -245,6 +252,11 @@ feature "Control Panel", :type => :feature, :retry => 3 do
           end
           first('#data_api_submit_action').find('input').click
         end
+
+        expect(page).to have_content('my_awesome_attribute')
+
+        # we need to confirm our changes
+        first('#data_api_submit_action').find('input').click
 
         expect(page).to have_content('my_awesome_attribute')
 
