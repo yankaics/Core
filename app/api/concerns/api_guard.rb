@@ -148,4 +148,19 @@ module APIGuard
       end
     end
   end
+
+  def self.access_token_error_codes
+    [
+      [401, "Unauthorized: missing or bad access token."],
+      [403, "Forbidden: the access token you hand over doesn't give the power you requested."]
+    ]
+  end
+
+  def self.access_token_required_note(scope: nil)
+    if scope.present?
+      "An access token with the #{scope} scope is required while making this request."
+    else
+      "An access token is required while making this request."
+    end
+  end
 end

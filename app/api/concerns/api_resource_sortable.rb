@@ -46,4 +46,18 @@ module APIResourceSortable
       @sort
     end
   end
+
+  # Return the 'sort' param description
+  def self.sort_param_desc(example: nil, default: nil)
+    if default.present?
+      desc = "Specify how the returning data should be sorted, defaults to '#{default}'."
+    else
+      desc = "Specify how the returning data should be sorted."
+    end
+    if example.present?
+      "#{desc} Example value: '#{example}'"
+    else
+      desc
+    end
+  end
 end

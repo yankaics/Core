@@ -1,6 +1,8 @@
 require 'grape-swagger'
 
 class API < Grape::API
+  include APIGuard
+
   content_type :json, 'application/vnd.api+json'
   content_type :json, 'application/json'
   content_type :xml, 'text/xml'

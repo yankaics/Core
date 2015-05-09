@@ -83,4 +83,13 @@ module APIResourceFieldsettable
       end
     end
   end
+
+  # Return the 'fields' param description
+  def self.fields_param_desc(example: nil)
+    if example.present?
+      "Choose the fields to be returned. Example value: '#{example}'"
+    else
+      "Choose the fields to be returned."
+    end
+  end
 end

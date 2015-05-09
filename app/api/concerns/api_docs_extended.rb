@@ -70,8 +70,8 @@ module APIDocsExtended
           params: {
             per_page: { required: false, type: 'Integer', desc: "The number of #{data_api_description.try(:pluralize)} to return per page, defaults to 20 and up to a maximum of 100." },
             page: { required: false, type: 'Integer', desc: "Specify further page of data to retrieve, defaults to 1." },
-            sort: { required: false, type: 'String', desc: "Specify how the returning data should be sorted, defaults to '#{data_api.default_order}'. Example value: '#{data_api.schema.keys.sample(2).map { |s| ['-', ''].sample + s }.join(',')}'" },
-            fields: { required: false, type: 'String', desc: "Choose the fields to be returned. Example value: '#{data_api.schema.keys.sample(3).join(',')}'" },
+            sort: { required: false, type: 'String', desc: APIResourceSortable.sort_param_desc(default: data_api.default_order, example: data_api.schema.keys.sample(2).map { |s| ['-', ''].sample + s }.join(',')) },
+            fields: { required: false, type: 'String', desc: APIResourceFieldsettable.fields_param_desc(example: data_api.schema.keys.sample(3).join(',')) },
             callback: { required: false, type: 'String', desc: "JSON-P callbacks, wrap the results in a specific JSON function." }
           },
           http_codes: [],
@@ -84,7 +84,7 @@ module APIDocsExtended
         singular_resource_opts = {
           params: {
             data_api.primary_key => { required: true, type: 'String', desc: "The #{data_api.primary_key} of #{data_api_description}." },
-            fields: { required: false, type: 'String', desc: "Choose the fields to be returned. Example value: '#{data_api.schema.keys.sample(3).join(',')}'" },
+            fields: { required: false, type: 'String', desc: APIResourceFieldsettable.fields_param_desc(example: data_api.schema.keys.sample(3).join(',')) },
             callback: { required: false, type: 'String', desc: "JSON-P callbacks, wrap the results in a specific JSON function." }
           },
           http_codes: [

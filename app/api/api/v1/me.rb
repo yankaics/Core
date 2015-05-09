@@ -4,17 +4,14 @@ class API::V1::Me < API::V1
 
   resource :me, desc: "Operations about the current user" do
     desc "Get data of the current user", {
-      http_codes: [
-        [401, "Unauthorized: missing or bad access token."],
-        [403, "Forbidden: the access token you hand over doesn't give the power you requested."]
-      ],
+      http_codes: APIGuard.access_token_error_codes,
       notes:  <<-NOTE
-        Requires OAuth access token.
+        #{APIGuard.access_token_required_note}
       NOTE
     }
     params do
-      optional :fields, desc: "Return only specific fields in resource object."
-      optional :include, desc: "Returning compound documents that include specific associated objects."
+      optional :fields, desc: APIResourceFieldsettable.fields_param_desc(example: 'id,uuid,name,avatar_url')
+      optional :include, desc: APIResourceIncludable.include_param_desc(example: 'organization,primary_identity')
     end
     get rabl: 'user' do
       permitted_attrs = []
@@ -38,11 +35,23 @@ class API::V1::Me < API::V1
       @user = current_user
     end
 
+    desc "Get emails of the current user", {
+      http_codes: APIGuard.access_token_error_codes,
+      notes:  <<-NOTE
+        #{APIGuard.access_token_required_note(scope: 'identity')}
+      NOTE
+    }
     get :emails, rabl: 'user_email' do
       guard! scopes: ['identity']
       @user_email = current_user.emails
     end
 
+    desc "Get identities of the current user", {
+      http_codes: APIGuard.access_token_error_codes,
+      notes:  <<-NOTE
+        #{APIGuard.access_token_required_note(scope: 'identity')}
+      NOTE
+    }
     get :identities, rabl: 'user_identity' do
       guard! scopes: ['identity']
       @user_identity = current_user.identities
