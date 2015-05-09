@@ -20,12 +20,14 @@ module APIDocsExtended
     end
 
     def appended_namespace_routes
-      data_api_combined_namespace_routes
+      data_api_routes
     end
 
     def combined_namespace_routes
+      combined_namespace_routes = @combined_namespace_routes.clone
+      combined_namespace_routes['me'] += data_api_routes(owned_by_user: true, combined_namespace: false)
       prepended_namespace_routes.merge(
-        @combined_namespace_routes.merge(appended_namespace_routes)
+        combined_namespace_routes.merge(appended_namespace_routes)
       )
     end
 
@@ -35,12 +37,20 @@ module APIDocsExtended
       )
     end
 
-    def data_apis(org_code = nil)
+    def data_apis(org_code = nil, owned_by_user = false)
       if org_code
-        DataAPI.public_accessible.order(:name).where(organization_code: org_code)
+        scoped_resource = DataAPI.order(:name).where(organization_code: org_code)
       else
-        DataAPI.public_accessible.order(:name).global
+        scoped_resource = DataAPI.order(:name).global
       end
+
+      if owned_by_user
+        scoped_resource = scoped_resource.accessible.owned_by_user
+      else
+        scoped_resource = scoped_resource.public_accessible
+      end
+
+      scoped_resource
     end
 
     def data_api_combined_namespaces(org_code = nil)
@@ -60,9 +70,14 @@ module APIDocsExtended
       namespaces
     end
 
-    def data_api_combined_namespace_routes(org_code = nil)
-      data_apis = data_apis(org_code)
-      routes = {}
+    def data_api_routes(org_code = nil, owned_by_user: false, combined_namespace: true)
+      data_apis = data_apis(org_code, owned_by_user)
+
+      if combined_namespace
+        routes = {}
+      else
+        routes = []
+      end
 
       data_apis.each do |data_api|
         data_api_description = data_api.description.present? ? data_api.description : data_api.name
@@ -75,10 +90,10 @@ module APIDocsExtended
             callback: { required: false, type: 'String', desc: "JSON-P callbacks, wrap the results in a specific JSON function." }
           },
           http_codes: [],
-          description: "Get data of #{data_api_description.try(:pluralize)}",
+          description: "Get data of#{' the current user\'s' if owned_by_user} #{data_api_description.try(:pluralize)}",
           notes: data_api.notes,
           method: 'GET',
-          path: "/#{data_api.path}(.:format)"
+          path: "#{'/me' if owned_by_user}/#{data_api.path}(.:format)"
         }
 
         singular_resource_opts = {
@@ -90,17 +105,22 @@ module APIDocsExtended
           http_codes: [
             [404, "Not Found: that #{data_api_description} does not exists."]
           ],
-          description: "Get data of an #{data_api_description}",
+          description: "Get data of an #{data_api_description}#{' that belong to the current user' if owned_by_user}",
           notes: data_api.notes,
           method: 'GET',
-          path: "/#{data_api.path}/:#{data_api.primary_key}(.:format)",
+          path: "#{'/me' if owned_by_user}/#{data_api.path}/:#{data_api.primary_key}(.:format)",
           callback: { required: false, type: 'String', desc: "" }
         }
 
         collection_route = Grape::Route.new(collection_opts)
         singular_resource_route = Grape::Route.new(singular_resource_opts)
 
-        routes[data_api.name] = [collection_route, singular_resource_route]
+        if combined_namespace
+          routes[data_api.name] = [collection_route, singular_resource_route]
+        else
+          routes << collection_route
+          routes << singular_resource_route
+        end
       end
 
       routes

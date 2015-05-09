@@ -102,6 +102,6 @@ class API::Open < API
       end
     end
 
-    error! 404
+    error! 404, 404
   end
 end
