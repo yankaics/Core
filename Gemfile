@@ -74,7 +74,6 @@ gem 'grape-rabl'
 gem 'grape-entity'
 gem 'grape-swagger'
 gem 'rack-cors', :require => 'rack/cors'
-gem 'grape-swagger-rails'
 gem 'rack-oauth2', '~> 1.1.1'
 
 gem 'devise', '~> 3.4.0'
@@ -100,10 +99,6 @@ gem 'activerecord-import', '~> 0.7.0'
 # Use ActiveAdmin as the administration framework
 gem 'activeadmin', github: 'activeadmin'
 gem 'active_admin_import', '2.1.2'
-
-# Integrate swagger docs
-gem 'swagger-docs', '~> 0.1.8'
-gem 'swagger-ui_rails', '~> 0.1.7'
 
 # Development tools
 group :development do
@@ -154,7 +149,7 @@ gem 'hirb-unicode', :require => false
 gem 'react-rails', '~> 1.0'
 gem 'normalize-rails', '>= 3.0.1'
 gem 'modernizr-rails'
-# gem 'react-rails', '~> 1.0.0.pre', github: 'reactjs/react-rails'
+gem 'swagger-ui_rails', '~> 2.1.0.alpha.7.1'
 gem 'nprogress-rails', '~> 0.1.6.5'
 gem 'select2-rails', '~> 3.5.9'
 gem 'chosen-rails'

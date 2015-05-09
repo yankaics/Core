@@ -73,4 +73,18 @@ module APIResourceIncludable
       end
     end
   end
+
+  # Return the 'include' param description
+  def self.include_param_desc(example: nil, default: nil)
+    if default.present?
+      desc = "Returning compound documents that include specific associated objects, defaults to '#{default}'."
+    else
+      desc = "Returning compound documents that include specific associated objects."
+    end
+    if example.present?
+      "#{desc} Example value: '#{example}'"
+    else
+      desc
+    end
+  end
 end

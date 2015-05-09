@@ -55,6 +55,10 @@ module APIGuard
       @current_user = @current_resource_owner
     end
 
+    def current_access_token
+      @access_token
+    end
+
     def current_resource_owner
       @current_resource_owner ||= User.find(@access_token.resource_owner_id)
     end
@@ -127,12 +131,12 @@ module APIGuard
           when OAuth::ExpiredTokenError
             Rack::OAuth2::Server::Resource::Bearer::Unauthorized.new(
               :invalid_token,
-              "Token is expired.")
+              "Token has expired.")
 
           when OAuth::RevokedTokenError
             Rack::OAuth2::Server::Resource::Bearer::Unauthorized.new(
               :invalid_token,
-              "Token is revoked.")
+              "Token has been revoked.")
 
           when OAuth::InsufficientTokenScopeError
             # FIXME: ForbiddenError (inherited from Bearer::Forbidden of Rack::Oauth2)
@@ -146,6 +150,21 @@ module APIGuard
 
         response.finish
       end
+    end
+  end
+
+  def self.access_token_error_codes
+    [
+      [401, "Unauthorized: missing or bad access token."],
+      [403, "Forbidden: the access token you hand over doesn't give the power you requested."]
+    ]
+  end
+
+  def self.access_token_required_note(scope: nil)
+    if scope.present?
+      "An access token with the #{scope} scope is required while making this request."
+    else
+      "An access token is required while making this request."
     end
   end
 end

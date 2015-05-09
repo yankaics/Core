@@ -1,5 +1,4 @@
 class API::V1 < API
-  include APIGuard
   include APIResourceFieldsettable
   include APIResourceIncludable
   include APIResourceSortable
@@ -8,4 +7,5 @@ class API::V1 < API
 
   mount Me
   mount Organizations
+  mount Utilities
 end

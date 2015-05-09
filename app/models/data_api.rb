@@ -7,6 +7,10 @@ class DataAPI < ActiveRecord::Base
 
   scope :global, -> { where(organization_code: nil) }
   scope :local, -> { where.not(organization_code: nil) }
+  scope :public_accessible, -> { where(public: true, accessible: true) }
+  scope :accessible, -> { where(accessible: true) }
+  scope :owned_by_user, -> { where(owned_by_user: true) }
+
 
   belongs_to :organization, primary_key: :code, foreign_key: :organization_code
 
