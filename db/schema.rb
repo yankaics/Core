@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150502172221) do
+ActiveRecord::Schema.define(version: 20150509002034) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace"
@@ -78,6 +78,8 @@ ActiveRecord::Schema.define(version: 20150502172221) do
     t.boolean  "owned_by_user",     default: false,     null: false
     t.string   "owner_primary_key"
     t.string   "owner_foreign_key"
+    t.string   "description"
+    t.text     "notes"
   end
 
   add_index "data_apis", ["accessible"], name: "index_data_apis_on_accessible"
@@ -133,6 +135,12 @@ ActiveRecord::Schema.define(version: 20150502172221) do
   add_index "friendly_id_slugs", ["slug", "sluggable_type"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type"
   add_index "friendly_id_slugs", ["sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_id"
   add_index "friendly_id_slugs", ["sluggable_type"], name: "index_friendly_id_slugs_on_sluggable_type"
+
+  create_table "my_new_api", force: :cascade do |t|
+    t.string  "my_string"
+    t.integer "my_int"
+    t.boolean "my_bool"
+  end
 
   create_table "oauth_access_grants", force: :cascade do |t|
     t.integer  "resource_owner_id", null: false

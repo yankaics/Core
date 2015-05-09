@@ -33,7 +33,7 @@ ActiveAdmin.register DataAPI do
     end
 
     def data_api_params
-      p = [:accessible, :public, :name, :path, :primary_key, :default_order, :database_url, :maintain_schema, :owned_by_user, :owner_primary_key, :owner_foreign_key]
+      p = [:accessible, :public, :name, :path, :description, :notes, :primary_key, :default_order, :database_url, :maintain_schema, :owned_by_user, :owner_primary_key, :owner_foreign_key]
       p.concat [:organization_code, :organization] if current_admin.root?
       params.require(:data_api).slice(*p).permit(p)
     end
@@ -77,6 +77,7 @@ ActiveAdmin.register DataAPI do
     column(:path)
     column(:accessible)
     column(:public)
+    column(:description)
     column(:owned_by_user)
     column(:organization) { |data_api| data_api.organization.blank? ? nil : link_to(data_api.organization_code, admin_organization_path(data_api.organization)) } if current_admin.root?
     column(:maintain_schema)
@@ -97,6 +98,8 @@ ActiveAdmin.register DataAPI do
       row(:name)
       row(:path)
       row(:organization) if current_admin.root?
+      row(:description)
+      row(:notes)
       row(:primary_key)
       row(:schema) { |data_api| pre { JSON.pretty_generate(data_api.schema) } }
       row(:default_order)
@@ -143,6 +146,8 @@ ActiveAdmin.register DataAPI do
       f.input :name
       f.input :path
       f.input :organization_code, as: :select, collection: options_for_select(Organization.all_for_select, data_api.organization_code) if current_admin.root?
+      f.input :description
+      f.input :notes
 
       f.input :primary_key, hint: "必須是存在的欄位名稱"
       f.input :default_order, hint: "必須使用存在的欄位名稱"

@@ -127,12 +127,12 @@ module APIGuard
           when OAuth::ExpiredTokenError
             Rack::OAuth2::Server::Resource::Bearer::Unauthorized.new(
               :invalid_token,
-              "Token is expired.")
+              "Token has expired.")
 
           when OAuth::RevokedTokenError
             Rack::OAuth2::Server::Resource::Bearer::Unauthorized.new(
               :invalid_token,
-              "Token is revoked.")
+              "Token has been revoked.")
 
           when OAuth::InsufficientTokenScopeError
             # FIXME: ForbiddenError (inherited from Bearer::Forbidden of Rack::Oauth2)
