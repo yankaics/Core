@@ -55,6 +55,10 @@ module APIGuard
       @current_user = @current_resource_owner
     end
 
+    def current_access_token
+      @access_token
+    end
+
     def current_resource_owner
       @current_resource_owner ||= User.find(@access_token.resource_owner_id)
     end

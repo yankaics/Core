@@ -7,4 +7,5 @@ class API::V1 < API
 
   mount Me
   mount Organizations
+  mount Utilities
 end

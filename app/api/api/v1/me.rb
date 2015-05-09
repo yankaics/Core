@@ -57,12 +57,4 @@ class API::V1::Me < API::V1
       @user_identity = current_user.identities
     end
   end
-
-  desc "Simulate errors"
-  params do
-    optional :code, type: Integer, default: 404
-  end
-  get "error" do
-    error!(params[:code], params[:code])
-  end
 end

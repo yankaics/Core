@@ -78,7 +78,7 @@ module APIDocsExtended
           description: "Get data of #{data_api_description.try(:pluralize)}",
           notes: data_api.notes,
           method: 'GET',
-          path: "#{data_api.path}(.:format)"
+          path: "/#{data_api.path}(.:format)"
         }
 
         singular_resource_opts = {
@@ -93,7 +93,7 @@ module APIDocsExtended
           description: "Get data of an #{data_api_description}",
           notes: data_api.notes,
           method: 'GET',
-          path: "#{data_api.path}/:#{data_api.primary_key}(.:format)",
+          path: "/#{data_api.path}/:#{data_api.primary_key}(.:format)",
           callback: { required: false, type: 'String', desc: "" }
         }
 
