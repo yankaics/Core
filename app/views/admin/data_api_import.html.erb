@@ -2,7 +2,7 @@
   CSV 檔的第一列（行）必須是表頭，標明檔案中資料屬於何欄位。資料內容由第二列（行）開始。
 </p>
 <p>
-  可用欄位：<%= DataAPI::Data.column_names.join(t('general.comma')) %>。
+  可用欄位：<%= DataAPI::APIData.column_names.join(t('general.comma')) %>。
 </p>
 <%= semantic_form_for @active_admin_import_model, url: {action: :do_import}, html: {multipart: true} do |f| %>
     <%= f.inputs do %>

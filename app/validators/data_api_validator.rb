@@ -1,7 +1,5 @@
 class DataAPIValidator < ActiveModel::Validator
   def validate(record)
-
-
     if record.id.present? && old_record = DataAPI.find_by(id: record.id)
       old_columns = Hash[old_record.schema.map { |_k, v| [v['uuid'], v] }]
       current_columns = Hash[record.schema.map { |_k, v| [v['uuid'], v] }]
@@ -15,7 +13,7 @@ class DataAPIValidator < ActiveModel::Validator
       record.errors[:owner_foreign_key] << "The owner_foreign_key column name \"#{record.owner_foreign_key}\" does not exist on the schema!" if !record.schema.keys.include?(record.owner_foreign_key)
     end
 
-    record.errors[:maintain_schema] << "This can not be turned off while using system database!" if record.database_url.blank? && !record.maintain_schema
+    record.errors[:maintain_schema] << "This can not be turned off while using system database!" if record.using_system_database? && !record.maintain_schema
 
     # if record.database_url.present?
     #   begin

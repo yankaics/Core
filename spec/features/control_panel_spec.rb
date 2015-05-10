@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-feature "Control Panel", :type => :feature, :retry => 3 do
+feature "Control Panel", :type => :feature do
   scenario "Admin signs in" do
     admin_credentials = { username: 'test_admin', password: 'password' }
     admin = create(:admin, admin_credentials)
@@ -264,7 +264,7 @@ feature "Control Panel", :type => :feature, :retry => 3 do
         data_api.data_model.create!(my_awesome_attribute: 'awesome')
 
         # the data API data control panel should be updated too
-        visit(admin_data_api_data_api_data_path(data_api))
+        visit(admin_data_api_data_api_api_data_path(data_api))
         expect(page).to have_content('My Awesome Attribute')
 
         Timecop.scale(1)
@@ -273,23 +273,23 @@ feature "Control Panel", :type => :feature, :retry => 3 do
 
       scenario "Admin manages data of an Data API", :js => false do
         data_api = create(:data_api, schema: { string: { type: 'string' }, text: { type: 'text' }, boolean: { type: 'boolean' } })
-        visit(admin_data_api_data_api_data_path data_api_id: data_api.id)
-        click_link I18n.t(:'active_admin.new_model', model: I18n.t(:'activerecord.models.data_api_data'))
-        fill_in 'data_api_data_string', with: "Hello World"
-        fill_in 'data_api_data_text', with: "Have a good day!"
-        check 'data_api_data_boolean'
+        visit(admin_data_api_data_api_api_data_path(data_api_id: data_api.id))
+        click_link I18n.t(:'active_admin.new_model', model: I18n.t(:'activerecord.models.data_api_api_data'))
+        fill_in 'data_api_api_data_string', with: "Hello World"
+        fill_in 'data_api_api_data_text', with: "Have a good day!"
+        check 'data_api_api_data_boolean'
         find('input[type=submit]').click
         expect(data_api.data_model.first.string).to eq("Hello World")
         expect(data_api.data_model.first.text).to eq("Have a good day!")
         expect(data_api.data_model.first.boolean).to be(true)
         expect(page).to have_content("Hello World")
-        visit(admin_data_api_data_api_data_path data_api_id: data_api.id)
+        visit(admin_data_api_data_api_api_data_path(data_api_id: data_api.id))
         expect(page).to have_content("Hello World")
       end
 
       scenario "Admin imports data to an Data API", :js => false do
         data_api = create(:data_api, name: 'stores', path: 'stores', schema: { code: { type: 'string', null: false, unique: true }, name: { type: 'string', null: false }, location_latitude: { type: 'string' }, location_longitude: { type: 'string' }, open_at: { type: 'integer' }, close_at: { type: 'integer' }, description: { type: 'text' } })
-        visit(import_admin_data_api_data_api_data_path data_api_id: data_api.id)
+        visit(import_admin_data_api_data_api_api_data_path(data_api_id: data_api.id))
         attach_file('active_admin_import_model_file', api_data_stores_csv_file)
         find('input[type=submit]').click
 

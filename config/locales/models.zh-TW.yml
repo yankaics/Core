@@ -11,8 +11,9 @@ zh-TW:
       doorkeeper_application: "應用程式"
       doorkeeper/application: "應用程式"
       data_api: "資料集 API"
-      data_api/data: "資料集 API 資料"
-      data_api_data: "資料集 API 資料"
+      data_api/api_data: "資料集 API 資料"
+      data_api_api_data: "資料集 API 資料"
+      data_api_api_datum: "API 資料"
 
     attributes:
       user:
@@ -46,8 +47,8 @@ zh-TW:
         default_order: "預設資料排序"
         database_url: "Database URL"
         maintain_schema: "自動維護資料表"
-        data_api/data: "資料集 API 資料"
-        data_api_data: "資料集 API 資料"
+        data_api/api_data: "資料集 API 資料"
+        data_api_api_data: "資料集 API 資料"
         manage: "管理"
       organization:
         code: "代碼"

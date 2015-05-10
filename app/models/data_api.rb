@@ -62,67 +62,8 @@ class DataAPI < ActiveRecord::Base
     data_api
   end
 
-  module Models
-  end
-
-  class Data < ActiveRecord::Base
-    cattr_accessor :model
-
-    def self.column_names(*args, &block)
-      model.column_names(*args, &block)
-    end
-
-    def self.connection(*args, &block)
-      model.connection(*args, &block)
-    end
-
-    def self.quoted_table_name(*args, &block)
-      model.quoted_table_name(*args, &block)
-    end
-
-    def self.primary_key(*args, &block)
-      model.primary_key(*args, &block)
-    end
-
-    def self.human_attribute_name(*args, &block)
-      model.human_attribute_name(*args, &block)
-    end
-
-    def self.content_columns(*args, &block)
-      model.content_columns(*args, &block)
-    end
-
-    def self.find_by_id(*args, &block)
-      model.find_by_id(*args, &block)
-    end
-
-    def self.transaction(*args, &block)
-      model.transaction(*args, &block)
-    end
-
-    def self.import(*args, &block)
-      model.import(*args, &block)
-    end
-  end
-
-  class Model < ActiveRecord::Base
-    establish_connection DataAPI.database_url
-    self.abstract_class = true
-    self.primary_key = :id
-    self.inheritance_column = nil
-
-    cattr_accessor :updated_at
-
-    # validates :uid, presence: true
-    # validates :uid, uniqueness: true
-  end
-
   def columns
     schema.keys
-  end
-
-  def get_database_url
-    database_url.present? ? database_url : DataAPI.database_url
   end
 
   def schema=(s)
@@ -138,49 +79,48 @@ class DataAPI < ActiveRecord::Base
     self[:schema] = schema.to_s
   end
 
-  def data_model
-    return Models.const_get(name.classify) if Models.const_defined?(name.classify)
-    Models.const_set(name.classify, Class.new(DataAPI::Model))
-    m = Models.const_get(name.classify)
-    begin
-      m.establish_connection get_database_url
-    rescue ActiveRecord::ActiveRecordError => e
-      Rails.logger.error e
-    end
-    m.cattr_accessor(:organization_code)
-    m.organization_code = organization_code
-    m.table_name = name
-    m.updated_at = updated_at
-
-    if owned_by_user
-      m.cattr_accessor(:owner_primary_key)
-      m.owner_primary_key = owner_primary_key
-      m.cattr_accessor(:owner_foreign_key)
-      m.owner_foreign_key = owner_foreign_key
-
-      case owner_primary_key
-      when 'id'
-        m.belongs_to :owner, class_name: User, primary_key: :id, foreign_key: owner_foreign_key
-      when 'uuid'
-        m.belongs_to :owner, class_name: User, primary_key: :uuid, foreign_key: owner_foreign_key
-      when 'email'
-        m.belongs_to :owner, class_name: User, primary_key: :email, foreign_key: owner_foreign_key
-      when 'uid'
-        m.belongs_to :owner_identity, ->(o) { where(organization_code: o.class.organization_code) },
-                     class_name: UserIdentity, primary_key: :uid, foreign_key: owner_foreign_key
-        m.has_one :owner, class_name: :User, through: :owner_identity, source: :user
-      end
-    end
-
-    m
+  # Is this API using the system database?
+  def using_system_database?
+    self[:database_url].blank?
   end
 
-  def data_api_data
+  # Is this API using an outer database?
+  def using_outer_database?
+    self[:database_url].present?
+  end
+
+  # Get the database URL of this data API
+  # (prefixed with 'get' to separate with the original database_url getter,
+  #  which returns nil if the outer database_url for this API is not setted)
+  def get_database_url
+    self[:database_url].present? ? self[:database_url] : DataAPI.database_url
+  end
+
+  # Get the database table name of this data API
+  def table_name
+    self[:table_name].present? ? self[:table_name] : name
+  end
+
+  def data_model
+    return DataModels.get(name.classify) if DataModels.has?(name.classify)
+
+    DataModels.construct(name.classify,
+      database_url: get_database_url,
+      table_name: table_name,
+      organization_code: organization_code,
+      owned_by_user: owned_by_user,
+      owner_primary_key: owner_primary_key,
+      owner_foreign_key: owner_foreign_key,
+      updated_at: updated_at
+    )
+  end
+
+  def data_api_api_data
     data_model.all
   end
 
   def reset_data_model_const
-    Models.send(:remove_const, name.classify) if Object.const_defined? "DataAPI::Models::#{name.classify}"
+    DataModels.remove_if_exists(name.classify)
     begin
       data_model.establish_connection get_database_url
       data_model.connection.schema_cache.clear!
@@ -284,10 +224,10 @@ class DataAPI < ActiveRecord::Base
 
       def connection
         begin
-          DataAPI::Model.establish_connection @db_url
+          DataAPI::DataModel.establish_connection @db_url
         rescue ActiveRecord::AdapterNotSpecified
         end
-        DataAPI::Model.connection
+        DataAPI::DataModel.connection
       end
     end
     migration

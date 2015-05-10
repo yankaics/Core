@@ -1,4 +1,4 @@
-ActiveAdmin.register DataAPI::Data, namespace: :admin do
+ActiveAdmin.register DataAPI::APIData, namespace: :admin do
   belongs_to :data_api
   navigation_menu :default
   menu priority: 60, parent: 'api', if: proc { params[:controller] == "admin/data_api_data" }
@@ -14,13 +14,13 @@ ActiveAdmin.register DataAPI::Data, namespace: :admin do
     end
 
     def set_model
-      DataAPI::Data.model = scoped_collection.model
+      DataAPI::APIData.model = scoped_collection.model
       active_admin_namespace.permitted_params += [:data_api_id]
     end
   end
 
   permit_params do
-    DataAPI::Data.column_names
+    DataAPI::APIData.column_names
   end
 
   sidebar "資料集 API" do
