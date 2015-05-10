@@ -24,8 +24,6 @@ You may want to change the app's default environment variables, which lays in `.
 
 This application is designed under The [Twelve-Factor App](http://12factor.net/) pattern, making its deployment and operations on cloud platforms easy.
 
-### Deploy to Heroku
-
 It's also aimed to be Heroku deployable: [![Deploy](https://neson.github.io/GitHub-Badges/deploy_to_heroku_xs.svg)](https://heroku.com/deploy)
 
 
