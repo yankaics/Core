@@ -84,7 +84,7 @@ class DataAPI < ActiveRecord::Base
 
   # List of columns
   def columns
-    schema.keys
+    schema.keys.map(&:to_sym)
   end
 
   # Is this API using the system database?
