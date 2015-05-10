@@ -277,7 +277,7 @@ GEM
       nokogiri (>= 1.5.9)
     mail (2.6.3)
       mime-types (>= 1.16, < 3)
-    mailgunner (2.2.0)
+    mailgunner (2.2.1)
     meta-tags (2.0.0)
       actionpack (>= 3.0.0)
     meta_request (0.3.4)
