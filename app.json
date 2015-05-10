@@ -3,7 +3,8 @@
   "description": "The core API server & authentication system for Colorgy.",
   "addons": [
     "heroku-postgresql:hobby-dev",
-    "heroku-postgresql:hobby-dev"
+    "heroku-postgresql:hobby-dev",
+    "mailgun:starter"
   ],
   "scripts": {
     "postdeploy": "bundle exec rake dev:prime"
@@ -49,8 +50,8 @@
       "value": "stdout"
     },
     "MAILER_DELIVERY_METHOD": {
-      "description": "Which Mailing Service to use, can be 'letter_opener' or 'mailgun'.",
-      "value": "letter_opener"
+      "description": "Which Mailing Service to use, defaults to 'mailgun'.",
+      "value": "mailgun"
     },
     "SMS_DELIVERY_METHOD": {
       "description": "Which SMS Service to use, can be 'test' or 'nexmo'.",

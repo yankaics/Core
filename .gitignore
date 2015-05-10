@@ -16,6 +16,7 @@
 /tmp
 
 /doc
+.yardoc
 
 .env
 .powenv
