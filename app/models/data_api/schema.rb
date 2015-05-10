@@ -14,7 +14,7 @@ class DataAPI::Schema < ActiveSupport::HashWithIndifferentAccess
     super(constructor)
   ensure
     return if skip_check
-    clear_invalid_data
+    clear_invalid_columns
     generate_uuid_for_new_columns
     set_default_type_for_columns
     sort_column_attrs
@@ -33,7 +33,7 @@ class DataAPI::Schema < ActiveSupport::HashWithIndifferentAccess
   end
 
   def validate!
-    clear_invalid_data
+    clear_invalid_columns
     generate_uuid_for_new_columns
     set_default_type_for_columns
     clear_duplicated_uuid_columns
@@ -44,9 +44,19 @@ class DataAPI::Schema < ActiveSupport::HashWithIndifferentAccess
     to_json
   end
 
+  def to_hash_indexed_with_uuid
+    HashWithIndifferentAccess.new(
+      Hash[
+        map do |column_name, column_attrs|
+          [column_attrs[:uuid], column_attrs.merge('name' => column_name)]
+        end
+      ]
+    )
+  end
+
   private
 
-  def clear_invalid_data
+  def clear_invalid_columns
     self.each_pair do |column_name, column_attrs|
 
       if RESERVED_COLUMN_NAMES.include?(column_name) ||

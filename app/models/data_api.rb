@@ -2,7 +2,6 @@ class DataAPI < ActiveRecord::Base
   attr_accessor :single_data_id
   has_paper_trail class_name: 'DataAPIVersion'
 
-  COLUMN_TYPES = %w(string integer float boolean text datetime)
   OWNER_PRIMARY_KEYS = %w(id uuid email uid)
 
   scope :global, -> { where(organization_code: nil) }
@@ -21,15 +20,22 @@ class DataAPI < ActiveRecord::Base
   validates :owner_primary_key, presence: true, inclusion: { in: OWNER_PRIMARY_KEYS }, if: :has_owner?
   validates :owner_foreign_key, presence: true, if: :has_owner?
 
-  after_find :reset_data_model_if_needed, :inspect_data_model
+  before_validation :check_organization_code
+
+  after_find :reset_data_model_if_needed
+
   before_validation :save_schema
   before_save :save_schema
-  before_validation :check_organization_code
-  after_create :create_db_table
-  before_update :reset_data_model_const, :change_db_table
-  after_update :reset_data_model_column_information
-  after_destroy :drop_db_table
 
+  before_update :reset_data_model
+
+  after_create :create_db_table_if_needed
+  before_update :update_db_table_if_needed
+  after_destroy :drop_db_table_if_needed
+
+  after_update :reset_data_model
+
+  # Get the System API Database URL
   def self.database_url
     return @database_url if @database_url.present?
     if Rails.env.test?
@@ -43,6 +49,7 @@ class DataAPI < ActiveRecord::Base
     end
   end
 
+  # Find a DataAPI by path
   def self.find_by_path(path, private: false)
     singular_path = path.match(/(?<path>.+)\/(?<id>[^\/]+)\z/)
     if singular_path
@@ -62,21 +69,22 @@ class DataAPI < ActiveRecord::Base
     data_api
   end
 
-  def columns
-    schema.keys
+  def schema
+    @schema ||= DataAPI::Schema.new(self[:schema], true)
   end
 
   def schema=(s)
     @schema = DataAPI::Schema.new(s)
   end
 
-  def schema
-    @schema ||= DataAPI::Schema.new(self[:schema], true)
+  # Is this API owned by a user?
+  def has_owner?
+    owned_by_user
   end
 
-  def save_schema
-    schema.validate!
-    self[:schema] = schema.to_s
+  # List of columns
+  def columns
+    schema.keys
   end
 
   # Is this API using the system database?
@@ -87,6 +95,11 @@ class DataAPI < ActiveRecord::Base
   # Is this API using an outer database?
   def using_outer_database?
     self[:database_url].present?
+  end
+
+  # Returns all the API data
+  def data_api_api_data
+    data_model.all
   end
 
   # Get the database URL of this data API
@@ -101,6 +114,7 @@ class DataAPI < ActiveRecord::Base
     self[:table_name].present? ? self[:table_name] : name
   end
 
+  # Get the data model of this API Data
   def data_model
     return DataModels.get(name.classify) if DataModels.has?(name.classify)
 
@@ -115,14 +129,14 @@ class DataAPI < ActiveRecord::Base
     )
   end
 
-  def data_api_api_data
-    data_model.all
+  def save_schema
+    schema.validate!
+    self[:schema] = schema.to_s
   end
 
-  def reset_data_model_const
+  def reset_data_model
     DataModels.remove_if_exists(name.classify)
     begin
-      data_model.establish_connection get_database_url
       data_model.connection.schema_cache.clear!
       data_model.reset_column_information
     rescue ActiveRecord::ActiveRecordError => e
@@ -131,109 +145,40 @@ class DataAPI < ActiveRecord::Base
   end
 
   def reset_data_model_if_needed
-    reset_data_model_const if data_model.try(:updated_at) != updated_at
-  end
-
-  def reset_data_model_column_information
-    data_model.reset_column_information
-  end
-
-  def inspect_data_model
-    data_model.inspect
-  end
-
-  def create_db_table
-    return unless maintain_schema
-    migration = new_migration
-
-    migration.create_table name do |t|
-      # t.string :uid, null: false
-
-      schema.each do |k, v|
-        t.send(v['type'], k)
-      end
-
-      # t.timestamps
-    end
-
-    # migration.add_index name, :uid, unique: true
-  end
-
-  def change_db_table
-    return unless maintain_schema
-    migration = new_migration
-    previous_version = DataAPI.find(id)
-    old_table_name = previous_version.name
-    current_table_name = name
-
-    if current_table_name != old_table_name
-      migration.rename_table old_table_name, current_table_name
-    end
-
-    old_columns = Hash[previous_version.schema.map { |k, v| [v['uuid'], v.merge('name' => k)] }]
-    current_columns = Hash[schema.map { |k, v| [v['uuid'], v.merge('name' => k)] }]
-
-    deleted_columns = {}
-
-    old_columns.each do |k, v|
-      deleted_columns[k] = v unless current_columns.key?(k)
-    end
-
-    deleted_columns.each do |_uuid, column|
-      migration.remove_column name, column['name']
-    end
-
-    new_columns = {}
-
-    current_columns.each do |k, v|
-      new_columns[k] = v unless old_columns.key?(k)
-    end
-
-    new_columns.each do |_uuid, column|
-      migration.add_column name, column['name'], column['type']
-    end
-
-    renamed_columns = {}
-
-    current_columns.each do |k, v|
-      renamed_columns[k] = v if old_columns[k].present? && v['name'] != old_columns[k]['name']
-    end
-
-    renamed_columns.each do |uuid, _column|
-      migration.rename_column name, old_columns[uuid]['name'], current_columns[uuid]['name']
-    end
-
-    reset_data_model_const
-  end
-
-  def drop_db_table
-    migration = new_migration
-    migration.drop_table name
-  end
-
-  def has_owner?
-    owned_by_user
+    reset_data_model if data_model.try(:updated_at) != updated_at
   end
 
   private
 
-  def new_migration
-    migration = ActiveRecord::Migration.new
-    migration.instance_exec(get_database_url) do |db_url|
-      @db_url = db_url
-
-      def connection
-        begin
-          DataAPI::DataModel.establish_connection @db_url
-        rescue ActiveRecord::AdapterNotSpecified
-        end
-        DataAPI::DataModel.connection
-      end
-    end
-    migration
-  end
-
   def check_organization_code
     self.organization_code = nil if organization_code.blank?
+  end
+
+  # Database callback operations
+
+  def create_db_table_if_needed
+    return unless maintain_schema
+    db_maintainer = DatabaseMaintainer.new(data_model)
+    db_maintainer.create_table(table_name, schema)
+  end
+
+  def update_db_table_if_needed
+    return unless maintain_schema
+    db_maintainer = DatabaseMaintainer.new(data_model)
+
+    previous_version = DataAPI.find(id)
+
+    old_table_name = previous_version.table_name
+    new_table_name = table_name
+    old_schema = previous_version.schema
+    new_schema = schema
+
+    db_maintainer.update_table(old_table_name, new_table_name, old_schema, new_schema)
+  end
+
+  def drop_db_table_if_needed
+    return unless maintain_schema
+    db_maintainer = DatabaseMaintainer.new(data_model)
+    db_maintainer.drop_table table_name
   end
 end

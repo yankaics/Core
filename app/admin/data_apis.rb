@@ -239,7 +239,7 @@ ActiveAdmin.register DataAPI do
               rand_uuid = SecureRandom.uuid
               td { text_field :name, class: :name, id: "data_api_schema_#{rand_uuid}_name", name: "data_api[schema][#{rand_uuid}][name]", value: '' }
               td do
-                select_tag :name, options_for_select(DataAPI::COLUMN_TYPES), class: :type, id: "data_api_schema_#{rand_uuid}_type", name: "data_api[schema][#{rand_uuid}][type]"
+                select_tag :name, options_for_select(DataAPI::Schema::COLUMN_TYPES), class: :type, id: "data_api_schema_#{rand_uuid}_type", name: "data_api[schema][#{rand_uuid}][type]"
               end
               td do
                 hidden_field :name, id: "data_api_schema_#{rand_uuid}_name", name: "data_api[schema][#{rand_uuid}][uuid]"

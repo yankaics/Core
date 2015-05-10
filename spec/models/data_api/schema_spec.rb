@@ -159,8 +159,27 @@ RSpec.describe DataAPI::Schema do
 
   describe "#to_s" do
     let(:schema) { DataAPI::Schema.new({ col: { type: '' } }) }
+
     it "returns a JSON string" do
       expect(schema.to_s).to eq(schema.to_json)
+    end
+  end
+
+  describe "#to_hash_indexed_with_uuid" do
+    let(:schema) do
+      DataAPI::Schema.new({
+        col: { uuid: '5361e73c-b17b-4cb7-9a75-800c149a813a' },
+        col2: { uuid: '0233fe82-2ba4-4992-85b3-4d5f0d231d56' }
+      })
+    end
+    subject { schema.to_hash_indexed_with_uuid }
+
+    it "returns a hash indexed with uuid" do
+      expect(subject).to be_a(HashWithIndifferentAccess)
+      expect(subject['5361e73c-b17b-4cb7-9a75-800c149a813a']).to be_a(Hash)
+      expect(subject['5361e73c-b17b-4cb7-9a75-800c149a813a'][:name]).to eq('col')
+      expect(subject['0233fe82-2ba4-4992-85b3-4d5f0d231d56']).to be_a(Hash)
+      expect(subject['0233fe82-2ba4-4992-85b3-4d5f0d231d56'][:name]).to eq('col2')
     end
   end
 end

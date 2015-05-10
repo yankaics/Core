@@ -153,7 +153,7 @@ RSpec.describe DataAPI, type: :model do
     end
   end
 
-  with_versioning do
+  describe "database maintenance" do
     let(:data_api) do
       create(:data_api, schema: { string_attr: { type: 'string' },
                                   text_attr: { type: 'text' },
