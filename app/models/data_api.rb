@@ -11,10 +11,7 @@ class DataAPI < ActiveRecord::Base
   scope :accessible, -> { where(accessible: true) }
   scope :owned_by_user, -> { where(owned_by_user: true) }
 
-
   belongs_to :organization, primary_key: :code, foreign_key: :organization_code
-
-  serialize :schema, Hash
 
   validates_with DataAPIValidator
   validates :name, :path, presence: true
@@ -25,7 +22,9 @@ class DataAPI < ActiveRecord::Base
   validates :owner_foreign_key, presence: true, if: :has_owner?
 
   after_find :reset_data_model_if_needed, :inspect_data_model
-  before_validation :stringify_schema_keys, :remove_blank_columns, :generate_uuid_for_new_columns, :set_type_for_new_columns, :check_organization_code
+  before_validation :save_schema
+  before_save :save_schema
+  before_validation :check_organization_code
   after_create :create_db_table
   before_update :reset_data_model_const, :change_db_table
   after_update :reset_data_model_column_information
@@ -119,21 +118,24 @@ class DataAPI < ActiveRecord::Base
   end
 
   def columns
-    schema.map { |k, v| k.to_sym }
+    schema.keys
   end
 
   def get_database_url
     database_url.present? ? database_url : DataAPI.database_url
   end
 
-  def schema_from_array(columns)
-    self.schema = {}
-    columns.each do |column|
-      column.stringify_keys!
-      next if !column.is_a?(Hash) || column['name'].blank?
-      self.schema[column['name']] = column
-      self.schema[column['name']].except!('name')
-    end
+  def schema=(s)
+    @schema = DataAPI::Schema.new(s)
+  end
+
+  def schema
+    @schema ||= DataAPI::Schema.new(self[:schema], true)
+  end
+
+  def save_schema
+    schema.validate!
+    self[:schema] = schema.to_s
   end
 
   def data_model
@@ -198,23 +200,6 @@ class DataAPI < ActiveRecord::Base
 
   def inspect_data_model
     data_model.inspect
-  end
-
-  def remove_blank_columns
-    self.schema ||= {}
-    schema.delete_if { |k, v| v.blank? }
-  end
-
-  def generate_uuid_for_new_columns
-    schema.each do |k, v|
-      v['uuid'] = SecureRandom.uuid if v['uuid'].blank? || v['uuid'].length < 30
-    end
-  end
-
-  def set_type_for_new_columns
-    schema.each do |k, v|
-      v['type'] = :string if v['type'].blank?
-    end
   end
 
   def create_db_table
@@ -284,15 +269,6 @@ class DataAPI < ActiveRecord::Base
   def drop_db_table
     migration = new_migration
     migration.drop_table name
-  end
-
-  def stringify_schema_keys
-    self.schema ||= {}
-    schema.stringify_keys!
-    schema.each_pair do |_, v|
-      v ||= {}
-      v.stringify_keys!
-    end
   end
 
   def has_owner?

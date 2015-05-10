@@ -12,7 +12,7 @@ ActiveAdmin.register DataAPI do
 
     def create
       @data_api = scoped_collection.new(data_api_params)
-      @data_api.schema_from_array(data_api_params_schema_array)
+      @data_api.schema.load_from_array(data_api_params_schema_array)
       if @data_api.save
         redirect_to admin_data_api_path(@data_api)
       else
@@ -22,7 +22,7 @@ ActiveAdmin.register DataAPI do
 
     def update
       @data_api = scoped_collection.find(params[:id])
-      @data_api.schema_from_array(data_api_params_schema_array) if data_api_params_schema_array.present?
+      @data_api.schema.load_from_array(data_api_params_schema_array) if data_api_params_schema_array.present?
       @data_api.assign_attributes(data_api_params)
 
       confirm_required = (@data_api.changes.keys & ['accessible', 'public', 'name', 'path', 'primary_key', 'default_order', 'database_url', 'maintain_schema', 'owned_by_user', 'owner_primary_key', 'owner_foreign_key']).present?
