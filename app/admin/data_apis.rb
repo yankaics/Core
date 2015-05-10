@@ -24,10 +24,12 @@ ActiveAdmin.register DataAPI do
       @data_api = scoped_collection.find(params[:id])
       @data_api.schema.load_from_array(data_api_params_schema_array) if data_api_params_schema_array.present?
       @data_api.assign_attributes(data_api_params)
+      @data_api.nilify_blanks
 
-      confirm_required = (@data_api.changes.keys & ['accessible', 'public', 'name', 'path', 'primary_key', 'default_order', 'database_url', 'maintain_schema', 'owned_by_user', 'owner_primary_key', 'owner_foreign_key']).present?
-      confirm_required = true if @data_api.changes['schema'] && @data_api.changes['schema'][0] != @data_api.changes['schema'][1]
-      confirm_required = true if @data_api.changes['has'] && @data_api.changes['has'][0] != @data_api.changes['has'][1]
+      confirm_required = (@data_api.changes.keys & ['accessible', 'public', 'name', 'table_name', 'path', 'primary_key', 'default_order', 'database_url', 'maintain_schema', 'owned_by_user', 'owner_primary_key', 'owner_foreign_key']).present?
+      previous_version = DataAPI.find(@data_api.id)
+      confirm_required = true if @data_api.schema != previous_version.schema
+      confirm_required = true if @data_api.has != previous_version.has
       confirm_required = false if params[:confirm]
 
       if @data_api.valid?
@@ -47,7 +49,7 @@ ActiveAdmin.register DataAPI do
     end
 
     def data_api_params
-      p = [:accessible, :public, :name, :path, :description, :notes, :primary_key, :default_order, :database_url, :maintain_schema, :owned_by_user, :owner_primary_key, :owner_foreign_key]
+      p = [:accessible, :public, :name, :table_name, :path, :description, :notes, :primary_key, :default_order, :database_url, :maintain_schema, :owned_by_user, :owner_primary_key, :owner_foreign_key]
       p.concat [:organization_code, :organization] if current_admin.root?
       params.require(:data_api).slice(*p).permit(p)
     end
@@ -88,6 +90,7 @@ ActiveAdmin.register DataAPI do
   index as: :detailed_table do
     selectable_column
     column(:name) { |data_api| link_to data_api.name, admin_data_api_path(data_api) }
+    column(:table_name)
     column(:path)
     column(:accessible)
     column(:public)
@@ -110,6 +113,7 @@ ActiveAdmin.register DataAPI do
       row(:accessible)
       row(:public)
       row(:name)
+      row(:table_name)
       row(:path)
       row(:organization) if current_admin.root?
       row(:description)
@@ -160,6 +164,7 @@ ActiveAdmin.register DataAPI do
           h2 '確認？'
           para "您即將更動 #{data_api.name} 的設定。有些改變是不可復原的，例如改動 schema 所造成的資料遺失，隨意更改路徑或資料關聯也有可能造成已串接的應用程式損壞。請再三確認以下變更沒有問題："
           br
+
           data_api.changes.each_pair do |k, v|
             bef = v[0]
             aft = v[1]
@@ -172,6 +177,22 @@ ActiveAdmin.register DataAPI do
             para '改變成：'
             pre aft
           end
+
+          if data_api.changes.has_key?('schema') || data_api.changes.has_key?('table_name')
+            db_maintainer = DataAPI::DatabaseMaintainer.new(data_api.data_model)
+            previous_version = DataAPI.find(data_api.id)
+
+            old_table_name = previous_version.table_name
+            new_table_name = data_api.table_name
+            old_schema = previous_version.schema
+            new_schema = data_api.schema
+
+            changes = db_maintainer.update_table(old_table_name, new_table_name, old_schema, new_schema, test_run: true)
+
+            h3 '資料表變動如下'
+            pre JSON.pretty_generate(changes)
+          end
+
           hidden_field :confirm, name: 'confirm', value: 'true'
           style '.edit_data_api_form { display: none }'
           f.actions
@@ -198,6 +219,7 @@ ActiveAdmin.register DataAPI do
         f.input :accessible
         f.input :public
         f.input :name
+        f.input :table_name
         f.input :path
         f.input :organization_code, as: :select, collection: options_for_select(Organization.all_for_select, data_api.organization_code) if current_admin.root?
         f.input :description

@@ -156,6 +156,7 @@ feature "Control Panel", :type => :feature do
 
         within("#main_content") do
           fill_in 'data_api_name', with: "my_new_api"
+          fill_in 'data_api_table_name', with: "my_new_apis"
           fill_in 'data_api_path', with: "my_apis/my_new_api"
 
           within(".data_api_schema_table") do
@@ -207,6 +208,8 @@ feature "Control Panel", :type => :feature do
 
         within("#main_content") do
           fill_in 'data_api_name', with: "my_todo_list"
+          fill_in 'data_api_table_name', with: "my_todo_lists"
+          fill_in 'data_api_table_name', with: "my_todos"
           fill_in 'data_api_path', with: "my/todos"
 
           within(".data_api_schema_table") do
@@ -227,6 +230,8 @@ feature "Control Panel", :type => :feature do
         expect(page).to have_content('done')
 
         # we need to confirm our changes
+        data_api = DataAPI.find(data_api.id)
+        expect(data_api.table_name).not_to eq('my_todo_list')
         first('#data_api_submit_action').find('input').click
 
         expect(page).to have_content('name')
@@ -256,6 +261,8 @@ feature "Control Panel", :type => :feature do
         expect(page).to have_content('my_awesome_attribute')
 
         # we need to confirm our changes
+        data_api = DataAPI.find(data_api.id)
+        expect(data_api.columns).not_to include(:my_awesome_attribute)
         first('#data_api_submit_action').find('input').click
 
         expect(page).to have_content('my_awesome_attribute')
@@ -266,6 +273,21 @@ feature "Control Panel", :type => :feature do
         # the data API data control panel should be updated too
         visit(admin_data_api_data_api_api_data_path(data_api))
         expect(page).to have_content('My Awesome Attribute')
+
+        # Another test
+        data_api = create(:data_api)
+        visit(edit_admin_data_api_path(data_api))
+
+        within("#main_content") do
+          fill_in 'data_api_description', with: "hello world"
+          first('#data_api_submit_action').find('input').click
+        end
+
+        expect(page).to have_content('hello world')
+
+        # we don't need to confirm our changes
+        data_api = DataAPI.find(data_api.id)
+        expect(data_api.description).to eq("hello world")
 
         Timecop.scale(1)
         Timecop.return
@@ -288,7 +310,7 @@ feature "Control Panel", :type => :feature do
       end
 
       scenario "Admin imports data to an Data API", :js => false do
-        data_api = create(:data_api, name: 'stores', path: 'stores', schema: { code: { type: 'string', null: false, unique: true }, name: { type: 'string', null: false }, location_latitude: { type: 'string' }, location_longitude: { type: 'string' }, open_at: { type: 'integer' }, close_at: { type: 'integer' }, description: { type: 'text' } })
+        data_api = create(:data_api, name: 'stores', table_name: 'stores', path: 'stores', schema: { code: { type: 'string', null: false, unique: true }, name: { type: 'string', null: false }, location_latitude: { type: 'string' }, location_longitude: { type: 'string' }, open_at: { type: 'integer' }, close_at: { type: 'integer' }, description: { type: 'text' } })
         visit(import_admin_data_api_data_api_api_data_path(data_api_id: data_api.id))
         attach_file('active_admin_import_model_file', api_data_stores_csv_file)
         find('input[type=submit]').click
@@ -317,6 +339,7 @@ feature "Control Panel", :type => :feature do
 
         within("#main_content") do
           fill_in 'data_api_name', with: "my_simple_api"
+          fill_in 'data_api_table_name', with: "my_simple_apis"
           fill_in 'data_api_path', with: "my_apis/my_simple_api"
 
           within(".data_api_schema_table") do

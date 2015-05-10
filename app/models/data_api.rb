@@ -13,17 +13,17 @@ class DataAPI < ActiveRecord::Base
   belongs_to :organization, primary_key: :code, foreign_key: :organization_code
 
   validates_with DataAPIValidator
-  validates :name, :path, presence: true
+  validates :name, :path, :table_name, presence: true, uniqueness: true
   validates :name, format: { with: /\A[a-z][a-z0-9_]*\z/ }
+  validates :table_name, format: { with: /\A[a-z][a-z0-9_]*\z/ }
   validates :path, format: { with: /\A[a-z0-9_]+(\/[a-z0-9_]+){0,4}\z/ }
   validates :database_url, format: { with: /\A(postgresql:\/\/)|(mysql:\/\/)|(sqlite3:db\/)/ }, allow_blank: true
   validates :owner_primary_key, presence: true, inclusion: { in: OWNER_PRIMARY_KEYS }, if: :has_owner?
   validates :owner_foreign_key, presence: true, if: :has_owner?
 
-  before_validation :check_organization_code
-
   after_find :reset_data_model_if_needed
 
+  before_validation :nilify_blanks
   before_validation :save_schema
   before_save :save_schema
 
@@ -109,11 +109,6 @@ class DataAPI < ActiveRecord::Base
     self[:database_url].present? ? self[:database_url] : DataAPI.database_url
   end
 
-  # Get the database table name of this data API
-  def table_name
-    self[:table_name].present? ? self[:table_name] : name
-  end
-
   # Get the data model of this API Data
   def data_model
     return DataModels.get(name.classify) if DataModels.has?(name.classify)
@@ -148,11 +143,16 @@ class DataAPI < ActiveRecord::Base
     reset_data_model if data_model.try(:updated_at) != updated_at
   end
 
-  private
-
-  def check_organization_code
+  def nilify_blanks
     self.organization_code = nil if organization_code.blank?
+    self.description = nil if description.blank?
+    self.notes = nil if notes.blank?
+    self.database_url = nil if database_url.blank?
+    self.owner_primary_key = nil if owner_primary_key.blank?
+    self.owner_foreign_key = nil if owner_foreign_key.blank?
   end
+
+  private
 
   # Database callback operations
 

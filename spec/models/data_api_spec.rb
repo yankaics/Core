@@ -8,7 +8,9 @@ RSpec.describe DataAPI, type: :model do
 
   it { should belong_to(:organization) }
   it { should validate_presence_of(:name) }
+  it { create(:data_api); should validate_uniqueness_of(:name) }
   it { should validate_presence_of(:path) }
+  it { create(:data_api); should validate_uniqueness_of(:path) }
 
   describe "instance" do
     subject(:data_api) { create(:data_api) }
@@ -189,13 +191,13 @@ RSpec.describe DataAPI, type: :model do
         expect(data_api.data_model.inspect).to include('string_attr: string')
         expect(data_api.data_model.table_name).to eq(data_api.name)
 
-        data_api.name = 'hello_api'
+        data_api.table_name = 'hello_api'
         data_api.save
         data_api.data_model.connection
         expect(data_api.data_model.inspect).to include('string_attr: string')
         expect(data_api.data_model.table_name).to eq('hello_api')
 
-        data_api.update(name: 'hello_world')
+        data_api.update(table_name: 'hello_world')
         data_api.data_model.connection
         expect(data_api.data_model.inspect).to include('string_attr: string')
         expect(data_api.data_model.table_name).to eq('hello_world')

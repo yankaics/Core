@@ -24,7 +24,7 @@ namespace :dev do
         u.confirm!
       end
 
-      create(:data_api, name: 'nice_stores', path: 'test/nice_stores', schema: { code: { type: 'string', null: false, unique: true, primary_key: true }, name: { type: 'string', null: false }, location_latitude: { type: 'string' }, location_longitude: { type: 'string' }, open_at: { type: 'integer' }, close_at: { type: 'integer' }, description: { type: 'text' } })
+      create(:data_api, name: 'nice_store', table_name: 'nice_stores', path: 'test/nice_stores', schema: { code: { type: 'string', null: false, unique: true, primary_key: true }, name: { type: 'string', null: false }, location_latitude: { type: 'string' }, location_longitude: { type: 'string' }, open_at: { type: 'integer' }, close_at: { type: 'integer' }, description: { type: 'text' } })
     end
   end
 end

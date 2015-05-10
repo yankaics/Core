@@ -3,6 +3,7 @@ FactoryGirl.define do
     accessible true
     public true
     sequence(:name) { |n| "api_#{SecureRandom.urlsafe_base64(4).underscore}#{n}" }
+    table_name { name }
     path { name }
     organization nil
     schema { { name: { type: 'string' }, text: { type: 'text' } } }

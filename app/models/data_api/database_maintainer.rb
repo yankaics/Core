@@ -18,12 +18,14 @@ class DataAPI::DatabaseMaintainer
     migration.drop_table table_name
   end
 
-  def update_table(old_table_name, new_table_name, old_schema, new_schema)
+  def update_table(old_table_name, new_table_name, old_schema, new_schema, test_run: false)
+    changes = []
 
     # Rename the table if needed
 
     if new_table_name != old_table_name
-      migration.rename_table old_table_name, new_table_name
+      migration.rename_table old_table_name, new_table_name unless test_run
+      changes << ['rename_table', [old_table_name, new_table_name]]
     end
 
     table_name = new_table_name
@@ -42,7 +44,8 @@ class DataAPI::DatabaseMaintainer
     end
 
     deleted_columns.each do |_uuid, column_attrs|
-      migration.remove_column table_name, column_attrs[:name]
+      migration.remove_column table_name, column_attrs[:name] unless test_run
+      changes << ['remove_column', [table_name, column_attrs[:name]]]
     end
 
     # Create new columns
@@ -54,7 +57,8 @@ class DataAPI::DatabaseMaintainer
     end
 
     new_columns.each do |_uuid, column_attrs|
-      migration.add_column table_name, column_attrs[:name], column_attrs[:type]
+      migration.add_column table_name, column_attrs[:name], column_attrs[:type] unless test_run
+      changes << ['add_column', [table_name, column_attrs[:name], column_attrs[:type]]]
     end
 
     # Deal with renamed columns
@@ -67,7 +71,8 @@ class DataAPI::DatabaseMaintainer
     end
 
     renamed_columns.each do |uuid, _column_attrs|
-      migration.rename_column table_name, old_column_data[uuid][:name], new_column_data[uuid][:name]
+      migration.rename_column table_name, old_column_data[uuid][:name], new_column_data[uuid][:name] unless test_run
+      changes << ['rename_column', [table_name, old_column_data[uuid][:name], new_column_data[uuid][:name]]]
     end
 
     # Deal with type changed columns
@@ -82,6 +87,8 @@ class DataAPI::DatabaseMaintainer
     # type_changed_columns.each do |uuid, _column_attrs|
     #   migration.change_column table_name, new_column_data[uuid][:name], new_column_data[uuid][:type]
     # end
+
+    changes
   end
 
   private
