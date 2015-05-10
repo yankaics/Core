@@ -1,5 +1,5 @@
 class DataAPI < ActiveRecord::Base
-  attr_accessor :single_data_id
+  attr_accessor :single_data_id, :exception
   has_paper_trail class_name: 'DataAPIVersion'
 
   OWNER_PRIMARY_KEYS = %w(id uuid email uid)
@@ -150,6 +150,20 @@ class DataAPI < ActiveRecord::Base
     self.database_url = nil if database_url.blank?
     self.owner_primary_key = nil if owner_primary_key.blank?
     self.owner_foreign_key = nil if owner_foreign_key.blank?
+  end
+
+  def test_update
+    db_maintainer = DatabaseMaintainer.new(data_model)
+
+    previous_version = DataAPI.find(id)
+    return nil if previous_version.blank?
+
+    old_table_name = previous_version.table_name
+    new_table_name = table_name
+    old_schema = previous_version.schema
+    new_schema = schema
+
+    db_maintainer.update_table(old_table_name, new_table_name, old_schema, new_schema, test_run: true)
   end
 
   private

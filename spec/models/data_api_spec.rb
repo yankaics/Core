@@ -160,7 +160,7 @@ RSpec.describe DataAPI, type: :model do
       create(:data_api, schema: { string_attr: { type: 'string' },
                                   text_attr: { type: 'text' },
                                   datetime_attr: { type: 'datetime' },
-                                  boolean_attr: { type: 'boolean' } })
+                                  boolean_attr: { type: 'boolean', index: true } })
     end
     let(:outer_data_api) { create(:data_api, :with_data, database_url: 'sqlite3:db/test_api_mt.sqlite3') }
 
@@ -250,6 +250,22 @@ RSpec.describe DataAPI, type: :model do
           sample_data = outer_data_api.data_model.first
           expect { sample_data.new_string_attr }.to raise_error
         end
+      end
+    end
+
+    context "on index changed" do
+      it "creates new index" do
+        data_api.schema[:string_attr][:index] = true
+        changes = data_api.test_update
+        expect(changes.first[0]).to eq('add_index')
+        expect(changes.first[1]).to eq([data_api.table_name, 'string_attr'])
+      end
+
+      it "removes deleted index" do
+        data_api.schema[:boolean_attr][:index] = false
+        changes = data_api.test_update
+        expect(changes.first[0]).to eq('remove_index')
+        expect(changes.first[1]).to eq([data_api.table_name, 'boolean_attr'])
       end
     end
 

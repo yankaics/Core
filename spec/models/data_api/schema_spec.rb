@@ -77,10 +77,12 @@ RSpec.describe DataAPI::Schema do
       subject.load_from_array([
         { name: 'col1', type: 'text' },
         { name: 'col2', type: 'string' },
-        { name: 'col3', type: 'integer', index: true }
+        { name: 'col3', type: 'integer', index: 'true' },
+        { name: '', type: 'string' }
       ])
 
       expect(subject).not_to have_key(:old_col)
+      expect(subject).not_to have_key('')
       expect(subject[:col1][:type]).to eq('text')
       expect(subject[:col2][:type]).to eq('string')
       expect(subject[:col3][:type]).to eq('integer')

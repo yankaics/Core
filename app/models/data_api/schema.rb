@@ -27,6 +27,7 @@ class DataAPI::Schema < ActiveSupport::HashWithIndifferentAccess
       column.stringify_keys!
       next if !column.is_a?(Hash) || column['name'].blank?
       self[column['name']] = column.clone
+      self[column['name']][:index] = true if self[column['name']][:index] == 'true'
     end
 
     validate!

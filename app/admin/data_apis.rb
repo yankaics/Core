@@ -37,9 +37,14 @@ ActiveAdmin.register DataAPI do
           request.params['confirm_required'] = true
           render :edit
         else
-          if @data_api.save
-            redirect_to admin_data_api_path(@data_api)
-          else
+          begin
+            if @data_api.save
+              redirect_to admin_data_api_path(@data_api)
+            else
+              render :edit
+            end
+          rescue Exception => e
+            @data_api.exception = e
             render :edit
           end
         end
@@ -179,15 +184,7 @@ ActiveAdmin.register DataAPI do
           end
 
           if data_api.changes.has_key?('schema') || data_api.changes.has_key?('table_name')
-            db_maintainer = DataAPI::DatabaseMaintainer.new(data_api.data_model)
-            previous_version = DataAPI.find(data_api.id)
-
-            old_table_name = previous_version.table_name
-            new_table_name = data_api.table_name
-            old_schema = previous_version.schema
-            new_schema = data_api.schema
-
-            changes = db_maintainer.update_table(old_table_name, new_table_name, old_schema, new_schema, test_run: true)
+            changes = data_api.test_update
 
             h3 '資料表變動如下'
             pre JSON.pretty_generate(changes)
@@ -210,6 +207,16 @@ ActiveAdmin.register DataAPI do
               li "#{k}: #{v}"
             end
           end
+        end
+      end
+    end
+
+    if data_api.exception.present?
+      div(class: 'errors') do
+        panel '系統錯誤' do
+          para "#{data_api.name} 更新時遭遇到以下例外："
+          br
+          para "#{data_api.exception}"
         end
       end
     end
@@ -240,6 +247,7 @@ ActiveAdmin.register DataAPI do
           thead do
             th { '欄位名稱' }
             th { '欄位型別' }
+            th { '索引' }
             th { '增加/刪除' }
           end
           tbody do
@@ -249,6 +257,9 @@ ActiveAdmin.register DataAPI do
                 td do
                   code { column['type'] }
                   hidden_field :name, id: "data_api_schema_#{column['uuid']}_type", name: "data_api[schema][#{column['uuid']}][type]", value: column['type']
+                end
+                td do
+                  check_box_tag :name, '索引', column['index'], class: :index, id: "data_api_schema_#{column['uuid']}_index", name: "data_api[schema][#{column['uuid']}][index]"
                 end
                 td do
                   hidden_field :name, id: "data_api_schema_#{column['uuid']}_name", name: "data_api[schema][#{column['uuid']}][uuid]", value: column['uuid']
@@ -262,6 +273,9 @@ ActiveAdmin.register DataAPI do
               td { text_field :name, class: :name, id: "data_api_schema_#{rand_uuid}_name", name: "data_api[schema][#{rand_uuid}][name]", value: '' }
               td do
                 select_tag :name, options_for_select(DataAPI::Schema::COLUMN_TYPES), class: :type, id: "data_api_schema_#{rand_uuid}_type", name: "data_api[schema][#{rand_uuid}][type]"
+              end
+              td do
+                check_box_tag :name, '索引', false, class: :index, id: "data_api_schema_#{rand_uuid}_index", name: "data_api[schema][#{rand_uuid}][index]"
               end
               td do
                 hidden_field :name, id: "data_api_schema_#{rand_uuid}_name", name: "data_api[schema][#{rand_uuid}][uuid]"
