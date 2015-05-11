@@ -2,6 +2,7 @@ class API::Open < API
   include APIGuard
   include APIResourceFieldsettable
   include APIResourceIncludable
+  include APIResourcePaginatable
   include APIResourceSortable
 
   route :any, '*path' do
@@ -78,25 +79,10 @@ class API::Open < API
       # If getting a resourse collection
       else
         sortable(default_order: @data_api.default_order)
-        @resources = resource_collection.order(sort).page(params[:page] || 1).per(params[:per_page] || 20)
+        pagination resource_collection.size, default_per_page: 20, maxium_per_page: 100
 
-        page_size = @resources.size
-        page_size = 1 if page_size < 1
-        total_count = @resources.total_count
-        pages_count = (total_count + page_size - 1) / page_size
-        current_page = (params[:page] || 1).to_i
-        header_links ||= []
+        @resources = resource_collection.order(sort).page(page).per(per_page)
 
-        if current_page < pages_count
-          header_links << "<#{request.url.add_or_replace_uri_param(:page, current_page + 1)}>; rel=\"next\""
-          header_links << "<#{request.url.add_or_replace_uri_param(:page, pages_count)}>; rel=\"last\""
-        end
-        if current_page > 1
-          header_links << "<#{request.url.add_or_replace_uri_param(:page, (current_page > pages_count ? pages_count : current_page - 1))}>; rel=\"prev\""
-          header_links << "<#{request.url.add_or_replace_uri_param(:page, 1)}>; rel=\"first\""
-        end
-
-        header 'Link', header_links.join(', ')
         render rabl: 'data_apis'
         return
       end

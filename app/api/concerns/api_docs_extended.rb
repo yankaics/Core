@@ -83,8 +83,8 @@ module APIDocsExtended
         data_api_description = data_api.description.present? ? data_api.description : data_api.name
         collection_opts = {
           params: {
-            per_page: { required: false, type: 'Integer', desc: "The number of #{data_api_description.try(:pluralize)} to return per page, defaults to 20 and up to a maximum of 100." },
-            page: { required: false, type: 'Integer', desc: "Specify further page of data to retrieve, defaults to 1." },
+            per_page: { required: false, type: 'Integer', desc: APIResourcePaginatable.per_page_param_desc },
+            page: { required: false, type: 'Integer', desc: APIResourcePaginatable.page_param_desc },
             sort: { required: false, type: 'String', desc: APIResourceSortable.sort_param_desc(default: data_api.default_order, example: data_api.schema.keys.sample(2).map { |s| ['-', ''].sample + s }.join(',')) },
             fields: { required: false, type: 'String', desc: APIResourceFieldsettable.fields_param_desc(example: data_api.schema.keys.sample(3).join(',')) },
             callback: { required: false, type: 'String', desc: "JSON-P callbacks, wrap the results in a specific JSON function." }
