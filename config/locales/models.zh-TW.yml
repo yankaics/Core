@@ -51,6 +51,10 @@ zh-TW:
         data_api/api_data: "資料集 API 資料"
         data_api_api_data: "資料集 API 資料"
         manage: "管理"
+        owned_by_user: "為使用者所擁有"
+        owner_writable: "擁有者可寫入"
+        owner_primary_key: "擁有者主鍵"
+        owner_foreign_key: "擁有者外部鍵"
       organization:
         code: "代碼"
         code_cont: "代碼"

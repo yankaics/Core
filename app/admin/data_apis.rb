@@ -26,7 +26,7 @@ ActiveAdmin.register DataAPI do
       @data_api.assign_attributes(data_api_params)
       @data_api.nilify_blanks
 
-      confirm_required = (@data_api.changes.keys & ['accessible', 'public', 'name', 'table_name', 'path', 'primary_key', 'default_order', 'database_url', 'maintain_schema', 'owned_by_user', 'owner_primary_key', 'owner_foreign_key']).present?
+      confirm_required = (@data_api.changes.keys & ['accessible', 'public', 'name', 'table_name', 'path', 'primary_key', 'default_order', 'database_url', 'maintain_schema', 'owned_by_user', 'owner_primary_key', 'owner_foreign_key', 'owner_writable']).present?
       previous_version = DataAPI.find(@data_api.id)
       confirm_required = true if @data_api.schema != previous_version.schema
       confirm_required = true if @data_api.has != previous_version.has
@@ -54,7 +54,7 @@ ActiveAdmin.register DataAPI do
     end
 
     def data_api_params
-      p = [:accessible, :public, :name, :table_name, :path, :description, :notes, :primary_key, :default_order, :database_url, :maintain_schema, :owned_by_user, :owner_primary_key, :owner_foreign_key]
+      p = [:accessible, :public, :name, :table_name, :path, :description, :notes, :primary_key, :default_order, :database_url, :maintain_schema, :owned_by_user, :owner_primary_key, :owner_foreign_key, :owner_writable]
       p.concat [:organization_code, :organization] if current_admin.root?
       params.require(:data_api).slice(*p).permit(p)
     end
@@ -71,7 +71,12 @@ ActiveAdmin.register DataAPI do
   scope :local, if: proc { current_admin.root? }
 
   filter :name
+  filter :table_name
   filter :path
+  filter :accessible
+  filter :public
+  filter :owned_by_user
+  filter :owner_writable
   filter :created_at
   filter :updated_at
 
@@ -85,6 +90,7 @@ ActiveAdmin.register DataAPI do
     column(:accessible)
     column(:public)
     column(:owned_by_user)
+    column(:owner_writable)
     column(:organization) { |data_api| data_api.organization.blank? ? nil : link_to(data_api.organization_code, admin_organization_path(data_api.organization)) } if current_admin.root?
     column(:maintain_schema)
     id_column
@@ -101,6 +107,7 @@ ActiveAdmin.register DataAPI do
     column(:public)
     column(:description)
     column(:owned_by_user)
+    column(:owner_writable)
     column(:organization) { |data_api| data_api.organization.blank? ? nil : link_to(data_api.organization_code, admin_organization_path(data_api.organization)) } if current_admin.root?
     column(:maintain_schema)
     column(:primary_key)
@@ -129,6 +136,7 @@ ActiveAdmin.register DataAPI do
       row(:maintain_schema)
       row(:database_url) { |data_api| code { data_api.database_url } }
       row(:owned_by_user)
+      row(:owner_writable)
       row(:owner_primary_key)
       row(:owner_foreign_key)
       row(:id)
@@ -238,6 +246,7 @@ ActiveAdmin.register DataAPI do
 
       f.inputs "資源擁有者" do
         f.input :owned_by_user
+        f.input :owner_writable
         f.input :owner_primary_key, as: :select, collection: options_for_select(DataAPI::OWNER_PRIMARY_KEYS, data_api.owner_primary_key)
         f.input :owner_foreign_key, hint: "必須是存在的欄位名稱"
       end
