@@ -30,6 +30,8 @@ zh-TW:
           staff: "教職員"
           lecturer: "講師"
           professor: "教授"
+        created_at: "註冊日期"
+        updated_at: "資料更新日期"
       user_data:
         genders:
           male: "男"
@@ -40,10 +42,12 @@ zh-TW:
         accessible: "開放使用"
         public: "公開"
         name: "名稱"
-        path: "存取網址路徑"
+        path: "API 存取路徑"
         table_name: "資料表名稱"
         organization: "所屬組織"
         organization_code: "所屬組織"
+        description: "描述"
+        notes: "註記"
         primary_key: "主鍵"
         default_order: "預設資料排序"
         database_url: "Database URL"
@@ -51,11 +55,20 @@ zh-TW:
         data_api/api_data: "資料集 API 資料"
         data_api_api_data: "資料集 API 資料"
         manage: "管理"
+        owned_by_user: "為使用者所擁有"
+        owner_writable: "擁有者可寫入"
+        owner_primary_key: "擁有者主鍵"
+        owner_foreign_key: "擁有者外部鍵"
+        data_count: "資料筆數"
+        created_at: "建立日期"
+        updated_at: "上次修改日期"
       organization:
         code: "代碼"
         code_cont: "代碼"
         name: "全名"
         short_name: "簡稱"
+        created_at: "建立日期"
+        updated_at: "上次修改日期"
       department:
         organization: "所屬組織"
         organization_code: "所屬組織代碼"
@@ -66,6 +79,8 @@ zh-TW:
         group: "類型代號"
         parent: "父部門"
         parent_code: "父部門代碼"
+        created_at: "建立日期"
+        updated_at: "上次修改日期"
       email_pattern:
         organization: "所屬組織"
         priority: "優先級"
@@ -78,6 +93,8 @@ zh-TW:
         permit_changing_department_in_group: "允許切換到同類型的部門"
         permit_changing_department_in_organization: "允許切換到同組織的部門"
         skip_confirmation: "略過驗証信"
+        created_at: "建立日期"
+        updated_at: "上次修改日期"
       user_identity:
         user: "對應使用者"
         email_pattern: "對應電子郵件識別模型"
@@ -106,6 +123,8 @@ zh-TW:
           staff: "老師"
           lecturer: "老師"
           professor: "老師"
+        created_at: "建立日期"
+        updated_at: "上次修改日期"
       admin:
         username: "帳號"
         password: "密碼"
@@ -114,6 +133,8 @@ zh-TW:
         password_confirmation: "密碼確認"
         scoped_organization: "所屬組織"
         scoped_organization_code: "所屬組織"
+        created_at: "建立日期"
+        updated_at: "上次修改日期"
       doorkeeper_application:
         name: "名稱"
         description: "簡介"
@@ -124,6 +145,7 @@ zh-TW:
         redirect_uri: "OAuth 回呼網址"
         type: "等級"
         created_at: "建立日期"
+        updated_at: "上次修改日期"
         sms_quota: "簡訊使用額度"
       doorkeeper/application:
         name: "名稱"
@@ -135,4 +157,5 @@ zh-TW:
         redirect_uri: "OAuth 回呼網址"
         type: "等級"
         created_at: "建立日期"
+        updated_at: "上次修改日期"
         sms_quota: "簡訊使用額度"

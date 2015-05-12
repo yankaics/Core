@@ -46,7 +46,7 @@ Doorkeeper.configure do
   default_scopes  :public
   optional_scopes :email, :account, :identity, :facebook, :info,
                   :read_notifications, :send_notification, :sms,
-                  :api,
+                  :api, :'api:write',
                   :offline_access, :long_term
 
   # Change the way client credentials are retrieved from the request object.

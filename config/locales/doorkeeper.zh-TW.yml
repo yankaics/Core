@@ -111,7 +111,7 @@ zh-TW:
       send_notification: '傳送通知'
       sms: '傳送簡訊'
       api: '所有 API 讀取'
-      api_write: '所有 API 寫入'
+      'api:write': '所有 API 寫入'
       offline_access: '離線存取'
       long_term: '長期使用'
 
@@ -127,7 +127,7 @@ zh-TW:
       send_notification: '傳送通知給您'
       sms: '傳送簡訊給您 (但不會得知您的手機號碼)'
       api: '讀取所有屬於您的 API 資料'
-      api_write: '管理所有屬於您的 API 資料'
+      'api:write': '管理所有屬於您的 API 資料'
       offline_access: '隨時取用您的資料'
       long_term: '長期使用'
 

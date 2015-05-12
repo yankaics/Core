@@ -45,6 +45,7 @@ describe "Open Data API" do
                                            user_uuid: { type: 'string' },
                                            user_email: { type: 'string' },
                                            user_uid: { type: 'string' },
+                                           datetime: { type: 'datetime' },
                                            data: { type: 'text' } })
     data_api.data_model.create!(user_id: user.id, user_uuid: user.uuid, user_email: user.email, user_uid: user.uid)
     data_api.data_model.create!(user_id: user2.id, user_uuid: user2.uuid, user_email: user2.email, user_uid: user2.uid)
@@ -52,10 +53,10 @@ describe "Open Data API" do
   end
   let(:not_accessible_data_api) do
     create(:data_api, path: 'path/to/private_user_data_api',
-                             accessible: false,
-                             schema: { a: { type: 'string' },
-                                       b: { type: 'string' },
-                                       c: { type: 'string' } })
+                      accessible: false,
+                      schema: { a: { type: 'string' },
+                                b: { type: 'string' },
+                                c: { type: 'string' } })
   end
 
   it "can be accessed with no versioning info provided" do
@@ -193,7 +194,7 @@ describe "Open Data API" do
     end
   end
 
-  describe "single resource" do
+  describe "specified resource" do
     it "returns a data" do
       first_data = data_api.data_model.first
       get "/api/v1/#{data_api.path}/#{first_data.id}.json"
@@ -219,6 +220,28 @@ describe "Open Data API" do
       expect(response).to be_success
       expect(response.body).not_to include(last_data.string_col)
       expect(response.body).to include(last_data.text_col)
+    end
+
+    it "is multigettable" do
+      first_data = another_data_api.data_model.first
+      last_data = another_data_api.data_model.last
+      get "/api/v1/#{another_data_api.path}/#{last_data.integer_col},#{first_data.integer_col}.json"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json.count).to eq(2)
+      expect(json.first['string_col']).to eq(first_data.string_col)
+      expect(json.last['string_col']).to eq(last_data.string_col)
+    end
+
+    it "fallbacks to use the id field to find a resourse" do
+      first_data = another_data_api.data_model.first
+      last_data = another_data_api.data_model.last
+      get "/api/v1/#{another_data_api.path}/#{last_data.id},#{first_data.id}.json"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json.count).to eq(2)
+      expect(json.first['string_col']).to eq(first_data.string_col)
+      expect(json.last['string_col']).to eq(last_data.string_col)
     end
 
     it "can have a owner" do
@@ -274,9 +297,11 @@ describe "Open Data API" do
     end
   end
 
-  describe "resourse owned by user" do
+  describe "resourse scoped by user" do
     let(:access_token) { create(:oauth_access_token, scopes: 'api', resource_owner_id: user.id).token }
     let(:access_token2) { create(:oauth_access_token, scopes: 'api', resource_owner_id: user2.id).token }
+    let(:writable_access_token) { create(:oauth_access_token, scopes: 'api api:write', resource_owner_id: user.id).token }
+    let(:writable_access_token2) { create(:oauth_access_token, scopes: 'api api:write', resource_owner_id: user2.id).token }
 
     it "is not accessable without an valid access token" do
       get "/api/v1/me/#{private_user_data_api.path}.json"
@@ -354,6 +379,64 @@ describe "Open Data API" do
       expect(response).to be_success
       json = JSON.parse(response.body)
       expect(json['owner']['uuid']).to eq(user.uuid)
+    end
+
+    it "is writeable while permitted" do
+      # While API's owner_writable is false
+      post "/api/me/#{private_user_data_api.path}.json?access_token=#{writable_access_token}",
+        private_user_data_api.name => {
+          datetime: '2014-9-9',
+          data: 'hi'
+        }
+      expect(response).not_to be_success
+      json = JSON.parse(response.body)
+      expect(json['error']).to eq(403)
+
+      private_user_data_api.owner_writable = true
+      private_user_data_api.save!
+
+      # While API's owner_writable is true
+      post "/api/me/#{private_user_data_api.path}.json?access_token=#{writable_access_token}",
+        private_user_data_api.name => {
+          datetime: '2014-9-9',
+          data: 'hi'
+        }
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json['data']).to eq('hi')
+      expect(json['datetime']).to start_with('2014-09-09 00:00:00')
+      data_id = json['id']
+
+      # With an access token without API write permission
+      post "/api/me/#{private_user_data_api.path}.json?access_token=#{access_token}",
+        private_user_data_api.name => {
+          datetime: '2014-9-9',
+          data: 'hi'
+        }
+      expect(response).not_to be_success
+      json = JSON.parse(response.body)
+      expect(json['error']).to eq('insufficient_scope')
+
+      # Update
+      put "/api/me/#{private_user_data_api.path}/#{data_id}.json?access_token=#{writable_access_token}",
+        private_user_data_api.name => {
+          datetime: '2014/9/9 12:34',
+        }
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json['data']).to eq('hi')
+      expect(json['datetime']).to start_with('2014-09-09 12:34:00')
+      get "/api/me/#{private_user_data_api.path}/#{data_id}.json?access_token=#{writable_access_token}"
+      expect(response).to be_success
+
+      # Delete
+      delete "/api/me/#{private_user_data_api.path}/#{data_id}.json?access_token=#{writable_access_token}"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json['data']).to eq('hi')
+      expect(json['datetime']).to start_with('2014-09-09 12:34:00')
+      get "/api/me/#{private_user_data_api.path}/#{data_id}.json?access_token=#{writable_access_token}"
+      expect(response).not_to be_success
     end
   end
 end

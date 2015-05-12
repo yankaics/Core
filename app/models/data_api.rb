@@ -1,5 +1,6 @@
 class DataAPI < ActiveRecord::Base
-  attr_accessor :single_data_id, :exception
+  attr_accessor :specified_resource_id, :exception
+  alias_method :specified_resource_ids, :specified_resource_id
   has_paper_trail class_name: 'DataAPIVersion'
 
   OWNER_PRIMARY_KEYS = %w(id uuid email uid)
@@ -13,13 +14,15 @@ class DataAPI < ActiveRecord::Base
   belongs_to :organization, primary_key: :code, foreign_key: :organization_code
 
   validates_with DataAPIValidator
-  validates :name, :path, :table_name, presence: true, uniqueness: true
+  validates :name, :path, :table_name, presence: true
+  validates :name, :path, uniqueness: true
+  validates :table_name, uniqueness: true, if: :using_system_database?
   validates :name, format: { with: /\A[a-z][a-z0-9_]*\z/ }
   validates :table_name, format: { with: /\A[a-z][a-z0-9_]*\z/ }
   validates :path, format: { with: /\A[a-z0-9_]+(\/[a-z0-9_]+){0,4}\z/ }
   validates :database_url, format: { with: /\A(postgresql:\/\/)|(mysql:\/\/)|(sqlite3:db\/)/ }, allow_blank: true
-  validates :owner_primary_key, presence: true, inclusion: { in: OWNER_PRIMARY_KEYS }, if: :has_owner?
-  validates :owner_foreign_key, presence: true, if: :has_owner?
+  validates :owner_primary_key, presence: true, inclusion: { in: OWNER_PRIMARY_KEYS }, if: :owner?
+  validates :owner_foreign_key, presence: true, if: :owner?
 
   after_find :reset_data_model_if_needed
 
@@ -49,23 +52,30 @@ class DataAPI < ActiveRecord::Base
     end
   end
 
-  # Find a DataAPI by path
-  def self.find_by_path(path, private: false)
-    singular_path = path.match(/(?<path>.+)\/(?<id>[^\/]+)\z/)
-    if singular_path
-      if private
-        data_api = DataAPI.find_by(path: [path, singular_path[:path]], accessible: true)
-      else
-        data_api = DataAPI.find_by(path: [path, singular_path[:path]], public: true, accessible: true)
-      end
-      data_api.single_data_id = singular_path[:id] if data_api.present? && data_api.path != path
+  # Find a DataAPI by a resource path
+  # TODO: cache the result
+  def self.find_by_path(path, include_not_public: false)
+    # scope to accessible APIs
+    if include_not_public
+      scoped_collection = DataAPI.where(accessible: true)
     else
-      if private
-        data_api = DataAPI.find_by(path: path, accessible: true)
-      else
-        data_api = DataAPI.find_by(path: path, public: true, accessible: true)
-      end
+      scoped_collection = DataAPI.where(public: true, accessible: true)
     end
+
+    # if the resource path might be a specified resource path
+    possible_specified_resource_path = path.match(%r{(?<path>.+)\/(?<id>[^\/]+)\z})
+
+    # query the database to find the result
+    if possible_specified_resource_path
+      data_api = scoped_collection.find_by(
+        path: [path, possible_specified_resource_path[:path]]
+      )
+      data_api.specified_resource_id = possible_specified_resource_path[:id] if \
+        data_api.present? && data_api.path != path
+    else
+      data_api = scoped_collection.find_by(path: path)
+    end
+
     data_api
   end
 
@@ -77,14 +87,39 @@ class DataAPI < ActiveRecord::Base
     @schema = DataAPI::Schema.new(s)
   end
 
-  # Is this API owned by a user?
-  def has_owner?
+  # Is this API's data owned by users?
+  def owner?
     owned_by_user
   end
 
   # List of columns
   def columns
-    schema.keys.map(&:to_sym)
+    return @columns if @columns
+    @columns = schema.keys.map(&:to_sym)
+  end
+
+  # List of accessible fields
+  def fields
+    return @fields if @fields
+    @fields = columns
+    @fields << :id
+    @fields &= data_model.columns.map { |c| c.name.to_sym }
+    @fields << :owner if owner?
+    @fields
+  end
+
+  def write_permitted_fields
+    return @write_permitted_fields if @write_permitted_fields
+    @write_permitted_fields = schema.keys
+    @write_permitted_fields -= [owner_foreign_key]
+  end
+
+  # List of accessible fields
+  def includable_fields
+    return @includable_fields if @includable_fields
+    @includable_fields = []
+    @includable_fields << :owner if owner?
+    @includable_fields
   end
 
   # Is this API using the system database?
@@ -122,6 +157,10 @@ class DataAPI < ActiveRecord::Base
       owner_foreign_key: owner_foreign_key,
       updated_at: updated_at
     )
+  end
+
+  def data_count
+    data_model.count
   end
 
   def save_schema

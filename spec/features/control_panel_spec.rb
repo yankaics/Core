@@ -168,6 +168,7 @@ feature "Control Panel", :type => :feature do
             within("tbody tr:nth-child(2)") do
               find('.name').set 'my_int'
               find('.type').set 'integer'
+              find('.index').set true
             end
             first('a.add').click
             within("tbody tr:nth-child(3)") do
@@ -193,6 +194,7 @@ feature "Control Panel", :type => :feature do
         expect(page).to have_content('my_bool')
 
         data_api = DataAPI.last
+        expect(data_api.schema['my_int']['index']).to eq(true)
         data_api.data_model.create(my_int: 1, my_string: 'Hi', my_bool: true)
 
         expect(data_api.data_model.last.my_int).to be_a(Integer)
@@ -220,6 +222,7 @@ feature "Control Panel", :type => :feature do
             within("tbody tr:nth-child(2)") do
               find('.name').set 'done'
               find('.type').set 'boolean'
+              find('.index').set true
             end
           end
           first('#data_api_submit_action').find('input').click
@@ -238,6 +241,7 @@ feature "Control Panel", :type => :feature do
         expect(page).to have_content('done')
 
         data_api = DataAPI.find(data_api.id)
+        expect(data_api.schema['done']['index']).to eq(true)
         data_api.data_model.create(name: 'sleep', done: false)
 
         # Another test

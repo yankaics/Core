@@ -25,19 +25,19 @@ RSpec.describe DataAPI, type: :model do
     it "returns matching data_api by a resource collection path" do
       data_api = DataAPI.find_by_path('path/to/a/api')
       expect(data_api).to eq(a_api)
-      expect(data_api.single_data_id).to be_blank
+      expect(data_api.specified_resource_id).to be_blank
       data_api = DataAPI.find_by_path('path/to/another/api')
       expect(data_api).to eq(another_api)
-      expect(data_api.single_data_id).to be_blank
+      expect(data_api.specified_resource_id).to be_blank
     end
 
-    it "returns matching data_api containing single_data_id by a single resource path" do
+    it "returns matching data_api containing specified_resource_id by a single resource path" do
       data_api = DataAPI.find_by_path('path/to/a/api/some_id')
       expect(data_api).to eq(a_api)
-      expect(data_api.single_data_id).to eq('some_id')
+      expect(data_api.specified_resource_id).to eq('some_id')
       data_api = DataAPI.find_by_path('path/to/another/api/yet_another_id')
       expect(data_api).to eq(another_api)
-      expect(data_api.single_data_id).to eq('yet_another_id')
+      expect(data_api.specified_resource_id).to eq('yet_another_id')
     end
   end
 

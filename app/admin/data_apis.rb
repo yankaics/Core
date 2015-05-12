@@ -26,7 +26,7 @@ ActiveAdmin.register DataAPI do
       @data_api.assign_attributes(data_api_params)
       @data_api.nilify_blanks
 
-      confirm_required = (@data_api.changes.keys & ['accessible', 'public', 'name', 'table_name', 'path', 'primary_key', 'default_order', 'database_url', 'maintain_schema', 'owned_by_user', 'owner_primary_key', 'owner_foreign_key']).present?
+      confirm_required = (@data_api.changes.keys & ['accessible', 'public', 'name', 'table_name', 'path', 'primary_key', 'default_order', 'database_url', 'maintain_schema', 'owned_by_user', 'owner_primary_key', 'owner_foreign_key', 'owner_writable']).present?
       previous_version = DataAPI.find(@data_api.id)
       confirm_required = true if @data_api.schema != previous_version.schema
       confirm_required = true if @data_api.has != previous_version.has
@@ -54,7 +54,7 @@ ActiveAdmin.register DataAPI do
     end
 
     def data_api_params
-      p = [:accessible, :public, :name, :table_name, :path, :description, :notes, :primary_key, :default_order, :database_url, :maintain_schema, :owned_by_user, :owner_primary_key, :owner_foreign_key]
+      p = [:accessible, :public, :name, :table_name, :path, :description, :notes, :primary_key, :default_order, :database_url, :maintain_schema, :owned_by_user, :owner_primary_key, :owner_foreign_key, :owner_writable]
       p.concat [:organization_code, :organization] if current_admin.root?
       params.require(:data_api).slice(*p).permit(p)
     end
@@ -71,11 +71,57 @@ ActiveAdmin.register DataAPI do
   scope :local, if: proc { current_admin.root? }
 
   filter :name
+  filter :table_name
   filter :path
+  filter :accessible
+  filter :public
+  filter :owned_by_user
+  filter :owner_writable
   filter :created_at
   filter :updated_at
 
   sidebar "資料集 API" do
+    para '以資料庫中資料為基礎提供的 API 資源。預設將資料存放在系統的「資料集」資料庫中，並由系統自動維護資料表；亦可設定連線進其他資料庫來取得資料製作成 API。'
+    para '只要資料集裡有欄位存放的是使用者的 <code>id</code>、<code>uuid</code>、<code>email</code> 或 <code>uid</code>，就能設定資料與使用者的關聯，進而開啟 OAuth 認證來取得個別使用者資料的功能。'.html_safe
+    para '相關名詞解釋如下：'
+    dl do
+      dt '開放使用'
+      dd '是否開放此 API 的使用？'
+      dt '公開'
+      dd '是否讓此 API 能夠透過公開路徑存取？若開啟，則任何人可由 <code>/api/&lt;API_存取路徑&gt;</code> 存取此 API。注意這不會影響經過認證的個別使用者所屬資料存取 (<code>/api/v1/me/&lt;API_存取路徑&gt;</code>)。'.html_safe
+      dt '名稱'
+      dd '此 API 資源的識別名稱，僅可使用小寫字母、數字與底線。'
+      dt '資料表名稱'
+      dd '此資料集在資料庫中的資料表名稱。'
+      dt 'API 存取路徑'
+      dd '此 API 的存取路徑。將影響公開存取 (<code>/api/&lt;API_存取路徑&gt;</code>) 與個別使用者的私有存取 (<code>/api/v1/me/&lt;API_存取路徑&gt;</code>)。'.html_safe
+      dt '所屬組織'
+      dd '將影響此 API 的歸類、管理權限，以及透過使用者的「唯一識別碼」所建立的擁有者關聯。'
+      dt '資料欄位 (schema)'
+      dd '設定資料表的欄位。若使用非由本系統維護的外部資料庫，則只有經設定的資料欄位可以被存取。'
+      dt '主鍵'
+      dd '<code>primary key</code>，將影響此 API 特定資源的存取方式。例如設定為「<code>title</code>」，則可以由 <code>/api/&lt;API_存取路徑&gt;/Hello</code> 取得 <code>title</code> 為 「Hello」的項目資料。'.html_safe
+      dt '預設資料排序'
+      dd 'API 呼叫時的預設資料排序方式。'
+      dt '資源擁有者：'
+      dd do
+        dt '為使用者所擁有'
+        dd '是否啟用每筆資料對應到使用者的「資源擁有者」關聯？'
+        dt '擁有者可寫入'
+        dd '是否啟用「資源擁有者」對此 API 的寫入 (新增、修改、刪除) 權？若開啟，持有具 <code>api:write</code> scope 的 access token 者，將可以寫入屬於對應使用者的 API (send <code>POST</code>、<code>PUT</code>、<code>DELETE</code> requests to <code>api/v1/me/&lt;API_存取路徑&gt;(/*)</code>)。'.html_safe
+        dt '擁有者主鍵'
+        dd '<code>primary key</code>，使用者的哪項資料存在於此資源集裡？'.html_safe
+        dt '擁有者外鍵'
+        dd '<code>foreign key</code>，資料中的哪個欄位存放的是使用者的「擁有者主鍵」？'.html_safe
+      end
+      dt '進階資料庫連線：'
+      dd do
+        dt 'Database URL'
+        dd '若要連線進其他資料庫，取得此 API 的資料，則在此設定資料庫位址。'
+        dt '自動維護資料表'
+        dd '在此資料集 API 建立、修改或刪除時，自動新增、更新以及刪除相對的資料表。若此資料庫係由其他系統管理，需要關閉此功能以避免修改到其他系統的資料表。'
+      end
+    end
   end
 
   index do
@@ -85,6 +131,7 @@ ActiveAdmin.register DataAPI do
     column(:accessible)
     column(:public)
     column(:owned_by_user)
+    column(:owner_writable)
     column(:organization) { |data_api| data_api.organization.blank? ? nil : link_to(data_api.organization_code, admin_organization_path(data_api.organization)) } if current_admin.root?
     column(:maintain_schema)
     id_column
@@ -100,7 +147,9 @@ ActiveAdmin.register DataAPI do
     column(:accessible)
     column(:public)
     column(:description)
+    column(:data_count)
     column(:owned_by_user)
+    column(:owner_writable)
     column(:organization) { |data_api| data_api.organization.blank? ? nil : link_to(data_api.organization_code, admin_organization_path(data_api.organization)) } if current_admin.root?
     column(:maintain_schema)
     column(:primary_key)
@@ -114,33 +163,41 @@ ActiveAdmin.register DataAPI do
   end
 
   show do
-    attributes_table do
-      row(:accessible)
-      row(:public)
-      row(:name)
-      row(:table_name)
-      row(:path)
-      row(:organization) if current_admin.root?
-      row(:description)
-      row(:notes)
-      row(:primary_key)
-      row(:schema) { |data_api| pre { JSON.pretty_generate(data_api.schema) } }
-      row(:default_order)
-      row(:maintain_schema)
-      row(:database_url) { |data_api| code { data_api.database_url } }
-      row(:owned_by_user)
-      row(:owner_primary_key)
-      row(:owner_foreign_key)
-      row(:id)
-      row(:created_at)
-      row(:updated_at)
+    panel '基本資料' do
+      attributes_table_for data_api do
+        row(:accessible) { |data_api| data_api.accessible ? status_tag('Yes', class: 'yes') : status_tag('No', class: 'no') }
+        row(:public) { |data_api| data_api.public ? status_tag('Yes', class: 'yes') : status_tag('No', class: 'no') }
+        row(:name)
+        row(:table_name)
+        row(:path)
+        row('存取網址') do |data_api|
+          ul do
+            li(a("http://#{CoreRSAKeyService.domain}/api/#{data_api.path}", href: "http://#{CoreRSAKeyService.domain}/api/#{data_api.path}", target: '_blank'))
+            li(a("http://#{CoreRSAKeyService.domain}/api/v1/me/#{data_api.path}", href: "http://#{CoreRSAKeyService.domain}/api/v1/me/#{data_api.path}", target: '_blank')) if data_api.owner?
+          end
+        end
+        row(:organization) if current_admin.root? && data_api.organization.present?
+        row(:description)
+        row(:notes)
+        row(:id)
+        row(:created_at)
+        row(:updated_at)
+      end
     end
+
+    panel '外部資料庫' do
+      attributes_table_for data_api do
+        row(:database_url) { |data_api| code { data_api.database_url } }
+        row(:maintain_schema)
+      end
+    end if data_api.using_outer_database?
 
     panel '資料綱要' do
       table(class: 'data_api_schema_table') do
         thead do
           th { '欄位名稱' }
           th { '欄位型別' }
+          th { '索引' }
         end
         tbody do
           data_api.schema.each do |name, column|
@@ -149,13 +206,33 @@ ActiveAdmin.register DataAPI do
               td do
                 code { column['type'] }
               end
+              td { column['index'] ? status_tag('On', :class => 'yes') : status_tag('Off', :class => 'no') }
             end
           end
         end
       end
     end
 
+    panel '資料表資料' do
+      attributes_table_for data_api do
+        row(:primary_key)
+        row(:default_order) { |data_api| code(data_api.default_order) }
+      end
+    end
+
+    panel '資料關連' do
+      attributes_table_for data_api do
+        row(:owned_by_user) { |data_api| data_api.owned_by_user ? status_tag('Yes', class: 'yes') : status_tag('No', class: 'no') }
+        row(:owner_writable) { |data_api| data_api.owner_writable ? status_tag('Yes', class: 'yes') : status_tag('No', class: 'no') }
+        row(:owner_primary_key)
+        row(:owner_foreign_key)
+      end
+    end
+
     panel '資料集' do
+      para do
+        "資料筆數：#{data_api.data_count}"
+      end
       para do
         link_to '管理資料集', admin_data_api_data_api_api_data_path(data_api_id: data_api.id)
       end
@@ -231,18 +308,9 @@ ActiveAdmin.register DataAPI do
         f.input :organization_code, as: :select, collection: options_for_select(Organization.all_for_select, data_api.organization_code) if current_admin.root?
         f.input :description
         f.input :notes
-
-        f.input :primary_key, hint: "必須是存在的欄位名稱"
-        f.input :default_order, hint: "必須使用存在的欄位名稱"
       end
 
-      f.inputs "資源擁有者" do
-        f.input :owned_by_user
-        f.input :owner_primary_key, as: :select, collection: options_for_select(DataAPI::OWNER_PRIMARY_KEYS, data_api.owner_primary_key)
-        f.input :owner_foreign_key, hint: "必須是存在的欄位名稱"
-      end
-
-      panel '資料綱要' do
+      panel '資料欄位' do
         table(class: 'data_api_schema_table editable') do
           thead do
             th { '欄位名稱' }
@@ -259,7 +327,7 @@ ActiveAdmin.register DataAPI do
                   hidden_field :name, id: "data_api_schema_#{column['uuid']}_type", name: "data_api[schema][#{column['uuid']}][type]", value: column['type']
                 end
                 td do
-                  check_box_tag :name, '索引', column['index'], class: :index, id: "data_api_schema_#{column['uuid']}_index", name: "data_api[schema][#{column['uuid']}][index]"
+                  check_box_tag :name, 'true', column['index'], class: :index, id: "data_api_schema_#{column['uuid']}_index", name: "data_api[schema][#{column['uuid']}][index]"
                 end
                 td do
                   hidden_field :name, id: "data_api_schema_#{column['uuid']}_name", name: "data_api[schema][#{column['uuid']}][uuid]", value: column['uuid']
@@ -275,7 +343,7 @@ ActiveAdmin.register DataAPI do
                 select_tag :name, options_for_select(DataAPI::Schema::COLUMN_TYPES), class: :type, id: "data_api_schema_#{rand_uuid}_type", name: "data_api[schema][#{rand_uuid}][type]"
               end
               td do
-                check_box_tag :name, '索引', false, class: :index, id: "data_api_schema_#{rand_uuid}_index", name: "data_api[schema][#{rand_uuid}][index]"
+                check_box_tag :name, 'true', false, class: :index, id: "data_api_schema_#{rand_uuid}_index", name: "data_api[schema][#{rand_uuid}][index]"
               end
               td do
                 hidden_field :name, id: "data_api_schema_#{rand_uuid}_name", name: "data_api[schema][#{rand_uuid}][uuid]"
@@ -286,9 +354,22 @@ ActiveAdmin.register DataAPI do
         end
       end
 
-      f.inputs "進階資料庫連線資訊" do
-        f.input :database_url, hint: "如資料存放在外部資料庫，可在此欄填寫其資料庫網址，支援 PostgreSQL ('postgresql://USER:PASSWORD@HOST:PORT/NAME') 以及 MySQL ('mysql://USER:PASSWORD@HOST:PORT/NAME')，留空表示使用系統的資料庫"
-        f.input :maintain_schema, hint: "若取消自動維護資料表，則需要手動確保資料庫綱要與設定一致，否則會在存取資料時發生錯誤，關閉此功能而又開啟、或搬遷到新資料庫，也需手動設定資料表"
+      f.inputs "資料欄位資訊" do
+        f.input :primary_key, hint: "必須是存在的欄位名稱"
+        f.input :default_order, hint: "必須使用存在的欄位名稱"
+      end
+
+      f.inputs "擁有者對應關係" do
+        f.input :owned_by_user
+        f.input :owner_writable
+        f.input :owner_primary_key, as: :select, collection: options_for_select(DataAPI::OWNER_PRIMARY_KEYS, data_api.owner_primary_key)
+        f.input :owner_foreign_key, hint: "必須是存在的欄位名稱"
+      end
+
+      f.inputs "進階資料庫連線資訊", class: 'db' do
+        li '填寫以下資訊以連線進外部資料庫，來取得 API 資料。否則請忽略此區設定。'
+        f.input :database_url, hint: "資料庫位址，支援 PostgreSQL (<code>postgresql://USER:PASSWORD@HOST:PORT/NAME</code>) 以及 MySQL (<code>mysql://USER:PASSWORD@HOST:PORT/NAME</code>)，留空表示使用系統的資料庫".html_safe
+        f.input :maintain_schema, hint: "在此資料集 API 建立、修改或刪除時，自動新增、更新以及刪除相對的資料表，若此資料庫係由其他系統管理，請取消勾選此選項<br>若取消自動維護資料表，則需要手動確保資料庫綱要與設定一致，否則會在存取資料時發生錯誤，關閉此功能而又開啟、或搬遷到新資料庫，也需手動設定資料表".html_safe
       end
 
       f.actions
