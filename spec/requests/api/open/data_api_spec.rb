@@ -52,10 +52,10 @@ describe "Open Data API" do
   end
   let(:not_accessible_data_api) do
     create(:data_api, path: 'path/to/private_user_data_api',
-                             accessible: false,
-                             schema: { a: { type: 'string' },
-                                       b: { type: 'string' },
-                                       c: { type: 'string' } })
+                      accessible: false,
+                      schema: { a: { type: 'string' },
+                                b: { type: 'string' },
+                                c: { type: 'string' } })
   end
 
   it "can be accessed with no versioning info provided" do
@@ -193,7 +193,7 @@ describe "Open Data API" do
     end
   end
 
-  describe "single resource" do
+  describe "specified resource" do
     it "returns a data" do
       first_data = data_api.data_model.first
       get "/api/v1/#{data_api.path}/#{first_data.id}.json"
@@ -219,6 +219,28 @@ describe "Open Data API" do
       expect(response).to be_success
       expect(response.body).not_to include(last_data.string_col)
       expect(response.body).to include(last_data.text_col)
+    end
+
+    it "is multigettable" do
+      first_data = another_data_api.data_model.first
+      last_data = another_data_api.data_model.last
+      get "/api/v1/#{another_data_api.path}/#{last_data.integer_col},#{first_data.integer_col}.json"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json.count).to eq(2)
+      expect(json.first['string_col']).to eq(first_data.string_col)
+      expect(json.last['string_col']).to eq(last_data.string_col)
+    end
+
+    it "fallbacks to use the id field to find a resourse" do
+      first_data = another_data_api.data_model.first
+      last_data = another_data_api.data_model.last
+      get "/api/v1/#{another_data_api.path}/#{last_data.id},#{first_data.id}.json"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json.count).to eq(2)
+      expect(json.first['string_col']).to eq(first_data.string_col)
+      expect(json.last['string_col']).to eq(last_data.string_col)
     end
 
     it "can have a owner" do
@@ -274,7 +296,7 @@ describe "Open Data API" do
     end
   end
 
-  describe "resourse owned by user" do
+  describe "resourse scoped by user" do
     let(:access_token) { create(:oauth_access_token, scopes: 'api', resource_owner_id: user.id).token }
     let(:access_token2) { create(:oauth_access_token, scopes: 'api', resource_owner_id: user2.id).token }
 
