@@ -14,7 +14,9 @@ class DataAPI < ActiveRecord::Base
   belongs_to :organization, primary_key: :code, foreign_key: :organization_code
 
   validates_with DataAPIValidator
-  validates :name, :path, :table_name, presence: true, uniqueness: true
+  validates :name, :path, :table_name, presence: true
+  validates :name, :path, uniqueness: true
+  validates :table_name, uniqueness: true, if: :using_system_database?
   validates :name, format: { with: /\A[a-z][a-z0-9_]*\z/ }
   validates :table_name, format: { with: /\A[a-z][a-z0-9_]*\z/ }
   validates :path, format: { with: /\A[a-z0-9_]+(\/[a-z0-9_]+){0,4}\z/ }
@@ -155,6 +157,10 @@ class DataAPI < ActiveRecord::Base
       owner_foreign_key: owner_foreign_key,
       updated_at: updated_at
     )
+  end
+
+  def data_count
+    data_model.count
   end
 
   def save_schema
