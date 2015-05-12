@@ -42,7 +42,7 @@ module APIGuard
     def guard!(scopes: [])
       token_string = request.env[Rack::OAuth2::Server::Resource::ACCESS_TOKEN]
       fail OAuth::MissingTokenError if token_string.blank?
-      fail OAuth::TokenNotFoundError if (@access_token = find_access_token(token_string)).nil?
+      fail OAuth::TokenNotFoundError if (@access_token ||= find_access_token(token_string)).nil?
 
       if current_application.present? && current_application.core_app?
         @access_token.scopes = all_scopes.join(' ')
@@ -56,20 +56,24 @@ module APIGuard
     end
 
     def current_access_token
-      @access_token
+      return @access_token if @access_token
+      token_string = request.env[Rack::OAuth2::Server::Resource::ACCESS_TOKEN]
+      if token_string.blank?
+        @access_token = nil
+      else
+        @access_token = find_access_token(token_string)
+      end
     end
 
     def current_resource_owner
-      @current_resource_owner ||= User.find(@access_token.resource_owner_id)
+      @current_resource_owner ||= User.find(current_access_token.try(:resource_owner_id))
     end
 
     def current_application
-      @access_token.application
+      current_access_token.try(:application)
     end
 
-    def current_app
-      current_application
-    end
+    alias_method :current_app, :current_application
 
     def scopes
       @scopes ||= @access_token.scopes.map(&:to_sym)

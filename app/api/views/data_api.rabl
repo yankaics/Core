@@ -1,7 +1,7 @@
 object @resource
 
-set_fieldset @resource_name, default_fields: @resource_columns,
-                             permitted_fields: @resource_columns
+set_fieldset @resource_name, default_fields: @resource_fields,
+                             permitted_fields: @resource_fields
 set_inclusion @resource_name
 
 @includable_fields.each do |field|
@@ -9,10 +9,6 @@ set_inclusion @resource_name
   when :owner
     set_inclusion_field @resource_name, :owner, :owner_code, class_name: :User
   end
-end
-
-node :id do |data|
-  data[@resource_primary_key]
 end
 
 attributes(*fieldset[@resource_name])

@@ -10,81 +10,67 @@ class API::Open < API
     # remove format extension in path
     @request_path.slice!(/\..+$/)
     # remove versioning in path
-    @request_path.slice!(/^v1\//)
+    @request_path.slice!(/^v[0-9]{1,2}\//)
+
+    @request_method = request.request_method
 
     # Find if there is a matching TransferAPI
     if false
 
     # Find if there is a matching DataAPI
     elsif (
-      if @request_path.match(/^me\//)
-        @me = true
-        @data_api = DataAPI.find_by_path(@request_path.gsub(/^me\//, ''), private: true)
-      else
-        @data_api = DataAPI.find_by_path(@request_path)
-      end
+      @data_api_request = DataAPI::Request.new(@request_path, access_token: current_access_token)
     ).present?
-
-      # Guard APIs that belongs to user
-      if @me
+      # Guard the API if the requested resource is scoped under a user
+      if @data_api_request.scoped_under_user && @request_method != 'GET'
+        guard!(scopes: ['api:write'])
+      elsif @data_api_request.scoped_under_user
         guard!(scopes: ['api'])
       end
 
+      # prepare variables
+      @data_api = @data_api_request.data_api
       @resource_name = @data_api.name.to_sym
-      @resource_columns = @data_api.columns
-      @resource_primary_key = @data_api.primary_key
-      @resource_fields = @resource_columns
-      @resource_fields << :id
+      @resource_fields = @data_api.fields
+      @includable_fields = @data_api.includable_fields
 
-      # List all the includable fields
-      @includable_fields = []
-      @includable_fields << :owner if @data_api.has_owner?
-      @resource_fields << :owner if @data_api.has_owner?
+      # process request
+      case @request_method
 
-      fieldset_for @resource_name, permitted_fields: @resource_fields,
-                                   show_all_permitted_fields_by_default: true,
-                                   root: true
-      inclusion_for @resource_name, root: true
-
-      if @data_api.has_owner?
-        fieldset_for :user, permitted_fields: User::PUBLIC_ATTRS,
-                            show_all_permitted_fields_by_default: true
-      end
-
-      # Scope the collection
-      select = fieldset(@resource_name)
-      fieldset_select = (fieldset(@resource_name) + [@resource_primary_key])
-      fieldset_select.delete(:owner)
-      fieldset_select << @data_api.owner_foreign_key if @data_api.has_owner? && fieldset(@resource_name).include?(:owner)
-      resource_collection = @data_api.data_model.select(fieldset_select)
-
-      # Scope the collection to the current user if needed
-      if @me
-        case @data_api.owner_primary_key
-        when 'uid'
-          resource_collection = resource_collection.none if @current_user.organization_code != @data_api.organization_code
-          resource_collection = resource_collection.where(@data_api.owner_foreign_key => @current_user.try(@data_api.owner_primary_key))
-        else
-          resource_collection = resource_collection.where(@data_api.owner_foreign_key => @current_user.try(@data_api.owner_primary_key))
+      # GET requests
+      when 'GET'
+        # fieldset
+        fieldset_for @resource_name, permitted_fields: @resource_fields,
+                                     show_all_permitted_fields_by_default: true,
+                                     root: true
+        # inclusion
+        inclusion_for @resource_name, root: true
+        # fieldset for inclusion
+        if @data_api.owner?
+          fieldset_for :user, permitted_fields: User::PUBLIC_ATTRS,
+                              show_all_permitted_fields_by_default: true
         end
-      end
 
-      # If getting a single resourse
-      if @data_api.single_data_id.present?
-        if (@resource = resource_collection.find_by(@resource_primary_key => @data_api.single_data_id)).present?
-          render rabl: 'data_api'
+        # resource specified, e.g.: 'GET /resources/1'
+        if @data_api_request.resource_specified?
+          @resource = @data_api_request.specified_resource
+          if @resource.present?
+            render rabl: 'data_api'
+            return
+          end
+
+        # resource unspecified, e.g.: 'GET /resources'
+        else
+          @resource_collection = @data_api_request.resource_collection
+          # sortable
+          sortable default_order: @data_api.default_order
+          # pagination
+          pagination @resource_collection.size, default_per_page: 20, maxium_per_page: 100
+
+          @resources = @resource_collection.order(sort).page(page).per(per_page)
+          render rabl: 'data_apis'
           return
         end
-
-      # If getting a resourse collection
-      else
-        sortable(default_order: @data_api.default_order)
-        pagination resource_collection.size, default_per_page: 20, maxium_per_page: 100
-
-        @resources = resource_collection.order(sort).page(page).per(per_page)
-
-        render rabl: 'data_apis'
-        return
       end
     end
 
