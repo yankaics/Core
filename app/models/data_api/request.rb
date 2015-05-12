@@ -97,20 +97,20 @@ class DataAPI::Request
       ids = ids[0..(MAX_MULTIGETTABLE_ITEMS - 1)]
 
       if ids.count > 1
-        res = resource_collection.where(data_api.primary_key => ids)
+        @requested_resource = resource_collection.where(data_api.primary_key => ids)
       else
-        res = resource_collection.find_by(data_api.primary_key => ids[0])
+        @requested_resource = resource_collection.find_by(data_api.primary_key => ids[0])
       end
 
-      if res.blank? && data_api.primary_key != 'id'
+      if @requested_resource.blank? && data_api.primary_key != 'id'
         if ids.count > 1
-          res = resource_collection.where(id: ids)
+          @requested_resource = resource_collection.where(id: ids)
         else
-          res = resource_collection.find_by(id: ids[0])
+          @requested_resource = resource_collection.find_by(id: ids[0])
         end
       end
 
-      res
+      @requested_resource
     end
   end
 

@@ -45,6 +45,7 @@ describe "Open Data API" do
                                            user_uuid: { type: 'string' },
                                            user_email: { type: 'string' },
                                            user_uid: { type: 'string' },
+                                           datetime: { type: 'datetime' },
                                            data: { type: 'text' } })
     data_api.data_model.create!(user_id: user.id, user_uuid: user.uuid, user_email: user.email, user_uid: user.uid)
     data_api.data_model.create!(user_id: user2.id, user_uuid: user2.uuid, user_email: user2.email, user_uid: user2.uid)
@@ -299,6 +300,8 @@ describe "Open Data API" do
   describe "resourse scoped by user" do
     let(:access_token) { create(:oauth_access_token, scopes: 'api', resource_owner_id: user.id).token }
     let(:access_token2) { create(:oauth_access_token, scopes: 'api', resource_owner_id: user2.id).token }
+    let(:writable_access_token) { create(:oauth_access_token, scopes: 'api api:write', resource_owner_id: user.id).token }
+    let(:writable_access_token2) { create(:oauth_access_token, scopes: 'api api:write', resource_owner_id: user2.id).token }
 
     it "is not accessable without an valid access token" do
       get "/api/v1/me/#{private_user_data_api.path}.json"
@@ -376,6 +379,64 @@ describe "Open Data API" do
       expect(response).to be_success
       json = JSON.parse(response.body)
       expect(json['owner']['uuid']).to eq(user.uuid)
+    end
+
+    it "is writeable while permitted" do
+      # While API's owner_writable is false
+      post "/api/me/#{private_user_data_api.path}.json?access_token=#{writable_access_token}",
+        private_user_data_api.name => {
+          datetime: '2014-9-9',
+          data: 'hi'
+        }
+      expect(response).not_to be_success
+      json = JSON.parse(response.body)
+      expect(json['error']).to eq(403)
+
+      private_user_data_api.owner_writable = true
+      private_user_data_api.save!
+
+      # While API's owner_writable is true
+      post "/api/me/#{private_user_data_api.path}.json?access_token=#{writable_access_token}",
+        private_user_data_api.name => {
+          datetime: '2014-9-9',
+          data: 'hi'
+        }
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json['data']).to eq('hi')
+      expect(json['datetime']).to start_with('2014-09-09 00:00:00')
+      data_id = json['id']
+
+      # With an access token without API write permission
+      post "/api/me/#{private_user_data_api.path}.json?access_token=#{access_token}",
+        private_user_data_api.name => {
+          datetime: '2014-9-9',
+          data: 'hi'
+        }
+      expect(response).not_to be_success
+      json = JSON.parse(response.body)
+      expect(json['error']).to eq('insufficient_scope')
+
+      # Update
+      put "/api/me/#{private_user_data_api.path}/#{data_id}.json?access_token=#{writable_access_token}",
+        private_user_data_api.name => {
+          datetime: '2014/9/9 12:34',
+        }
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json['data']).to eq('hi')
+      expect(json['datetime']).to start_with('2014-09-09 12:34:00')
+      get "/api/me/#{private_user_data_api.path}/#{data_id}.json?access_token=#{writable_access_token}"
+      expect(response).to be_success
+
+      # Delete
+      delete "/api/me/#{private_user_data_api.path}/#{data_id}.json?access_token=#{writable_access_token}"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json['data']).to eq('hi')
+      expect(json['datetime']).to start_with('2014-09-09 12:34:00')
+      get "/api/me/#{private_user_data_api.path}/#{data_id}.json?access_token=#{writable_access_token}"
+      expect(response).not_to be_success
     end
   end
 end

@@ -106,6 +106,12 @@ class DataAPI < ActiveRecord::Base
     @fields
   end
 
+  def write_permitted_fields
+    return @write_permitted_fields if @write_permitted_fields
+    @write_permitted_fields = schema.keys
+    @write_permitted_fields -= [owner_foreign_key]
+  end
+
   # List of accessible fields
   def includable_fields
     return @includable_fields if @includable_fields

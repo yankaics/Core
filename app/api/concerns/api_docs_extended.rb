@@ -96,7 +96,7 @@ module APIDocsExtended
           path: "#{'/me' if owned_by_user}/#{data_api.path}(.:format)"
         }
 
-        singular_resource_opts = {
+        specified_resource_opts = {
           params: {
             data_api.primary_key => { required: true, type: 'String', desc: "The #{data_api.primary_key} of #{data_api_description}." },
             fields: { required: false, type: 'String', desc: APIResourceFieldsettable.fields_param_desc(example: data_api.schema.keys.sample(3).join(',')) },
@@ -113,13 +113,73 @@ module APIDocsExtended
         }
 
         collection_route = Grape::Route.new(collection_opts)
-        singular_resource_route = Grape::Route.new(singular_resource_opts)
+        specified_resource_route = Grape::Route.new(specified_resource_opts)
 
         if combined_namespace
-          routes[data_api.name] = [collection_route, singular_resource_route]
+          routes[data_api.name] = [collection_route, specified_resource_route]
         else
           routes << collection_route
-          routes << singular_resource_route
+          routes << specified_resource_route
+        end
+
+        # if can create, update and delete
+        if owned_by_user && data_api.owner_writable
+          # prepare params
+          params = {}
+          data_api.schema.each_pair do |name, attrs|
+            type = attrs['type']
+            type = 'string' if type == 'text' || type == 'datetime'
+            params["#{data_api.name}[#{name}]"] = { type: type } if name != data_api.owner_foreign_key
+          end
+
+          create_opts = {
+            params: {
+              callback: { required: false, type: 'String', desc: "JSON-P callbacks, wrap the results in a specific JSON function." }
+            }.merge(params),
+            http_codes: [],
+            description: "Create #{data_api_description.try(:pluralize)} data#{' for the current user' if owned_by_user}",
+            notes: data_api.notes,
+            method: 'POST',
+            path: "#{'/me' if owned_by_user}/#{data_api.path}(.:format)"
+          }
+
+          create_route = Grape::Route.new(create_opts)
+
+          update_opts = {
+            params: {
+              data_api.primary_key => { required: true, type: 'String', desc: "The #{data_api.primary_key} of #{data_api_description}." },
+              callback: { required: false, type: 'String', desc: "JSON-P callbacks, wrap the results in a specific JSON function." }
+            }.merge(params),
+            http_codes: [],
+            description: "Update #{data_api_description.try(:pluralize)} data#{' for the current user' if owned_by_user}",
+            notes: data_api.notes,
+            method: 'PUT',
+            path: "#{'/me' if owned_by_user}/#{data_api.path}/:#{data_api.primary_key}(.:format)"
+          }
+
+          update_route = Grape::Route.new(update_opts)
+
+          delete_opts = {
+            params: {
+              data_api.primary_key => { required: true, type: 'String', desc: "The #{data_api.primary_key} of #{data_api_description}." },
+              callback: { required: false, type: 'String', desc: "JSON-P callbacks, wrap the results in a specific JSON function." }
+            },
+            http_codes: [],
+            description: "Delete #{data_api_description.try(:pluralize)} data#{' for the current user' if owned_by_user}",
+            notes: data_api.notes,
+            method: 'DELETE',
+            path: "#{'/me' if owned_by_user}/#{data_api.path}/:#{data_api.primary_key}(.:format)"
+          }
+
+          delete_route = Grape::Route.new(delete_opts)
+
+          if combined_namespace
+            routes[data_api.name] += [create_route, update_route, delete_route]
+          else
+            routes << create_route
+            routes << update_route
+            routes << delete_route
+          end
         end
       end
 

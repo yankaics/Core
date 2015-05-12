@@ -71,6 +71,60 @@ class API::Open < API
           render rabl: 'data_apis'
           return
         end
+
+      # POST requests, create resource
+      when 'POST'
+        # this is only for user scoped resources,
+        # the access token permission is verified on the above 'guard' section
+        error! 403, 403 unless @data_api.owner_writable
+        error! 403, 403 unless @data_api_request.scoped_under_user
+        error!({ error: 'blank_data', description: "" }, 400) if params[@data_api.name].blank?
+        attrs = params[@data_api.name].slice(*@data_api.write_permitted_fields).to_h
+        @resource = @data_api_request.resource_collection.build(attrs)
+        if @resource.save
+          status 201
+          render rabl: 'data_api'
+          return
+        else
+          error! 400, 400
+        end
+
+      # PUT requests, create resource
+      when 'PUT'
+        # this is only for user scoped resources,
+        # the access token permission is verified on the above 'guard' section
+        error! 403, 403 unless @data_api.owner_writable
+        error! 403, 403 unless @data_api_request.scoped_under_user
+        error! 404, 404 if @data_api_request.specified_resource.blank? ||
+                           @data_api_request.specified_resource.is_a?(Array)
+        error!({ error: 'blank_data', description: "" }, 400) if params[@data_api.name].blank?
+        attrs = params[@data_api.name].slice(*@data_api.write_permitted_fields).to_h
+        @resource = @data_api_request.specified_resource
+        @resource.assign_attributes(attrs)
+        if @resource.save
+          status 200
+          render rabl: 'data_api'
+          return
+        else
+          error! 400, 400
+        end
+
+      # DELETE requests, deletes resource
+      when 'DELETE'
+        # this is only for user scoped resources,
+        # the access token permission is verified on the above 'guard' section
+        error! 403, 403 unless @data_api.owner_writable
+        error! 403, 403 unless @data_api_request.scoped_under_user
+        error! 404, 404 if @data_api_request.specified_resource.blank? ||
+                           @data_api_request.specified_resource.is_a?(Array)
+        @resource = @data_api_request.specified_resource
+        if @resource.destroy
+          status 200
+          render rabl: 'data_api'
+          return
+        else
+          error! 400, 400
+        end
       end
     end
 
