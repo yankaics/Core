@@ -3,6 +3,8 @@ require "factory_girl"
 namespace :dev do
   desc "Seed data for development environment"
   task prime: "db:setup" do
+    api_db = Rails.root.join('db', 'api.sqlite3')
+    File.delete(api_db) if File.exist?(api_db)
 
     if Rails.env.development? || ENV['STAGING'].present?
       include FactoryGirl::Syntax::Methods
