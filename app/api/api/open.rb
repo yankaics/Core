@@ -65,7 +65,8 @@ class API::Open < API
           # sortable
           sortable default_order: @data_api.default_order
           # pagination
-          pagination @resource_collection.size, default_per_page: 20, maxium_per_page: 100
+          maxium_per_page = current_application.try(:core_app?) ? 2000 : 100
+          pagination @resource_collection.size, default_per_page: 20, maxium_per_page: maxium_per_page
 
           @resources = @resource_collection.order(sort).page(page).per(per_page)
           render rabl: 'data_apis'
