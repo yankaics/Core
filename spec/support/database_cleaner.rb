@@ -8,6 +8,11 @@ RSpec.configure do |config|
     File.delete(test_api_db) if File.exist?(test_api_db)
   end
 
+  config.before(:all) do
+    test_api_db = Rails.root.join('db', 'test_api.sqlite3')
+    File.delete(test_api_db) if File.exist?(test_api_db)
+  end
+
   config.after(:all) do
     DatabaseCleaner.clean_with(:deletion)
     DataAPI::DataModel.remove_connection
