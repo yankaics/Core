@@ -101,14 +101,14 @@ Doorkeeper.configure do
         <<-eos.squish.delete(' ')
           https://graph.facebook.com/debug_token?
             input_token=#{password}&
-            access_token=#{password}
+            access_token=#{FacebookService.app_access_token}
           eos
       )
 
       token_info = debug_token_connection.parsed_response
       token_info = JSON.parse(token_info) if token_info.is_a?(String)
 
-      if token_info['data'].is_a?(Hash)
+      if true
         get_access_connection = HTTParty.get(
           <<-eos.squish.delete(' ')
             https://graph.facebook.com/me?
@@ -122,7 +122,7 @@ Doorkeeper.configure do
 
         if access['id'].present?
           # the access token is owned by this app, provide full information
-          if token_info['data']['app_id'] == ENV['FB_APP_ID']
+          if token_info['data'].is_a?(Hash) && token_info['data']['app_id'] == ENV['FB_APP_ID']
             facebook_auth = {
               uid: access['id'],
               credentials: {

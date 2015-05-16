@@ -196,7 +196,7 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
     @core_app = create(:oauth_application, :owned_by_admin, redirect_uri: "urn:ietf:wg:oauth:2.0:oob\nhttp://non-existing.oauth.testing.app/")
 
     # Stub requests to Facebook
-    stub_request(:get, "https://graph.facebook.com/debug_token?access_token=#{fbtoken}&input_token=#{fbtoken}")
+    stub_request(:get, "https://graph.facebook.com/debug_token?access_token=&input_token=#{fbtoken}")
       .to_return(body: <<-eos
         {
           "data": {
@@ -215,7 +215,7 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
         }
       eos
     )
-    stub_request(:get, "https://graph.facebook.com/debug_token?access_token=#{fbtoken_of_other_app}&input_token=#{fbtoken_of_other_app}")
+    stub_request(:get, "https://graph.facebook.com/debug_token?access_token=&input_token=#{fbtoken_of_other_app}")
       .to_return(body: <<-eos
         {
           "data": {
@@ -232,7 +232,18 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
         }
       eos
     )
-    stub_request(:get, "https://graph.facebook.com/debug_token?access_token=invalid_token&input_token=invalid_token")
+    stub_request(:get, "https://graph.facebook.com/debug_token?access_token=&input_token=invalid_token")
+      .to_return(body: <<-eos
+        {
+          "error": {
+            "message": "Invalid OAuth access token.",
+            "type": "OAuthException",
+            "code": 190
+          }
+        }
+      eos
+    )
+    stub_request(:get, "https://graph.facebook.com/me?access_token=invalid_token&fields=id,name,email,gender")
       .to_return(body: <<-eos
         {
           "error": {
