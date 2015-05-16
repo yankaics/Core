@@ -45,7 +45,6 @@ ActiveAdmin.register Doorkeeper::Application do
       f.input :owner_id
     end
     f.inputs "Credentials" do
-      f.input :uid
       f.input :secret
       f.input :redirect_uri
     end
