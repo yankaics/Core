@@ -82,7 +82,7 @@
 # Include this +Concern+ in your Grape API class:
 #
 #   class SampleAPI < Grape::API
-#     include APIResourceFieldsettable
+#     include APIResourceIncludable
 #   end
 #
 # then set the options for the inclusion in the grape method:

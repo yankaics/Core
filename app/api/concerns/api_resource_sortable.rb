@@ -1,4 +1,32 @@
-# Some helpers for Grape to construct an sortable resource API easily.
+# = Helper To Make Resource APIs Sortable
+#
+# A Sortable Resource API gives the flexibility to change how the returned data
+# is sorted to the client. Clients can use the +sort+ URL parameter to control
+# how the returned data is sorted, as this example:
+#
+#   GET /posts?sort=-created_at,title
+#
+# This means to sort the data by its created time descended and then the title
+# ascended.
+#
+# == Usage
+#
+# Include this +Concern+ in your Grape API class:
+#
+#   class SampleAPI < Grape::API
+#     include APIResourceSortable
+#   end
+#
+# then use the +sortable+ method like this:
+#
+#   resources :posts do
+#     get do
+#       sortable default_order: {created_at: :desc }
+#       # ...
+#       @posts = Post.order(sort)#...
+#       # ...
+#     end
+#   end
 module APIResourceSortable
   extend ActiveSupport::Concern
 
@@ -7,7 +35,6 @@ module APIResourceSortable
   end
 
   module HelperMethods
-    ##
     # Gets the `sort` parameter with the format 'resourses?sort=-created_at,name',
     # verify and converts it into an safe Hash that can be passed into the .order
     # method.
@@ -16,7 +43,6 @@ module APIResourceSortable
     #
     # +default_order+::
     #   +Hash+ the default value to return if the sort parameter is not provided
-    #
     def sortable(default_order: {})
       # get the parameter
       sort_by = params[:sort] || params[:sort_by]
@@ -39,9 +65,7 @@ module APIResourceSortable
       end
     end
 
-    ##
     # Helper to get the sort data
-    #
     def sort
       @sort
     end
