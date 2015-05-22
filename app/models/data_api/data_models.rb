@@ -24,6 +24,8 @@ module DataAPI::DataModels
     model.owner_primary_key = options[:owner_primary_key]
     model.owner_foreign_key = options[:owner_foreign_key]
 
+    model.max_paginates_per 10_000
+
     model.set_owner_relation
     model.test_db_connection
 
