@@ -96,6 +96,13 @@ module APIDocsExtended
           path: "#{'/me' if owned_by_user}/#{data_api.path}(.:format)"
         }
 
+        data_api.columns.each do |column|
+          collection_opts[:params]["filter[#{column}]"] = \
+            { required: false,
+              type: 'String',
+              desc: APIResourceFilterable.filter_param_desc(for_field: column) }
+        end
+
         specified_resource_opts = {
           params: {
             data_api.primary_key => { required: true, type: 'String', desc: "The #{data_api.primary_key} of #{data_api_description}." },

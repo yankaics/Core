@@ -55,22 +55,23 @@ module APIResourceMultigettable
     #
     # Params:
     #
-    # +scoped_resource+::
-    #   +ActiveRecord::Base+ scoped resources to find data from
+    # +resource+::
+    #   +ActiveRecord::Base+ or +ActiveRecord::Relation+ resource collection
+    #   to find data from
     #
     # +find_by+::
     #   +Symbol+ the attribute that is used to find data
     #
     # +max+::
     #   +Integer+ maxium count of returning results
-    def multiget(scoped_resource, find_by: :id, max: 10)
+    def multiget(resource, find_by: :id, max: 10)
       ids = params[find_by].split(',')
       ids = ids[0..(max - 1)]
 
       if ids.count > 1
-        scoped_resource.where(find_by => ids)
+        resource.where(find_by => ids)
       else
-        scoped_resource.find_by(find_by => ids[0])
+        resource.find_by(find_by => ids[0])
       end
     end
 

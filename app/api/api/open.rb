@@ -2,6 +2,7 @@ class API::Open < API
   include APIGuard
   include APIResourceFieldsettable
   include APIResourceIncludable
+  include APIResourceFilterable
   include APIResourcePaginatable
   include APIResourceSortable
 
@@ -62,6 +63,8 @@ class API::Open < API
         # resource unspecified, e.g.: 'GET /resources'
         else
           @resource_collection = @data_api_request.resource_collection
+          # filterable
+          @resource_collection = filter(@resource_collection)
           # sortable
           sortable default_order: @data_api.default_order
           # pagination

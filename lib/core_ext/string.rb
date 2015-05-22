@@ -2,6 +2,10 @@ require 'uri'
 
 class String
 
+  def to_bool
+    self == 'true'
+  end
+
   def add_uri_param(param_name, param_value)
     uri = URI(self)
     params = URI.decode_www_form(uri.query || '') << [param_name, param_value]

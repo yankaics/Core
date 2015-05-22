@@ -7,7 +7,7 @@ describe "Open Data API" do
                                             integer_col: { type: 'integer' } })
   end
   let(:another_data_api) do
-    create(:data_api, :with_data, data_count: 10, path: 'path/to/another_data_api',
+    create(:data_api, :with_data, data_count: 12, path: 'path/to/another_data_api',
                                   primary_key: :integer_col,
                                   schema: { string_col: { type: 'string' },
                                             integer_col: { type: 'integer' },
@@ -106,6 +106,83 @@ describe "Open Data API" do
       expect(response).to be_success
       expect(response.body).not_to include(last_data.string_col)
       expect(response.body).to include(last_data.text_col)
+    end
+
+    it "is filterable" do
+      get "/api/v1/#{another_data_api.path}.json?filter[boolean_col]=true"
+      expect(response).to be_success
+      response_data = JSON.parse(response.body)
+      expect(response_data).not_to be_blank
+      response_data.each do |data|
+        expect(data['boolean_col']).to be true
+      end
+
+      get "/api/v1/#{another_data_api.path}.json?filter[boolean_col]=not(true)"
+      expect(response).to be_success
+      response_data = JSON.parse(response.body)
+      expect(response_data).not_to be_blank
+      response_data.each do |data|
+        expect(data['boolean_col']).to be false
+      end
+
+      get "/api/v1/#{another_data_api.path}.json?filter[boolean_col]=not(true,false)"
+      expect(response).to be_success
+      response_data = JSON.parse(response.body)
+      expect(response_data).to be_blank
+
+      get "/api/v1/#{another_data_api.path}.json?filter[boolean_col]=true,false"
+      expect(response).to be_success
+      response_data = JSON.parse(response.body)
+      expect(response_data.count).to eq(12)
+
+      get "/api/v1/#{another_data_api.path}.json?filter[float_col]=greater_then(5)"
+      expect(response).to be_success
+      response_data = JSON.parse(response.body)
+      response_data.each do |data|
+        expect(data['float_col']).to be > 5
+      end
+
+      get "/api/v1/#{another_data_api.path}.json?filter[id]=greater_then_or_equal(5)"
+      expect(response).to be_success
+      response_data = JSON.parse(response.body)
+      expect(response_data).not_to be_blank
+      response_data.each do |data|
+        expect(data['id']).to be >= 5
+      end
+
+      get "/api/v1/#{another_data_api.path}.json?filter[float_col]=less_then(5)"
+      expect(response).to be_success
+      response_data = JSON.parse(response.body)
+      response_data.each do |data|
+        expect(data['float_col']).to be < 5
+      end
+
+      get "/api/v1/#{another_data_api.path}.json?filter[id]=less_then_or_equal(5)"
+      expect(response).to be_success
+      response_data = JSON.parse(response.body)
+      expect(response_data).not_to be_blank
+      response_data.each do |data|
+        expect(data['id']).to be <= 5
+      end
+
+      get "/api/v1/#{another_data_api.path}.json?filter[id]=between(3,7)"
+      expect(response).to be_success
+      response_data = JSON.parse(response.body)
+      expect(response_data.count).to eq(5)
+      response_data.each do |data|
+        expect(data['id']).to be >= 3
+        expect(data['id']).to be <= 7
+      end
+
+      get "/api/v1/#{another_data_api.path}.json?filter[text_col]=like(%25(7))"
+      expect(response).to be_success
+      response_data = JSON.parse(response.body)
+      expect(response_data.first['text_col'][-3..-1]).to eq('(7)')
+
+      get "/api/v1/#{another_data_api.path}.json?filter[datetime_col]=between(1800-1-1,8000-1-1)"
+      expect(response).to be_success
+      response_data = JSON.parse(response.body)
+      expect(response_data.count).to eq(12)
     end
 
     it "is paginated" do
