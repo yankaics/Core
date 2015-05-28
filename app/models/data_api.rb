@@ -54,12 +54,16 @@ class DataAPI < ActiveRecord::Base
 
   # Find a DataAPI by a resource path
   # TODO: cache the result
-  def self.find_by_path(path, include_not_public: false)
-    # scope to accessible APIs
-    if include_not_public
-      scoped_collection = DataAPI.where(accessible: true)
+  def self.find_by_path(path, include_not_public: false, include_inaccessible: false)
+    # scope the collection
+    if include_inaccessible
+      scoped_collection = DataAPI.all
     else
-      scoped_collection = DataAPI.where(public: true, accessible: true)
+      scoped_collection = DataAPI.where(accessible: true)
+    end
+
+    unless include_not_public
+      scoped_collection = scoped_collection.where(public: true)
     end
 
     # if the resource path might be a specified resource path

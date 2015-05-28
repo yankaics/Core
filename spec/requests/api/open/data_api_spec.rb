@@ -52,7 +52,7 @@ describe "Open Data API" do
     data_api
   end
   let(:not_accessible_data_api) do
-    create(:data_api, path: 'path/to/private_user_data_api',
+    create(:data_api, path: 'path/to/not_opened_data_api',
                       accessible: false,
                       schema: { a: { type: 'string' },
                                 b: { type: 'string' },
@@ -68,11 +68,19 @@ describe "Open Data API" do
   end
 
   describe "unaccessible (not-opened) API" do
+    let(:core_access_token) { create(:oauth_access_token, :core).token }
+
     it "is not accessible" do
       get "/api/v1/#{not_accessible_data_api.path}.json"
       expect(response).not_to be_success
       json = JSON.parse(response.body)
       expect(json).to have_key('error')
+    end
+
+    it "is accessible via core apps" do
+      get "/api/v1/#{not_accessible_data_api.path}.json?access_token=#{core_access_token}"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
     end
   end
 

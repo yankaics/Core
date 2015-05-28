@@ -20,7 +20,11 @@ class API::Open < API
 
     # Find if there is a matching DataAPI
     elsif (
-      @data_api_request = DataAPI::Request.new(@request_path, access_token: current_access_token)
+      if current_application.try(:core_app?)
+        @data_api_request = DataAPI::Request.new(@request_path, access_token: current_access_token, include_inaccessible: true)
+      else
+        @data_api_request = DataAPI::Request.new(@request_path, access_token: current_access_token)
+      end
     ).present?
       # Guard the API if the requested resource is scoped under a user
       if @data_api_request.scoped_under_user && @request_method != 'GET'
