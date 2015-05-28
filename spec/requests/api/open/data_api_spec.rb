@@ -503,13 +503,47 @@ describe "Open Data API" do
       expect(json['error']).to eq('insufficient_scope')
 
       # Update
-      put "/api/me/#{private_user_data_api.path}/#{data_id}.json?access_token=#{writable_access_token}",
-        private_user_data_api.name => {
-          datetime: '2014/9/9 12:34',
-        }
+      patch "/api/me/#{private_user_data_api.path}/#{data_id}.json?access_token=#{writable_access_token}",
+            private_user_data_api.name => {
+              datetime: '2014/9/9 12:34'
+            }
       expect(response).to be_success
       json = JSON.parse(response.body)
       expect(json['data']).to eq('hi')
+      expect(json['datetime']).to start_with('2014-09-09 12:34:00')
+      get "/api/me/#{private_user_data_api.path}/#{data_id}.json?access_token=#{writable_access_token}"
+      expect(response).to be_success
+
+      # Create or Replace
+      put "/api/me/#{private_user_data_api.path}/1023.json?access_token=#{writable_access_token}",
+          private_user_data_api.name => {
+            data: 'hello',
+            datetime: '2014/9/9 12:34'
+          }
+      expect(response).to be_success
+      expect(response.status).to eq(201)  # created
+      json = JSON.parse(response.body)
+      expect(json['data']).to eq('hello')
+      expect(json['datetime']).to start_with('2014-09-09 12:34:00')
+      get "/api/me/#{private_user_data_api.path}/1023.json?access_token=#{writable_access_token}"
+      expect(response).to be_success
+
+      put "/api/me/#{private_user_data_api.path}/1023.json?access_token=#{writable_access_token2}",
+          private_user_data_api.name => {
+            data: 'hello',
+            datetime: '2014/9/9 12:34'
+          }
+      expect(response).not_to be_success
+      expect(response.status).to eq(400)  # duplicated primary key
+
+      put "/api/me/#{private_user_data_api.path}/#{data_id}.json?access_token=#{writable_access_token}",
+          private_user_data_api.name => {
+            datetime: '2014/9/9 12:34'
+          }
+      expect(response).to be_success
+      expect(response.status).to eq(200)  # updated
+      json = JSON.parse(response.body)
+      expect(json['data']).to be_blank  # because the whole object is replaced
       expect(json['datetime']).to start_with('2014-09-09 12:34:00')
       get "/api/me/#{private_user_data_api.path}/#{data_id}.json?access_token=#{writable_access_token}"
       expect(response).to be_success
@@ -518,7 +552,6 @@ describe "Open Data API" do
       delete "/api/me/#{private_user_data_api.path}/#{data_id}.json?access_token=#{writable_access_token}"
       expect(response).to be_success
       json = JSON.parse(response.body)
-      expect(json['data']).to eq('hi')
       expect(json['datetime']).to start_with('2014-09-09 12:34:00')
       get "/api/me/#{private_user_data_api.path}/#{data_id}.json?access_token=#{writable_access_token}"
       expect(response).not_to be_success

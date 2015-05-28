@@ -112,10 +112,10 @@ class DataAPI < ActiveRecord::Base
     @fields
   end
 
-  def write_permitted_fields
-    return @write_permitted_fields if @write_permitted_fields
-    @write_permitted_fields = schema.keys
-    @write_permitted_fields -= [owner_foreign_key]
+  def owner_write_permitted_fields
+    return @owner_write_permitted_fields if @owner_write_permitted_fields
+    @owner_write_permitted_fields = schema.keys
+    @owner_write_permitted_fields -= [owner_foreign_key]
   end
 
   # List of accessible fields
@@ -155,6 +155,7 @@ class DataAPI < ActiveRecord::Base
     DataModels.construct(name.classify,
       database_url: get_database_url,
       table_name: table_name,
+      primary_key: primary_key,
       organization_code: organization_code,
       owned_by_user: owned_by_user,
       owner_primary_key: owner_primary_key,

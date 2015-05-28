@@ -84,10 +84,10 @@ class API::Open < API
       when 'POST'
         # this is only for user scoped resources,
         # the access token permission is verified on the above 'guard' section
-        error! 403, 403 unless @data_api.owner_writable
         error! 403, 403 unless @data_api_request.scoped_under_user
-        error!({ error: 'blank_data', description: "" }, 400) if params[@data_api.name].blank?
-        attrs = params[@data_api.name].slice(*@data_api.write_permitted_fields).to_h
+        error! 403, 403 unless @data_api.owner_writable
+        error!({ error: 'no_data_provided', description: "The #{@data_api.name} parameter is expected to exist and be a object." }, 400) if params[@data_api.name].blank? || !params[@data_api.name].is_a?(Hash)
+        attrs = params[@data_api.name].slice(*@data_api.owner_write_permitted_fields).to_h
         @resource = @data_api_request.resource_collection.build(attrs)
         if @resource.save
           status 201
@@ -97,20 +97,53 @@ class API::Open < API
           error! 400, 400
         end
 
-      # PUT requests, create resource
+      # PATCH requests, update resource
+      when 'PATCH'
+        # this is only for user scoped resources,
+        # the access token permission is verified on the above 'guard' section
+        error! 403, 403 unless @data_api_request.scoped_under_user
+        error! 403, 403 unless @data_api.owner_writable
+
+        error! 404, 404 if @data_api_request.specified_resource.blank? ||
+                           !@data_api_request.specified_resource.try(:persisted?)
+
+        error!({ error: 'no_data_provided', description: "The #{@data_api.name} parameter is expected to exist and be a object." }, 400) if params[@data_api.name].blank? || !params[@data_api.name].is_a?(Hash)
+        attrs = params[@data_api.name].slice(*@data_api.owner_write_permitted_fields).to_h
+        @resource = @data_api_request.specified_resource
+        @resource.assign_attributes(attrs)
+
+        if @resource.save
+          status 200
+          render rabl: 'data_api'
+          return
+        else
+          error! 400, 400
+        end
+
+      # PUT requests, create or replace resource
       when 'PUT'
         # this is only for user scoped resources,
         # the access token permission is verified on the above 'guard' section
-        error! 403, 403 unless @data_api.owner_writable
         error! 403, 403 unless @data_api_request.scoped_under_user
-        error! 404, 404 if @data_api_request.specified_resource.blank? ||
-                           @data_api_request.specified_resource.is_a?(Array)
-        error!({ error: 'blank_data', description: "" }, 400) if params[@data_api.name].blank?
-        attrs = params[@data_api.name].slice(*@data_api.write_permitted_fields).to_h
-        @resource = @data_api_request.specified_resource
+        error! 403, 403 unless @data_api.owner_writable
+
+        error! 400, 400 if @data_api_request.specified_resource_id.blank?
+
+        error!({ error: 'no_data_provided', description: "The #{@data_api.name} parameter is expected to exist and be a object." }, 400) if params[@data_api.name].blank? || !params[@data_api.name].is_a?(Hash)
+        permitted_fields = @data_api.owner_write_permitted_fields
+        attrs = params[@data_api.name].slice(*permitted_fields).to_h
+        @resource = @data_api_request.specified_resource ||
+                    @data_api_request.resource_collection.build(@data_api.primary_key => @data_api_request.specified_resource_id)
+        @resource.assign_attributes(Hash[permitted_fields.map { |attr| [attr, nil] }])
         @resource.assign_attributes(attrs)
-        if @resource.save
+
+        if @resource.persisted?
           status 200
+        else
+          status 201
+        end
+
+        if @resource.save
           render rabl: 'data_api'
           return
         else
@@ -121,8 +154,8 @@ class API::Open < API
       when 'DELETE'
         # this is only for user scoped resources,
         # the access token permission is verified on the above 'guard' section
-        error! 403, 403 unless @data_api.owner_writable
         error! 403, 403 unless @data_api_request.scoped_under_user
+        error! 403, 403 unless @data_api.owner_writable
         error! 404, 404 if @data_api_request.specified_resource.blank? ||
                            @data_api_request.specified_resource.is_a?(Array)
         @resource = @data_api_request.specified_resource

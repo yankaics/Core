@@ -87,15 +87,27 @@ class DataAPI::Request
     !!data_api.specified_resource_ids
   end
 
-  # Returns the single requested resource
+  # Returns the single specified requested resource id
+  def specified_resource_id
+    data_api.specified_resource_ids
+  end
+
+  # Returns the specified requested resource ids in an array,
+  # multigettable, a request path can be like this: '/resources/1,5,7'
+  def specified_resource_ids
+    ids = data_api.specified_resource_ids.split(',')
+    ids = ids[0..(MAX_MULTIGETTABLE_ITEMS - 1)]
+    ids
+  end
+
+  # Returns the specified requested resource
   def specified_resource
     return @requested_resource if @requested_resource_processed
     @requested_resource_processed = true
 
     if data_api.specified_resource_ids.present?
       # multigettable, a request path can be like this: '/resources/1,5,7'
-      ids = data_api.specified_resource_ids.split(',')
-      ids = ids[0..(MAX_MULTIGETTABLE_ITEMS - 1)]
+      ids = specified_resource_ids
 
       if ids.count > 1
         @requested_resource = resource_collection.where(data_api.primary_key => ids)

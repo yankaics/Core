@@ -130,7 +130,7 @@ module APIDocsExtended
         end
 
         # if can create, update and delete
-        if owned_by_user && data_api.owner_writable
+        if owned_by_user && data_api.owned_by_user && data_api.owner_writable
           # prepare params
           params = {}
           data_api.schema.each_pair do |name, attrs|
@@ -160,11 +160,25 @@ module APIDocsExtended
             http_codes: [],
             description: "Update #{data_api_description.try(:pluralize)} data#{' for the current user' if owned_by_user}",
             notes: data_api.notes,
-            method: 'PUT',
+            method: 'PATCH',
             path: "#{'/me' if owned_by_user}/#{data_api.path}/:#{data_api.primary_key}(.:format)"
           }
 
           update_route = Grape::Route.new(update_opts)
+
+          replace_opts = {
+            params: {
+              data_api.primary_key => { required: true, type: 'String', desc: "The #{data_api.primary_key} of #{data_api_description}." },
+              callback: { required: false, type: 'String', desc: "JSON-P callbacks, wrap the results in a specific JSON function." }
+            }.merge(params),
+            http_codes: [],
+            description: "Replace or relpace #{data_api_description.try(:pluralize)} data#{' for the current user' if owned_by_user}",
+            notes: data_api.notes,
+            method: 'PUT',
+            path: "#{'/me' if owned_by_user}/#{data_api.path}/:#{data_api.primary_key}(.:format)"
+          }
+
+          replace_route = Grape::Route.new(replace_opts)
 
           delete_opts = {
             params: {
@@ -181,10 +195,11 @@ module APIDocsExtended
           delete_route = Grape::Route.new(delete_opts)
 
           if combined_namespace
-            routes[data_api.name] += [create_route, update_route, delete_route]
+            routes[data_api.name] += [create_route, update_route, replace_route, delete_route]
           else
             routes << create_route
             routes << update_route
+            routes << replace_route
             routes << delete_route
           end
         end
