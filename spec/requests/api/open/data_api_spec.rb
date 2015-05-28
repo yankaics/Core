@@ -469,10 +469,10 @@ describe "Open Data API" do
     it "is writeable while permitted" do
       # While API's owner_writable is false
       post "/api/me/#{private_user_data_api.path}.json?access_token=#{writable_access_token}",
-        private_user_data_api.name => {
-          datetime: '2014-9-9',
-          data: 'hi'
-        }
+           private_user_data_api.name => {
+             datetime: '2014-9-9',
+             data: 'hi'
+           }
       expect(response).not_to be_success
       json = JSON.parse(response.body)
       expect(json['error']).to eq(403)
@@ -482,10 +482,10 @@ describe "Open Data API" do
 
       # While API's owner_writable is true
       post "/api/me/#{private_user_data_api.path}.json?access_token=#{writable_access_token}",
-        private_user_data_api.name => {
-          datetime: '2014-9-9',
-          data: 'hi'
-        }
+           private_user_data_api.name => {
+             datetime: '2014-9-9',
+             data: 'hi'
+           }
       expect(response).to be_success
       json = JSON.parse(response.body)
       expect(json['data']).to eq('hi')
@@ -494,10 +494,10 @@ describe "Open Data API" do
 
       # With an access token without API write permission
       post "/api/me/#{private_user_data_api.path}.json?access_token=#{access_token}",
-        private_user_data_api.name => {
-          datetime: '2014-9-9',
-          data: 'hi'
-        }
+           private_user_data_api.name => {
+             datetime: '2014-9-9',
+             data: 'hi'
+           }
       expect(response).not_to be_success
       json = JSON.parse(response.body)
       expect(json['error']).to eq('insufficient_scope')
@@ -555,6 +555,78 @@ describe "Open Data API" do
       expect(json['datetime']).to start_with('2014-09-09 12:34:00')
       get "/api/me/#{private_user_data_api.path}/#{data_id}.json?access_token=#{writable_access_token}"
       expect(response).not_to be_success
+
+      ids = []
+      10.times do |i|
+        post "/api/me/#{private_user_data_api.path}.json?access_token=#{writable_access_token}",
+             private_user_data_api.name => {
+               datetime: '2014-9-9',
+               data: 'hi'
+             }
+        expect(response).to be_success
+        json = JSON.parse(response.body)
+        ids[i] = json['id']
+      end
+
+      get "/api/me/#{private_user_data_api.path}/#{ids[0]}.json?access_token=#{writable_access_token}"
+      expect(response).to be_success
+      get "/api/me/#{private_user_data_api.path}/#{ids[5]}.json?access_token=#{writable_access_token}"
+      expect(response).to be_success
+
+      delete "/api/me/#{private_user_data_api.path}/#{ids.join(',')}.json?access_token=#{writable_access_token}"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json.count).to eq(10)
+
+      get "/api/me/#{private_user_data_api.path}/#{ids[0]}.json?access_token=#{writable_access_token}"
+      expect(response).not_to be_success
+      get "/api/me/#{private_user_data_api.path}/#{ids[5]}.json?access_token=#{writable_access_token}"
+      expect(response).not_to be_success
+
+      9.times do |i|
+        post "/api/me/#{private_user_data_api.path}.json?access_token=#{writable_access_token}",
+             private_user_data_api.name => {
+               datetime: "201#{i}-1-1",
+               data: 'hi'
+             }
+        expect(response).to be_success
+        post "/api/me/#{private_user_data_api.path}.json?access_token=#{writable_access_token}",
+             private_user_data_api.name => {
+               datetime: "201#{i}-1-1",
+               data: 'yo'
+             }
+        expect(response).to be_success
+        post "/api/me/#{private_user_data_api.path}.json?access_token=#{writable_access_token2}",
+             private_user_data_api.name => {
+               datetime: "201#{i}-1-1",
+               data: 'hi'
+             }
+        expect(response).to be_success
+        post "/api/me/#{private_user_data_api.path}.json?access_token=#{writable_access_token2}",
+             private_user_data_api.name => {
+               datetime: "201#{i}-1-1",
+               data: 'yo'
+             }
+        expect(response).to be_success
+      end
+
+      delete "/api/me/#{private_user_data_api.path}.json?access_token=#{writable_access_token}&filter[datetime]=less_then(2014-4-4)&filter[data]=yo"
+      expect(response).to be_success
+
+      get "/api/me/#{private_user_data_api.path}.json?access_token=#{writable_access_token}&filter[datetime]=less_then(2014-4-4)&filter[data]=yo"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json).to be_blank
+
+      get "/api/me/#{private_user_data_api.path}.json?access_token=#{writable_access_token2}&filter[datetime]=less_then(2014-4-4)&filter[data]=yo"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json).not_to be_blank
+
+      get "/api/me/#{private_user_data_api.path}.json?access_token=#{writable_access_token}"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json).not_to be_blank
     end
   end
 end

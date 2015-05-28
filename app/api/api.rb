@@ -48,5 +48,6 @@ class API < Grape::API
 
   add_swagger_documentation(documentation_settings)
 
+  mount API::APIDataManagement
   mount API::Open
 end

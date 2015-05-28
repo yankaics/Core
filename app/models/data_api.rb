@@ -14,7 +14,7 @@ class DataAPI < ActiveRecord::Base
   belongs_to :organization, primary_key: :code, foreign_key: :organization_code
 
   validates_with DataAPIValidator
-  validates :name, :path, :table_name, presence: true
+  validates :name, :path, :table_name, :management_api_key, presence: true
   validates :name, :path, uniqueness: true
   validates :table_name, uniqueness: true, if: :using_system_database?
   validates :name, format: { with: /\A[a-z][a-z0-9_]*\z/ }
@@ -24,6 +24,7 @@ class DataAPI < ActiveRecord::Base
   validates :owner_primary_key, presence: true, inclusion: { in: OWNER_PRIMARY_KEYS }, if: :owner?
   validates :owner_foreign_key, presence: true, if: :owner?
 
+  after_initialize :initialize_management_api_key
   after_find :reset_data_model_if_needed
 
   before_validation :nilify_blanks
@@ -112,10 +113,26 @@ class DataAPI < ActiveRecord::Base
     @fields
   end
 
-  def owner_write_permitted_fields
-    return @owner_write_permitted_fields if @owner_write_permitted_fields
-    @owner_write_permitted_fields = schema.keys
-    @owner_write_permitted_fields -= [owner_foreign_key]
+  def writable_fields(primary_key: true)
+    if primary_key
+      return @writable_fields if @writable_fields
+      @writable_fields = schema.keys
+    else
+      return @writable_fields_without_primary_key if @writable_fields_without_primary_key
+      @writable_fields_without_primary_key = schema.keys - [self.primary_key]
+    end
+  end
+
+  def owner_write_permitted_fields(primary_key: true)
+    if primary_key
+      return @owner_write_permitted_fields if @owner_write_permitted_fields
+      @owner_write_permitted_fields = writable_fields(primary_key: true)
+      @owner_write_permitted_fields -= [owner_foreign_key]
+    else
+      return @owner_write_permitted_fields_without_primary_key if @owner_write_permitted_fields_without_primary_key
+      @owner_write_permitted_fields_without_primary_key = writable_fields(primary_key: false)
+      @owner_write_permitted_fields_without_primary_key -= [owner_foreign_key]
+    end
   end
 
   # List of accessible fields
@@ -185,6 +202,11 @@ class DataAPI < ActiveRecord::Base
 
   def reset_data_model_if_needed
     reset_data_model if data_model.try(:updated_at) != updated_at
+  end
+
+  def initialize_management_api_key
+    return if management_api_key.present?
+    self.management_api_key = SecureRandom.urlsafe_base64(64).gsub(/[^a-zA-Z0-9]/, '0')
   end
 
   def nilify_blanks

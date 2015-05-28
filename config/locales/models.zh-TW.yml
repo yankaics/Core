@@ -40,10 +40,11 @@ zh-TW:
           unspecified: "未指定"
       data_api:
         accessible: "開放使用"
-        public: "公開"
+        public: "公開路徑存取"
         name: "名稱"
         path: "API 存取路徑"
         table_name: "資料表名稱"
+        management_api_key: "管理用 API 密鑰"
         organization: "所屬組織"
         organization_code: "所屬組織"
         description: "描述"

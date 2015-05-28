@@ -11,11 +11,13 @@ RSpec.describe DataAPI, type: :model do
   it { create(:data_api); should validate_uniqueness_of(:name) }
   it { should validate_presence_of(:path) }
   it { create(:data_api); should validate_uniqueness_of(:path) }
+  it { should validate_presence_of(:management_api_key) }
 
   describe "instance" do
     subject(:data_api) { create(:data_api) }
 
     its(:schema) { is_expected.to be_a(DataAPI::Schema) }
+    its(:management_api_key) { is_expected.to be_present }
   end
 
   describe ".find_by_path" do

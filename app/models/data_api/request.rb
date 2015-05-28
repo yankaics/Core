@@ -14,10 +14,11 @@ class DataAPI::Request
               :scoped_under_user, :scoped_user
   alias_method :scoped_under_user?, :scoped_under_user
 
-  def initialize(path, access_token: nil, include_inaccessible: false)
+  def initialize(path, access_token: nil, include_inaccessible: false, include_not_public: false)
     @full_path = path
     @path = path
     @include_inaccessible = include_inaccessible
+    @include_not_public = include_not_public
     # remove format extension in path
     @path.slice!(%r{\..+$})
     # remove versioning in path
@@ -39,7 +40,7 @@ class DataAPI::Request
   # Returns the corresponding DataAPI
   def data_api
     return @data_api if @data_api
-    @data_api = DataAPI.find_by_path(resource_path, include_not_public: scoped_under_user?, include_inaccessible: @include_inaccessible)
+    @data_api = DataAPI.find_by_path(resource_path, include_not_public: (scoped_under_user? || @include_not_public), include_inaccessible: @include_inaccessible)
   end
 
   # Does the corresponding DataAPI presents?

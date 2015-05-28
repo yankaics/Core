@@ -54,7 +54,7 @@ ActiveAdmin.register DataAPI do
     end
 
     def data_api_params
-      p = [:accessible, :public, :name, :table_name, :path, :description, :notes, :primary_key, :default_order, :database_url, :maintain_schema, :owned_by_user, :owner_primary_key, :owner_foreign_key, :owner_writable]
+      p = [:accessible, :public, :name, :table_name, :path, :management_api_key, :description, :notes, :primary_key, :default_order, :database_url, :maintain_schema, :owned_by_user, :owner_primary_key, :owner_foreign_key, :owner_writable]
       p.concat [:organization_code, :organization] if current_admin.root?
       params.require(:data_api).slice(*p).permit(p)
     end
@@ -170,11 +170,15 @@ ActiveAdmin.register DataAPI do
         row(:name)
         row(:table_name)
         row(:path)
-        row('存取網址') do |data_api|
+        row(:management_api_key) { |data_api| code { data_api.management_api_key } }
+        row('API 存取網址') do |data_api|
           ul do
-            li(a("http://#{CoreRSAKeyService.domain}/api/#{data_api.path}", href: "http://#{CoreRSAKeyService.domain}/api/#{data_api.path}", target: '_blank'))
+            li(a("http://#{CoreRSAKeyService.domain}/api/#{data_api.path}", href: "http://#{CoreRSAKeyService.domain}/api/#{data_api.path}", target: '_blank')) if data_api.public
             li(a("http://#{CoreRSAKeyService.domain}/api/v1/me/#{data_api.path}", href: "http://#{CoreRSAKeyService.domain}/api/v1/me/#{data_api.path}", target: '_blank')) if data_api.owner?
           end
+        end
+        row('資料集維護 API 網址') do |data_api|
+          a("http://#{CoreRSAKeyService.domain}/api/data_management/#{data_api.path}?key=#{data_api.management_api_key}", href: "http://#{CoreRSAKeyService.domain}/api/data_management/#{data_api.path}?key=#{data_api.management_api_key}", target: '_blank')
         end
         row(:organization) if current_admin.root? && data_api.organization.present?
         row(:description)
@@ -305,6 +309,7 @@ ActiveAdmin.register DataAPI do
         f.input :name
         f.input :table_name
         f.input :path
+        f.input :management_api_key
         f.input :organization_code, as: :select, collection: options_for_select(Organization.all_for_select, data_api.organization_code) if current_admin.root?
         f.input :description
         f.input :notes

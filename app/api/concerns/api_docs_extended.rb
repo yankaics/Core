@@ -194,13 +194,34 @@ module APIDocsExtended
 
           delete_route = Grape::Route.new(delete_opts)
 
+          bulk_delete_opts = {
+            params: {
+              callback: { required: false, type: 'String', desc: "JSON-P callbacks, wrap the results in a specific JSON function." }
+            },
+            http_codes: [],
+            description: "Delete scoped #{data_api_description.try(:pluralize)} datas#{' for the current user' if owned_by_user}",
+            notes: data_api.notes,
+            method: 'DELETE',
+            path: "#{'/me' if owned_by_user}/#{data_api.path}(.:format)"
+          }
+
+          data_api.columns.each do |column|
+            bulk_delete_opts[:params]["filter[#{column}]"] = \
+              { required: false,
+                type: 'String',
+                desc: APIResourceFilterable.filter_param_desc(for_field: column) }
+          end
+
+          bulk_delete_route = Grape::Route.new(bulk_delete_opts)
+
           if combined_namespace
-            routes[data_api.name] += [create_route, update_route, replace_route, delete_route]
+            routes[data_api.name] += [create_route, update_route, replace_route, delete_route, bulk_delete_route]
           else
             routes << create_route
             routes << update_route
             routes << replace_route
             routes << delete_route
+            routes << bulk_delete_route
           end
         end
       end

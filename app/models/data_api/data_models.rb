@@ -26,7 +26,6 @@ module DataAPI::DataModels
 
     model.max_paginates_per 10_000
 
-    model.validates options[:primary_key], presence: true
     model.validates options[:primary_key], uniqueness: true
 
     model.set_owner_relation

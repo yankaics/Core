@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150515222124) do
+ActiveRecord::Schema.define(version: 20150528004202) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace"
@@ -62,26 +62,27 @@ ActiveRecord::Schema.define(version: 20150515222124) do
   add_index "data_api_versions", ["item_id", "item_type"], name: "index_data_api_versions_on_item_id_and_item_type"
 
   create_table "data_apis", force: :cascade do |t|
-    t.string   "name",                                  null: false
-    t.string   "path",                                  null: false
+    t.string   "name",                                   null: false
+    t.string   "path",                                   null: false
     t.string   "organization_code"
-    t.string   "primary_key",       default: "id",      null: false
+    t.string   "primary_key",        default: "id",      null: false
     t.text     "schema"
     t.text     "has"
-    t.string   "default_order",     default: "id DESC", null: false
+    t.string   "default_order",      default: "id DESC", null: false
     t.string   "database_url"
-    t.boolean  "maintain_schema",   default: true,      null: false
+    t.boolean  "maintain_schema",    default: true,      null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "accessible",        default: false,     null: false
-    t.boolean  "public",            default: false,     null: false
-    t.boolean  "owned_by_user",     default: false,     null: false
+    t.boolean  "accessible",         default: false,     null: false
+    t.boolean  "public",             default: false,     null: false
+    t.boolean  "owned_by_user",      default: false,     null: false
     t.string   "owner_primary_key"
     t.string   "owner_foreign_key"
     t.string   "description"
     t.text     "notes"
-    t.string   "table_name",                            null: false
-    t.boolean  "owner_writable",    default: false,     null: false
+    t.string   "table_name",                             null: false
+    t.boolean  "owner_writable",     default: false,     null: false
+    t.string   "management_api_key",                     null: false
   end
 
   add_index "data_apis", ["accessible"], name: "index_data_apis_on_accessible"
@@ -139,6 +140,12 @@ ActiveRecord::Schema.define(version: 20150515222124) do
   add_index "friendly_id_slugs", ["slug", "sluggable_type"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type"
   add_index "friendly_id_slugs", ["sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_id"
   add_index "friendly_id_slugs", ["sluggable_type"], name: "index_friendly_id_slugs_on_sluggable_type"
+
+  create_table "my_new_api", force: :cascade do |t|
+    t.string  "my_string"
+    t.integer "my_int"
+    t.boolean "my_bool"
+  end
 
   create_table "oauth_access_grants", force: :cascade do |t|
     t.integer  "resource_owner_id", null: false

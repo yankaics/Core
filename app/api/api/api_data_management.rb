@@ -1,12 +1,11 @@
-class API::Open < API
-  include APIGuard
+class API::APIDataManagement < API
   include APIResourceFieldsettable
   include APIResourceIncludable
   include APIResourceFilterable
   include APIResourcePaginatable
   include APIResourceSortable
 
-  route :any, '*path' do
+  route :any, 'data_management/*path' do
     @request_path = params.path
     # remove format extension in path
     @request_path.slice!(/\..+$/)
@@ -15,23 +14,10 @@ class API::Open < API
 
     @request_method = request.request_method
 
-    # Find if there is a matching TransferAPI
-    if false
-
     # Find if there is a matching DataAPI
-    elsif (
-      if current_application.try(:core_app?)
-        @data_api_request = DataAPI::Request.new(@request_path, access_token: current_access_token, include_inaccessible: true)
-      else
-        @data_api_request = DataAPI::Request.new(@request_path, access_token: current_access_token)
-      end
+    if (
+      @data_api_request = DataAPI::Request.new(@request_path, access_token: current_access_token, include_inaccessible: true, include_not_public: true)
     ).present?
-      # Guard the API if the requested resource is scoped under a user
-      if @data_api_request.scoped_under_user && @request_method != 'GET'
-        guard!(scopes: ['api:write'])
-      elsif @data_api_request.scoped_under_user
-        guard!(scopes: ['api'])
-      end
 
       # prepare variables
       @data_api = @data_api_request.data_api
@@ -39,23 +25,14 @@ class API::Open < API
       @resource_fields = @data_api.fields
       @includable_fields = @data_api.includable_fields
 
+      # verify the request
+      error!(401, 401) if params[:key] != @data_api.management_api_key
+
       # process request
       case @request_method
 
       # GET requests
       when 'GET'
-        # fieldset
-        fieldset_for @resource_name, permitted_fields: @resource_fields,
-                                     show_all_permitted_fields_by_default: true,
-                                     root: true
-        # inclusion
-        inclusion_for @resource_name, root: true
-        # fieldset for inclusion
-        if @data_api.owner?
-          fieldset_for :user, permitted_fields: User::PUBLIC_ATTRS,
-                              show_all_permitted_fields_by_default: true
-        end
-
         # resource specified, e.g.: 'GET /resources/1'
         if @data_api_request.resource_specified?
           @resource = @data_api_request.specified_resource
@@ -82,13 +59,10 @@ class API::Open < API
 
       # POST requests, create resource
       when 'POST'
-        # this is only for user scoped resources,
-        # the access token permission is verified on the above 'guard' section
-        error! 403, 403 unless @data_api_request.scoped_under_user
-        error! 403, 403 unless @data_api.owner_writable
         error!({ error: 'no_data_provided', description: "The #{@data_api.name} parameter is expected to exist and be a object." }, 400) if params[@data_api.name].blank? || !params[@data_api.name].is_a?(Hash)
-        attrs = params[@data_api.name].slice(*@data_api.owner_write_permitted_fields).to_h
+        attrs = params[@data_api.name].slice(*@data_api.writable_fields).to_h
         @resource = @data_api_request.resource_collection.build(attrs)
+
         if @resource.save
           status 201
           render rabl: 'data_api'
@@ -99,16 +73,8 @@ class API::Open < API
 
       # PATCH requests, update resource
       when 'PATCH'
-        # this is only for user scoped resources,
-        # the access token permission is verified on the above 'guard' section
-        error! 403, 403 unless @data_api_request.scoped_under_user
-        error! 403, 403 unless @data_api.owner_writable
-
-        error! 404, 404 if @data_api_request.specified_resource.blank? ||
-                           !@data_api_request.specified_resource.try(:persisted?)
-
         error!({ error: 'no_data_provided', description: "The #{@data_api.name} parameter is expected to exist and be a object." }, 400) if params[@data_api.name].blank? || !params[@data_api.name].is_a?(Hash)
-        attrs = params[@data_api.name].slice(*@data_api.owner_write_permitted_fields).to_h
+        attrs = params[@data_api.name].slice(*@data_api.writable_fields).to_h
         @resource = @data_api_request.specified_resource
         @resource.assign_attributes(attrs)
 
@@ -122,15 +88,10 @@ class API::Open < API
 
       # PUT requests, create or replace resource
       when 'PUT'
-        # this is only for user scoped resources,
-        # the access token permission is verified on the above 'guard' section
-        error! 403, 403 unless @data_api_request.scoped_under_user
-        error! 403, 403 unless @data_api.owner_writable
-
         error! 400, 400 if @data_api_request.specified_resource_id.blank?
 
         error!({ error: 'no_data_provided', description: "The #{@data_api.name} parameter is expected to exist and be a object." }, 400) if params[@data_api.name].blank? || !params[@data_api.name].is_a?(Hash)
-        permitted_fields = @data_api.owner_write_permitted_fields(primary_key: false)
+        permitted_fields = @data_api.writable_fields(primary_key: false)
         attrs = params[@data_api.name].slice(*permitted_fields).to_h
         @resource = @data_api_request.specified_resource ||
                     @data_api_request.resource_collection.build(@data_api.primary_key => @data_api_request.specified_resource_id)
@@ -152,10 +113,6 @@ class API::Open < API
 
       # DELETE requests, deletes resource
       when 'DELETE'
-        # this is only for user scoped resources,
-        # the access token permission is verified on the above 'guard' section
-        error! 403, 403 unless @data_api_request.scoped_under_user
-        error! 403, 403 unless @data_api.owner_writable
 
         # deleting scoped resource collection
         if @data_api_request.specified_resource_id.blank?
@@ -189,6 +146,7 @@ class API::Open < API
 
           # deleting a single resource
           else
+            @resource = @data_api_request.specified_resource
             if @resource.destroy
               status 200
               render rabl: 'data_api'
