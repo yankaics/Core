@@ -10,6 +10,20 @@ ActiveAdmin.register DataAPI do
       super.includes(:organization)
     end
 
+    def new
+      if params[:template_data_api_id]
+        template = scoped_collection.find_by(id: params[:template_data_api_id])
+        if template.present?
+          template = template.dup
+          template.management_api_key = nil
+          template.initialize_management_api_key
+          @data_api = template
+        end
+      end
+
+      super
+    end
+
     def create
       @data_api = scoped_collection.new(data_api_params)
       @data_api.schema.load_from_array(data_api_params_schema_array)
@@ -136,6 +150,7 @@ ActiveAdmin.register DataAPI do
     column(:maintain_schema)
     id_column
     column(:manage) { |data_api| link_to '管理資料集', admin_data_api_data_api_api_data_path(data_api_id: data_api.id) }
+    column(:more_actions) { |data_api| link_to '作為樣板新增...', new_admin_data_api_path(template_data_api_id: data_api.id) }
     actions
   end
 
@@ -159,6 +174,7 @@ ActiveAdmin.register DataAPI do
     column(:owner_foreign_key)
     id_column
     column(:manage) { |data_api| link_to '管理資料集', admin_data_api_data_api_api_data_path(data_api_id: data_api.id) }
+    column(:more_actions) { |data_api| link_to '作為樣板新增...', new_admin_data_api_path(template_data_api_id: data_api.id) }
     actions
   end
 
@@ -239,6 +255,12 @@ ActiveAdmin.register DataAPI do
       end
       para do
         link_to '管理資料集', admin_data_api_data_api_api_data_path(data_api_id: data_api.id)
+      end
+    end
+
+    panel '更多動作' do
+      para do
+        link_to '作為樣板新增...', new_admin_data_api_path(template_data_api_id: data_api.id)
       end
     end
   end
