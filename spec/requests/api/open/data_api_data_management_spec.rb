@@ -174,17 +174,17 @@ describe "Open Data API - Data Management" do
       data_api.data_model.last[data_api.primary_key]
     ]
 
-    get "/api/data_management/#{data_api.path}/#{primary_keys.first}.json?key=#{data_api.management_api_key}"
+    get "/api/data_management/#{data_api.path}/#{URI.encode(primary_keys.first)}.json?key=#{data_api.management_api_key}"
     expect(response).to be_success
-    get "/api/data_management/#{data_api.path}/#{primary_keys.last}.json?key=#{data_api.management_api_key}"
-    expect(response).to be_success
-
-    delete "/api/data_management/#{data_api.path}/#{primary_keys.join(',')}.json?key=#{data_api.management_api_key}"
+    get "/api/data_management/#{data_api.path}/#{URI.encode(primary_keys.last)}.json?key=#{data_api.management_api_key}"
     expect(response).to be_success
 
-    get "/api/data_management/#{data_api.path}/#{primary_keys.first}.json?key=#{data_api.management_api_key}"
+    delete "/api/data_management/#{data_api.path}/#{URI.encode(primary_keys.join(','))}.json?key=#{data_api.management_api_key}"
+    expect(response).to be_success
+
+    get "/api/data_management/#{data_api.path}/#{URI.encode(primary_keys.first)}.json?key=#{data_api.management_api_key}"
     expect(response).not_to be_success
-    get "/api/data_management/#{data_api.path}/#{primary_keys.last}.json?key=#{data_api.management_api_key}"
+    get "/api/data_management/#{data_api.path}/#{URI.encode(primary_keys.last)}.json?key=#{data_api.management_api_key}"
     expect(response).not_to be_success
 
     # Deletes Scope of Data
