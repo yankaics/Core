@@ -149,7 +149,7 @@ ActiveAdmin.register DataAPI do
     column(:organization) { |data_api| data_api.organization.blank? ? nil : link_to(data_api.organization_code, admin_organization_path(data_api.organization)) } if current_admin.root?
     column(:maintain_schema)
     id_column
-    column(:manage) { |data_api| link_to '管理資料集', admin_data_api_data_api_api_data_path(data_api_id: data_api.id) }
+    column(:manage) { |data_api| link_to '管理資料集', admin_data_api_data_path(data_api_id: data_api.id) }
     column(:more_actions) { |data_api| link_to '作為樣板新增...', new_admin_data_api_path(template_data_api_id: data_api.id) }
     actions
   end
@@ -173,7 +173,7 @@ ActiveAdmin.register DataAPI do
     column(:owner_primary_key)
     column(:owner_foreign_key)
     id_column
-    column(:manage) { |data_api| link_to '管理資料集', admin_data_api_data_api_api_data_path(data_api_id: data_api.id) }
+    column(:manage) { |data_api| link_to '管理資料集', admin_data_api_data_path(data_api_id: data_api.id) }
     column(:more_actions) { |data_api| link_to '作為樣板新增...', new_admin_data_api_path(template_data_api_id: data_api.id) }
     actions
   end
@@ -254,7 +254,7 @@ ActiveAdmin.register DataAPI do
         "資料筆數：#{data_api.data_count}"
       end
       para do
-        link_to '管理資料集', admin_data_api_data_api_api_data_path(data_api_id: data_api.id)
+        link_to '管理資料集', admin_data_api_data_path(data_api_id: data_api.id)
       end
     end
 

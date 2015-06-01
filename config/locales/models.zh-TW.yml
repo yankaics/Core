@@ -12,8 +12,10 @@ zh-TW:
       doorkeeper/application: "應用程式"
       data_api: "資料集 API"
       data_api/api_data: "資料集 API 資料"
-      data_api_api_data: "資料集 API 資料"
+      data_api_api_data: "資料"
       data_api_api_datum: "API 資料"
+      data: "資料"
+      datum: "資料"
 
     attributes:
       user:

@@ -1,4 +1,4 @@
-ActiveAdmin.register DataAPI::APIData, namespace: :admin do
+ActiveAdmin.register DataAPI::APIData, as: 'data', namespace: :admin do
   belongs_to :data_api
   navigation_menu :default
   menu priority: 60, parent: 'api', if: proc { params[:controller] == "admin/data_api_data" }
@@ -7,10 +7,11 @@ ActiveAdmin.register DataAPI::APIData, namespace: :admin do
   scope_to(if: proc { current_admin.scoped? }) { current_admin.organization }
 
   controller do
-    before_action :set_model
+    before_filter :set_model
 
     def scoped_collection
-      super
+      @data_api = DataAPI.find(params[:data_api_id])
+      @data_api.data_model.all
     end
 
     def set_model
