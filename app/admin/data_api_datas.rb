@@ -29,4 +29,31 @@ ActiveAdmin.register DataAPI::APIData, as: 'data', namespace: :admin do
 
   active_admin_import :validate => true,
                       :template => 'admin/data_api_import'
+
+  index do
+    selectable_column
+    column(:id) if data.last.respond_to?(:id)
+    data_api.columns.each do |column|
+      column(column)
+    end
+    actions
+  end
+
+  show do
+    attributes_table do
+      row(:id) if data.respond_to?(:id)
+      data_api.columns.each do |column|
+        row(column)
+      end
+    end
+  end
+
+  form do |f|
+    f.inputs do
+      data_api.columns.each do |column|
+        f.input(column)
+      end
+    end
+    f.actions
+  end
 end

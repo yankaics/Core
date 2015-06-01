@@ -186,15 +186,11 @@ ActiveAdmin.register DataAPI do
         row(:name)
         row(:table_name)
         row(:path)
-        row(:management_api_key) { |data_api| code { data_api.management_api_key } }
         row('API 存取網址') do |data_api|
           ul do
             li(a("http://#{CoreRSAKeyService.domain}/api/#{data_api.path}", href: "http://#{CoreRSAKeyService.domain}/api/#{data_api.path}", target: '_blank')) if data_api.public
             li(a("http://#{CoreRSAKeyService.domain}/api/v1/me/#{data_api.path}", href: "http://#{CoreRSAKeyService.domain}/api/v1/me/#{data_api.path}", target: '_blank')) if data_api.owner?
           end
-        end
-        row('資料集維護 API 網址') do |data_api|
-          a("http://#{CoreRSAKeyService.domain}/api/data_management/#{data_api.path}?key=#{data_api.management_api_key}", href: "http://#{CoreRSAKeyService.domain}/api/data_management/#{data_api.path}?key=#{data_api.management_api_key}", target: '_blank')
         end
         row(:organization) if current_admin.root? && data_api.organization.present?
         row(:description)
@@ -202,6 +198,15 @@ ActiveAdmin.register DataAPI do
         row(:id)
         row(:created_at)
         row(:updated_at)
+      end
+    end
+
+    panel '管理用 API' do
+      attributes_table_for data_api do
+        row(:management_api_key) { |data_api| code { data_api.management_api_key } }
+        row('資料集維護 API 網址') do |data_api|
+          a("http://#{CoreRSAKeyService.domain}/api/data_management/#{data_api.path}", href: "http://#{CoreRSAKeyService.domain}/api/data_management/#{data_api.path}", target: '_blank')
+        end
       end
     end
 

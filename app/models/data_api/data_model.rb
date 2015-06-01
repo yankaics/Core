@@ -7,9 +7,6 @@ class DataAPI::DataModel < ActiveRecord::Base
   cattr_accessor :database_url, :organization_code, :updated_at,
                  :owned_by_user, :owner_primary_key, :owner_foreign_key
 
-  # validates :uid, presence: true
-  # validates :uid, uniqueness: true'
-
   # Sets the owner relation in needed
   def self.set_owner_relation
     if owned_by_user
