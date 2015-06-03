@@ -146,13 +146,11 @@ gem 'hirb', :require => false
 gem 'hirb-unicode', :require => false
 
 # Assets related Gems
+gem 'colorgy_style', github: 'colorgy/Style'
 gem 'react-rails', '~> 1.0'
-gem 'normalize-rails', '>= 3.0.1'
-gem 'modernizr-rails'
 gem 'swagger-ui_rails', '~> 2.1.0.alpha.7.1'
 gem 'nprogress-rails', '~> 0.1.6.5'
 gem 'select2-rails', '~> 3.5.9'
 gem 'chosen-rails'
-gem 'bootstrap-sass'
 
 gem 'rails_stdout_logging', :require => false

@@ -10,9 +10,10 @@
 // Read Sprockets README (https://github.com/sstephenson/sprockets#sprockets-directives) for details
 // about supported directives.
 //
-//= require es5-shim
 //= require jquery
 //= require jquery_ujs
+//= require colorgy/modernizr
+//= require colorgy
 //= require react
 //= require react_ujs
 //= require chosen-jquery
