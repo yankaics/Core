@@ -16,4 +16,15 @@ rescue LoadError
 end
 APP_PATH = File.expand_path('../../config/application',  __FILE__)
 require_relative '../config/boot'
+
+if ENV['CONSOLE'] == 'true'
+  begin
+    require 'awesome_print'
+    require 'hirb'
+    require 'hirb-unicode'
+    extend Hirb::Console
+  rescue LoadError => e
+  end
+end
+
 require 'rails/commands'

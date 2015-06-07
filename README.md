@@ -31,9 +31,10 @@ It's also aimed to be Heroku deployable: [![Deploy](https://neson.github.io/GitH
 
 Visit `http(s)://url_of_your_app/admin` to access the control panel. The default account and password is `admin` / `password`. Please change it immediately after your first login by clicking your administration account name ("admin") located at the top-right corner.
 
-You can also type $ `bin/rails c` <kbd>Enter</kbd> in the terminal to enter the rails console.
+You can also type `bin/console` <kbd>Enter</kbd> in the terminal to enter the rails console.
 
-Feel free to check out the [docs](https://github.com/colorgy/Core/wiki) for further information.
+Feel free to check out the [wiki](https://github.com/colorgy/Core/wiki) for further information.
+
 
 ## Testing
 
@@ -41,13 +42,19 @@ Run the following command to execute all test suites:
 
 ```bash
 $ bundle exec rake
-
 ```
 
 
 ## Chat
 
 [![Join the chat at https://gitter.im/colorgy/Core](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/colorgy/Core?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+
+## License
+
+Copyright (c) 2015 MISK. Licensed under [GNU AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.html) with the following conditions:
+
+This software can only be used to power a service where end users are not (able to be) charged for. An additional license should be made if this condition is not obeyed.
 
 
 ## Contributing

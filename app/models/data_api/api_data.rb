@@ -1,5 +1,5 @@
 # A fake ActiveRecord model that can change the reflected model on the fly
-class DataAPI::APIData < ActiveRecord::Base
+class DataAPI::APIData
   cattr_accessor :model
 
   def self.column_names(*args, &block)

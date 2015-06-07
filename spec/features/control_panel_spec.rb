@@ -301,9 +301,9 @@ feature "Control Panel", :type => :feature, :retry => 3 do
         data_api = create(:data_api, schema: { string: { type: 'string' }, text: { type: 'text' }, boolean: { type: 'boolean' } })
         visit(admin_data_api_data_path(data_api_id: data_api.id))
         click_link I18n.t(:'active_admin.new_model', model: I18n.t(:'activerecord.models.data_api_api_data'))
-        fill_in 'data_api_api_data_string', with: "Hello World"
-        fill_in 'data_api_api_data_text', with: "Have a good day!"
-        check 'data_api_api_data_boolean'
+        fill_in 'data_string', with: "Hello World"
+        fill_in 'data_text', with: "Have a good day!"
+        check 'data_boolean'
         find('input[type=submit]').click
         expect(data_api.data_model.first.string).to eq("Hello World")
         expect(data_api.data_model.first.text).to eq("Have a good day!")
