@@ -76,6 +76,8 @@ gem 'grape-swagger'
 gem 'rack-cors', :require => 'rack/cors'
 gem 'rack-oauth2', '~> 1.1.1'
 
+gem 'api_helper', github: 'Neson/api_helper'
+
 gem 'devise', '~> 3.4.0'
 gem 'cancancan', '~> 1.10.0'
 gem 'omniauth-facebook', '~> 2.0.0'

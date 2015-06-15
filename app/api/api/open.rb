@@ -1,10 +1,11 @@
 class API::Open < API
   include APIGuard
-  include APIResourceFieldsettable
-  include APIResourceIncludable
-  include APIResourceFilterable
-  include APIResourcePaginatable
-  include APIResourceSortable
+  helpers APIMetaDataHelper
+  helpers APIHelper::Fieldsettable
+  helpers APIHelper::Includable
+  helpers APIHelper::Paginatable
+  helpers APIHelper::Sortable
+  helpers APIHelper::Filterable
 
   route :any, '*path' do
     @request_path = params.path
@@ -46,14 +47,14 @@ class API::Open < API
       when 'GET'
         # fieldset
         fieldset_for @resource_name, permitted_fields: @resource_fields,
-                                     show_all_permitted_fields_by_default: true,
-                                     root: true
+                                     defaults_to_permitted_fields: true,
+                                     default: true
         # inclusion
-        inclusion_for @resource_name, root: true
+        inclusion_for @resource_name, default: true
         # fieldset for inclusion
         if @data_api.owner?
           fieldset_for :user, permitted_fields: User::PUBLIC_ATTRS,
-                              show_all_permitted_fields_by_default: true
+                              defaults_to_permitted_fields: true
         end
 
         # resource specified, e.g.: 'GET /resources/1'
@@ -75,7 +76,7 @@ class API::Open < API
           maxium_per_page = current_application.try(:core_app?) ? 5000 : 100
           pagination @resource_collection.size, default_per_page: 20, maxium_per_page: maxium_per_page
 
-          @resources = @resource_collection.order(sort).page(page).per(per_page)
+          @resources = @resource_collection.order(sortable_sort).page(pagination_page).per(pagination_per_page)
           render rabl: 'data_apis'
           return
         end

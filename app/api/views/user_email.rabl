@@ -3,7 +3,8 @@ set_fieldset :user_email, default_fields: [:id, :email],
 set_inclusion :user_email
 
 object @user_email
-attributes(*fieldset[:user_email])
+
+attributes(*(fieldset(:user_email) - inclusion_field(:user_email).keys))
 
 node :_type do
   :user_email

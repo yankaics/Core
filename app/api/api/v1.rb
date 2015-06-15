@@ -1,8 +1,13 @@
 class API::V1 < API
-  include APIResourceFieldsettable
-  include APIResourceIncludable
-  include APIResourceSortable
-  include APIResourceMultigettable
+  helpers APIMetaDataHelper
+  helpers APIHelper::Fieldsettable
+  helpers APIHelper::Includable
+  helpers APIHelper::Paginatable
+  helpers APIHelper::Sortable
+  helpers APIHelper::Filterable
+  helpers APIHelper::Multigettable
+  helpers APIHelper::Sortable
+
   version 'v1'
 
   mount Me

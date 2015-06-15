@@ -1,29 +1,37 @@
-unless @inclusion_field[locals[:self_resource]].blank?
-  @inclusion_field[locals[:self_resource]].each do |i_field|
+this = locals[:self_resource]
+
+unless inclusion_field(this).blank?
+  inclusion_field(this).each_pair do |field_name, includable_field|
+    next if fieldset(this).present? && !fieldset(this).include?(field_name)
+
     # include child
-    if inclusion[locals[:self_resource]].include?(i_field[:field])
-      child i_field[:field], root: i_field[:field], object_root: false do
-        template = (i_field[:class_name] || i_field[:field]).to_s.underscore.singularize
+    if inclusion[this].include?(field_name)
+
+      child field_name.to_sym, root: field_name.to_sym, object_root: false do
+        template = (includable_field[:resource_name] || field_name).to_s.underscore.singularize
         extends template
       end
 
     # not to include child
     else
-      node i_field[:field] do |obj|
-        if obj.try(i_field[:id_field]).present?
-          obj.try(i_field[:id_field])
+
+      node field_name do |obj|
+        if obj.try(includable_field[:id_field]).present?
+          obj.try(includable_field[:id_field])
         else
-          fk = obj.class.try("#{i_field[:field]}_foreign_key")
-          obj.try(fk) if fk.present?
+          foreign_key = obj.class.try("#{field_name}_foreign_key")
+          obj.try(foreign_key) if foreign_key.present?
         end
       end
-      type = (i_field[:class_name] || i_field[:field]).to_s.underscore.singularize
-      @meta ||= {}
-      @meta[locals[:self_resource]] ||= {}
-      @meta[locals[:self_resource]][:relations] ||= {}
-      @meta[locals[:self_resource]][:relations][i_field[:field]] ||= {}
-      @meta[locals[:self_resource]][:relations][i_field[:field]][:type] = type
-      @meta[locals[:self_resource]][:relations][i_field[:field]][:url] = request.url.gsub(@request_path, "/#{i_field[:url]}") if i_field[:url].present? && @request_path.is_a?(String)
+
+      # prepare the meta data
+      type = (includable_field[:resource_name] || field_name).to_s.underscore.singularize
+
+      meta[this] ||= {}
+      meta[this][:relations] ||= {}
+      meta[this][:relations][field_name] ||= {}
+      meta[this][:relations][field_name][:type] = type
+      meta[this][:relations][field_name][:url] = request.url.gsub(@request_path, "/#{includable_field[:url]}") if includable_field[:url].present? && @request_path.is_a?(String)
     end
   end
 end

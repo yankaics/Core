@@ -10,7 +10,7 @@ node :id do |dep|
   dep.code
 end
 
-attributes(*fieldset[:department])
+attributes(*(fieldset(:department) - inclusion_field(:department).keys))
 
 extends('extensions/includable_childs', locals: { self_resource: :department })
 

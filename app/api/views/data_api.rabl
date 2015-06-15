@@ -7,11 +7,11 @@ set_inclusion @resource_name
 @includable_fields.each do |field|
   case field
   when :owner
-    set_inclusion_field @resource_name, :owner, :owner_code, class_name: :User
+    set_inclusion_field @resource_name, :owner, :owner_code, resource_name: :user
   end
 end
 
-attributes(*fieldset[@resource_name])
+attributes(*(fieldset(@resource_name) - inclusion_field(@resource_name).keys))
 
 extends('extensions/includable_childs', locals: { self_resource: @resource_name })
 

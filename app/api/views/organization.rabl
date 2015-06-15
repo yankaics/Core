@@ -11,7 +11,7 @@ node :id do |org|
   org.code
 end
 
-attributes(*fieldset[:organization])
+attributes(*(fieldset(:organization) - inclusion_field(:organization).keys))
 
 extends('extensions/includable_childs', locals: { self_resource: :organization })
 

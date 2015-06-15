@@ -3,7 +3,8 @@ set_fieldset :user_identity, default_fields: [:id, :organization_code, :departme
 set_inclusion :user_identity
 
 object @user_identity
-attributes(*fieldset[:user_identity])
+
+attributes(*(fieldset(:user_identity) - inclusion_field(:user_identity).keys))
 
 node :_type do
   :user_identity

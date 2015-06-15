@@ -10,8 +10,8 @@ class API::V1::Me < API::V1
       NOTE
     }
     params do
-      optional :fields, desc: APIResourceFieldsettable.fields_param_desc(example: 'id,uuid,name,avatar_url')
-      optional :include, desc: APIResourceIncludable.include_param_desc(example: 'organization,primary_identity')
+      optional :fields, desc: APIHelper::Fieldsettable.fields_param_desc(example: 'id,uuid,name,avatar_url')
+      optional :include, desc: APIHelper::Includable.include_param_desc(example: 'organization,primary_identity')
     end
     get rabl: 'user' do
       permitted_attrs = []
@@ -23,14 +23,14 @@ class API::V1::Me < API::V1
       permitted_attrs += User::IDENTITY_ATTRS if scopes.include? :identity
       permitted_attrs += User::CORE_ATTRS if current_app.present? && current_app.core_app?
 
-      fieldset_for :user, root: true, permitted_fields: permitted_attrs,
-                          show_all_permitted_fields_by_default: true
+      fieldset_for :user, default: true, permitted_fields: permitted_attrs,
+                          defaults_to_permitted_fields: true
       fieldset_for :user_identity
       fieldset_for :user_email
       fieldset_for :organization
       fieldset_for :department
 
-      inclusion_for :user, root: true
+      inclusion_for :user, default: true
 
       @user = current_user
     end
