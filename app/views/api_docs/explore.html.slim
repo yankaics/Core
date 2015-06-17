@@ -1,2 +1,8 @@
+h1 Colorgy API Explorer
 .swagger-section
-  #api-explorer.swagger-ui-wrap.api-explorer(data={ url: @swagger_url, access_token: @access_token, all_scopes: @all_scopes.to_json, applications: @applications.to_json })
+  #api-explorer.api-explorer
+    #api-explorer-authorizer.api-explorer-authorizer(data={ access_token: @access_token, all_scopes: @all_scopes.to_json, applications: @applications.to_json })
+
+    #api-explorer-collection-selector.api-explorer-collection-selector(data={ api_collection: @api_collection, api_collections: @api_collections.to_json, api_base_url: @api_base_url })
+
+    #swagger-ui-wrap.swagger-ui-wrap

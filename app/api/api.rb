@@ -32,21 +32,16 @@ class API < Grape::API
     { pong: true }
   end
 
-  include APIDocsExtended
-
   documentation_settings = {
     base_path: ->(req) { req.host.match(/^api\./) ? '/' : '/api' },
     api_version: 'v1',
     mount_path: '/docs',
-    root_base_path: true,
-    # markdown: GrapeSwagger::Markdown::RedcarpetAdapter.new(render_options: { highlighter: :rouge }),
-    info: {
-      title: "Core API",
-      description: "本系統提供 OAuth 2.0 認證協定以及相關使用者資源 API 供開發者存取，可用於各平台應用程式之開發，並提供服務予使用者。"
-    }
+    root_base_path: true
   }
 
   add_swagger_documentation(documentation_settings)
+
+  mount API::ExtendDocs => '/extend_docs'
 
   mount API::APIDataManagement
   mount API::Open
