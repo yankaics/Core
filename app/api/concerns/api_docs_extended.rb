@@ -83,9 +83,9 @@ module APIDocsExtended
         data_api_description = data_api.description.present? ? data_api.description : data_api.name
         collection_opts = {
           params: {
-            per_page: { required: false, type: 'Integer', desc: APIResourcePaginatable.per_page_param_desc },
-            page: { required: false, type: 'Integer', desc: APIResourcePaginatable.page_param_desc },
-            sort: { required: false, type: 'String', desc: APIResourceSortable.sort_param_desc(default: data_api.default_order, example: data_api.schema.keys.sample(2).map { |s| ['-', ''].sample + s }.join(',')) },
+            per_page: { required: false, type: 'Integer', desc: APIHelper::Paginatable.per_page_param_desc },
+            page: { required: false, type: 'Integer', desc: APIHelper::Paginatable.page_param_desc },
+            sort: { required: false, type: 'String', desc: APIHelper::Sortable.sort_param_desc(default: data_api.default_order, example: data_api.schema.keys.sample(2).map { |s| ['-', ''].sample + s }.join(',')) },
             fields: { required: false, type: 'String', desc: APIHelper::Fieldsettable.fields_param_desc(example: data_api.schema.keys.sample(3).join(',')) },
             callback: { required: false, type: 'String', desc: "JSON-P callbacks, wrap the results in a specific JSON function." }
           },
@@ -100,7 +100,7 @@ module APIDocsExtended
           collection_opts[:params]["filter[#{column}]"] = \
             { required: false,
               type: 'String',
-              desc: APIResourceFilterable.filter_param_desc(for_field: column) }
+              desc: APIHelper::Filterable.filter_param_desc(for_field: column) }
         end
 
         specified_resource_opts = {
@@ -209,7 +209,7 @@ module APIDocsExtended
             bulk_delete_opts[:params]["filter[#{column}]"] = \
               { required: false,
                 type: 'String',
-                desc: APIResourceFilterable.filter_param_desc(for_field: column) }
+                desc: APIHelper::Filterable.filter_param_desc(for_field: column) }
           end
 
           bulk_delete_route = Grape::Route.new(bulk_delete_opts)
