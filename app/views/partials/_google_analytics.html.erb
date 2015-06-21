@@ -11,7 +11,7 @@
   ga("create", "<%= id %>", 'auto', {'name': "<%= i %>"});
   ga("<%= i %>.require", 'displayfeatures');
   <% if current_user %>
-  ga("<%= i %>.set", '&uid', "<%= current_user.sid %>");
+  ga("<%= i %>.set", '&uid', "<%= current_user.id %>");
   <% end %>
   ga("<%= i %>.send", 'pageview');
   <% end %>
