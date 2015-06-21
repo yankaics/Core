@@ -16,15 +16,17 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
         redirect_to @redirect_url and return if @redirect_url
       end
 
-      # redirect new users to verify their email
-      if @user.primary_identity_id.blank? && @user.created_at > 2.hours.ago
+      # redirect new users to verify their identity
+      if @user.primary_identity_id.blank? &&
+         @user.created_at > 2.hours.ago &&
+         ENV['SKIP_NEW_USER_IDENTITY_VERIFICATION'] != 'true'
         sign_in @user
         redirect_to new_my_account_email_path
       else
         sign_in_and_redirect @user, event: :authentication
       end
     else
-      flash[:alert] = "錯誤：請確認您的 Facebook 資料是有效的，或嘗試其他登入方式！"
+      flash[:alert] = "錯誤：請確認您的 Facebook 帳號是有效的 (啟用並已驗證信箱)，或嘗試其他登入方式！"
       redirect_to new_user_session_path
     end
   end
