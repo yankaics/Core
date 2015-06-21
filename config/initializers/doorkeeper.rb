@@ -44,7 +44,7 @@ Doorkeeper.configure do
   # For more information go to
   # https://github.com/doorkeeper-gem/doorkeeper/wiki/Using-Scopes
   default_scopes  :public
-  optional_scopes :email, :account, :identity, :facebook, :info,
+  optional_scopes :email, :account, :write, :identity, :facebook, :info,
                   :read_notifications, :send_notification, :sms,
                   :api, :'api:write',
                   :offline_access, :long_term
