@@ -28,6 +28,14 @@ describe "Open Data API" do
     data_api.data_model.create!(a: '4', b: 'beta', c: 'beta')
     data_api
   end
+  let(:ntust_data_api) do
+    create(:ntust_organization)
+    create(:data_api, :with_data, data_count: 2, path: 'ntust/data_api',
+                                  organization_code: 'NTUST',
+                                  primary_key: :integer_col,
+                                  schema: { string_col: { type: 'string' },
+                                            integer_col: { type: 'integer' } })
+  end
   let(:user) do
     create(:user, :confirmed, :with_identity)
   end
@@ -277,6 +285,18 @@ describe "Open Data API" do
       expect(json.first['owner']).to have_key('username')
       expect(json.first).not_to have_key('data')
     end
+
+    it "can be accessed with a path nested under an organization" do
+      get "/api/v1/#{ntust_data_api.path}.json"
+      expect(response).to be_success
+      json1 = JSON.parse(response.body)
+
+      get "/api/v1/organizations/NTUST/data_api.json"
+      expect(response).to be_success
+      json2 = JSON.parse(response.body)
+
+      expect(json1).to eq(json2)
+    end
   end
 
   describe "specified resource" do
@@ -379,6 +399,18 @@ describe "Open Data API" do
       expect(response).to be_success
       json = JSON.parse(response.body)
       expect(json['owner']).to be_nil
+    end
+
+    it "can be accessed with a path nested under an organization" do
+      get "/api/v1/#{ntust_data_api.path}/1.json"
+      expect(response).to be_success
+      json1 = JSON.parse(response.body)
+
+      get "/api/v1/organizations/NTUST/data_api/1.json"
+      expect(response).to be_success
+      json2 = JSON.parse(response.body)
+
+      expect(json1).to eq(json2)
     end
   end
 

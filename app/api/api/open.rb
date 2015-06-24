@@ -21,6 +21,10 @@ class API::Open < API
 
     # Find if there is a matching DataAPI
     elsif (
+      if path_nested_under_organization_match = @request_path.match(/^organizations\/(?<code>[a-zA-Z0-9]+)/)
+        @request_path.gsub!(/^organizations\/(?<code>[a-zA-Z0-9]+)/, path_nested_under_organization_match[:code].downcase)
+      end
+
       if current_application.try(:core_app?)
         @data_api_request = DataAPI::Request.new(@request_path, access_token: current_access_token, include_inaccessible: true)
       else
