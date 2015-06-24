@@ -51,6 +51,7 @@ class API::Open < API
                                      default: true
         # inclusion
         inclusion_for @resource_name, default: true
+
         # fieldset for inclusion
         if @data_api.owner?
           fieldset_for :user, permitted_fields: User::PUBLIC_ATTRS,
@@ -87,9 +88,14 @@ class API::Open < API
         # the access token permission is verified on the above 'guard' section
         error! 403, 403 unless @data_api_request.scoped_under_user
         error! 403, 403 unless @data_api.owner_writable
+
+        # expect the data exists
         error!({ error: 'no_data_provided', description: "The #{@data_api.name} parameter is expected to exist and be a object." }, 400) if params[@data_api.name].blank? || !params[@data_api.name].is_a?(Hash)
+
+        # slice out params, and save the record
         attrs = params[@data_api.name].slice(*@data_api.owner_write_permitted_fields).to_h
         @resource = @data_api_request.resource_collection.build(attrs)
+
         if @resource.save
           status 201
           render rabl: 'data_api'
@@ -108,7 +114,10 @@ class API::Open < API
         error! 404, 404 if @data_api_request.specified_resource.blank? ||
                            !@data_api_request.specified_resource.try(:persisted?)
 
+        # expect the data exists
         error!({ error: 'no_data_provided', description: "The #{@data_api.name} parameter is expected to exist and be a object." }, 400) if params[@data_api.name].blank? || !params[@data_api.name].is_a?(Hash)
+
+        # slice out params, and save the record
         attrs = params[@data_api.name].slice(*@data_api.owner_write_permitted_fields).to_h
         @resource = @data_api_request.specified_resource
         @resource.assign_attributes(attrs)
@@ -130,7 +139,9 @@ class API::Open < API
 
         error! 400, 400 if @data_api_request.specified_resource_id.blank?
 
+        # expect the data exists
         error!({ error: 'no_data_provided', description: "The #{@data_api.name} parameter is expected to exist and be a object." }, 400) if params[@data_api.name].blank? || !params[@data_api.name].is_a?(Hash)
+
         permitted_fields = @data_api.owner_write_permitted_fields(primary_key: false)
         attrs = params[@data_api.name].slice(*permitted_fields).to_h
         @resource = @data_api_request.specified_resource ||
@@ -162,6 +173,8 @@ class API::Open < API
         if @data_api_request.specified_resource_id.blank?
           @resource = @data_api_request.resource_collection
           @resource = filter(@resource)
+
+          error!({ error: 'collection_not_filtered', description: "The resource collection must be filtered for this kind of delete request." }, 400) if params[:filter].blank?
 
           if @resource.destroy_all
             status 204

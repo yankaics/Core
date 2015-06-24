@@ -50,8 +50,7 @@ class API::APIDataManagement < API
           # sortable
           sortable default_order: @data_api.default_order
           # pagination
-          maxium_per_page = current_application.try(:core_app?) ? 5000 : 100
-          pagination @resource_collection.size, default_per_page: 20, maxium_per_page: maxium_per_page
+          pagination @resource_collection.size, default_per_page: 20, maxium_per_page: 5000
 
           @resources = @resource_collection.order(sortable_sort).page(pagination_page).per(pagination_per_page)
           render rabl: 'data_apis'
@@ -74,6 +73,8 @@ class API::APIDataManagement < API
 
       # PATCH requests, update resource
       when 'PATCH'
+        error! 400, 400 if @data_api_request.specified_resource_id.blank?
+
         error!({ error: 'no_data_provided', description: "The #{@data_api.name} parameter is expected to exist and be a object." }, 400) if params[@data_api.name].blank? || !params[@data_api.name].is_a?(Hash)
         attrs = params[@data_api.name].slice(*@data_api.writable_fields).to_h
         @resource = @data_api_request.specified_resource
@@ -119,6 +120,8 @@ class API::APIDataManagement < API
         if @data_api_request.specified_resource_id.blank?
           @resource = @data_api_request.resource_collection
           @resource = filter(@resource)
+
+          error!({ error: 'collection_not_filtered', description: "The resource collection must be filtered for this kind of delete request." }, 400) if params[:filter].blank?
 
           if @resource.destroy_all
             status 204

@@ -627,6 +627,17 @@ describe "Open Data API" do
       expect(response).to be_success
       json = JSON.parse(response.body)
       expect(json).not_to be_blank
+
+      # Resource collection must be filtered for this kind of request, without an
+      # "filter" parameter, the request will not be success and the records will
+      # not be deleted
+      delete "/api/me/#{private_user_data_api.path}.json?access_token=#{writable_access_token}"
+      expect(response).not_to be_success
+
+      get "/api/me/#{private_user_data_api.path}.json?access_token=#{writable_access_token}"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json).not_to be_blank
     end
   end
 end
