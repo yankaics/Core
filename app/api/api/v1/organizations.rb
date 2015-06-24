@@ -46,12 +46,12 @@ class API::V1::Organizations < API::V1
       fieldset_for :organization, default: true, default_fields: [:code, :name, :short_name, :departments]
       fieldset_for :department, default_fields: [:code, :name, :short_name], permitted_fields: [:code, :name, :short_name, :group]
 
-      inclusion_for :organization, default: true, default_includes: (multiget?(find_by: :code) ? [] : [:departments])
+      inclusion_for :organization, default: true, default_includes: (multiget?(param: :code) ? [] : [:departments])
 
       scoped_resource = Organization#.select(fieldset(:organization))
       scoped_resource = scoped_resource.includes(:departments) if inclusion(:organization, :departments)
 
-      @organization = multiget(scoped_resource, find_by: :code)
+      @organization = multiget(scoped_resource, find_by: :code, param: :code)
     end
   end
 end
