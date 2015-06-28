@@ -55,7 +55,7 @@ describe "Open Data API - Data Management" do
     expect(response).to be_success
     json = JSON.parse(response.body)
 
-    get "/api/data_management/#{data_api.path}/1.json?key=#{data_api.management_api_key}"
+    get "/api/data_management/#{data_api.path}/#{data_api.data_model.first[data_api.primary_key]}.json?key=#{data_api.management_api_key}"
     expect(response).to be_success
     json = JSON.parse(response.body)
   end
@@ -86,7 +86,7 @@ describe "Open Data API - Data Management" do
   end
 
   it "PATCHs data" do
-    id = data_api.data_model.last.id
+    id = data_api.data_model.last[data_api.primary_key]
     patch "/api/data_management/#{data_api.path}/#{id}.json?key=#{data_api.management_api_key}",
           data_api.name => {
             text_col: 'hi',

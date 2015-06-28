@@ -32,7 +32,6 @@ describe "Open Data API" do
     create(:ntust_organization)
     create(:data_api, :with_data, data_count: 2, path: 'ntust/data_api',
                                   organization_code: 'NTUST',
-                                  primary_key: :integer_col,
                                   schema: { string_col: { type: 'string' },
                                             integer_col: { type: 'integer' } })
   end
@@ -331,17 +330,6 @@ describe "Open Data API" do
       first_data = another_data_api.data_model.first
       last_data = another_data_api.data_model.last
       get "/api/v1/#{another_data_api.path}/#{last_data.integer_col},#{first_data.integer_col}.json"
-      expect(response).to be_success
-      json = JSON.parse(response.body)
-      expect(json.count).to eq(2)
-      expect(json.first['string_col']).to eq(first_data.string_col)
-      expect(json.last['string_col']).to eq(last_data.string_col)
-    end
-
-    it "fallbacks to use the id field to find a resourse" do
-      first_data = another_data_api.data_model.first
-      last_data = another_data_api.data_model.last
-      get "/api/v1/#{another_data_api.path}/#{last_data.id},#{first_data.id}.json"
       expect(response).to be_success
       json = JSON.parse(response.body)
       expect(json.count).to eq(2)

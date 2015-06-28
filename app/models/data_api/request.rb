@@ -116,14 +116,6 @@ class DataAPI::Request
         @requested_resource = resource_collection.find_by(data_api.primary_key => ids[0])
       end
 
-      if @requested_resource.blank? && data_api.primary_key != 'id'
-        if ids.count > 1
-          @requested_resource = resource_collection.where(id: ids)
-        else
-          @requested_resource = resource_collection.find_by(id: ids[0])
-        end
-      end
-
       @requested_resource
     end
   end
