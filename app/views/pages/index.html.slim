@@ -58,26 +58,116 @@ css:
     font-size: 200%;
   }
 
+= stylesheet_link_tag 'landing_1/style'
+
 .jumbotron
   .container.home-header
     h1 歡迎進入 Colorgy 平台
     p Colorgy is the hub of college life.
-    p 目前提供服務於 #{Organization.short_name_list.join(t(:comma, scope: :general))}。
+    p
+      | 2015 開學季，敬請期待！
+      small
+        | 等不及嗎？你可以
+        = link_to '參與討論', 'https://www.facebook.com/pages/Colorgy/1529686803975150', target: '_blank'
+        | 或
+        = link_to '看看我們寫好的原始碼', 'https://github.com/colorgy', target: '_blank'
+        | 。
     p
       a.btn.btn-primary.btn-lg.home-btn(href="#{contact_url}" target="_blank" role="button") 聯繫我們 &raquo;
 
+#about.container
+  .row
+    .col-md-8.col-md-offset-2
+      h1.chain 「大學對你而言是什麼樣子呢？」
+      p.text-intro
+        | 我們來自不同地方，共同進入這座學術殿堂。
+        br/
+        | 我們鑽研不同領域，卻對未來擁有共同想像。
+        br/
+        | 我們希望改善校園生活，讓每間學校每位同學都能參與改變。
+        | 發揮自己的力量，為彼此的大學校園增添繽紛色彩。
 .container
   .row
-    .col-md-6.col-description
-      .icon-image= image_tag 'professor.png'
-      h2 教授
-      p 感謝您登入 Colorgy 平台，希望您願意支持我們的理念，至 Colorgy Books 惠予確認您開設之課程與用書，讓同學們能夠提早方便的團購您的指定用書。
-      p.button
-        a.btn.btn-default.home-btn href="http://books.colorgy.io/lecturer/" role="button"  教授上書 &raquo;
-    .col-md-6.col-description
-      .icon-image= image_tag 'student.png'
-      h2 同學
-      p 您可以註冊，享受我們方便的服務，敬請關注原文書團訂的時間。
-      p.button
-        a.btn.btn-default.home-btn href="./login" role="button" 同學註冊 &raquo;
-  hr/
+    #work.col-md-8.section-1.nopadding
+    .col-md-4.section-text.nopadding
+      .wp4.animated.fadeInUp
+        h2.frame ㄧ起，Colorgy
+        p
+          | 透過建立一個、專屬學生的網路平台，
+          | 我們可以整合我們的想法、我們的專長、我們的實際行動，
+          | 一起為了更加便利、更加豐富精彩的校園生活努力。
+          br/
+          | 在我們的努力下，Colorgy 就此誕生。
+          | 現在跟著我們，一起加入改變吧！
+        .thin-sep
+  .row
+    .col-md-4.section-text.nopadding
+      .wp5.animated.fadeInUp
+        h2.mech Colorgy Books
+        p
+          | 「買課本？叫班代弄一弄就好了啊！」
+          br
+          | 班代／總務誰人知的難處辛酸，其實更值得被重視。
+          | Colorgy Books，一個方便、透明、安心的購書平台。
+          br
+          | 7/20 開放公測，9/1 正式營運！
+        .thin-sep
+    .col-md-8.section-2.nopadding
+  .row
+    #work.col-md-8.section-1-1.nopadding
+    .col-md-4.section-text.nopadding
+      .wp4-2
+        h2.frame-2 Colorgy Table
+        p
+          | 當下一節課的教室、成為下一座亞特蘭提斯，
+          br/
+          | 身為深海探險家的你，需要的絕對不只是記憶力。
+          br/
+          | Colorgy Table，寫不完、記不清的行事曆，讓我來幫你。
+          | 敬請期待！
+        .thin-sep
+.container
+  .row
+    .col-md-4.section-3
+      .logo-3.wp3
+    .col-md-4.section-text.nopadding
+      .wp6
+        h2.front-frame Colorgy Paper
+        p
+          | 報紙留給了廁所、小說留給了咖啡店，
+          | 那留給校園的，會是什麼呢？
+          br/
+          | Colorgy Paper，滿足說書人與閱聽者的新知書櫃。
+        .thin-sep
+      .small-featured-img.frame-red
+        .wp6
+          h2.front-frame-1 Colorgy Tasks
+          p
+            | 說來容易的，往往最難做到。
+            | 那些你我心裡都有數的三個字：倒垃圾、買午餐、送影印...
+            br/
+            | Colorgy Tasks，專屬心有餘而力不足的你。
+hr
+.container
+  .row
+    h2 Our Story
+    p 我們是一群追求美好的大學生，有感於校園生活上的種種不便之處，於是萌生以己力創造更優良校園生活體驗的想法。從大一開始，我們便陸續在校內打造了課表行事歷提醒服務、住宿生日用品團購網站。在 2014 年夏，受到學弟建議啟發，開始了第一次的全校教科書團購平台服務，旨在降低同學們在分別聯絡書商、統計訂購、收錢等等的不便。平台開放後好評如潮，帶給了我們繼續前進、將這平台帶給更多同學的動力，在此 Colorgy 便誕生了。以便利服務，狹更多我們的創意點子，開放並 color 我們的 college life。
+
+  .row
+    .col-xs-6.col-md-3
+      .thumbnail
+        = image_tag 'landing_1/s1.png'
+    .col-xs-6.col-md-3
+      .thumbnail
+        = image_tag 'landing_1/s2.png'
+    .col-xs-6.col-md-3
+      .thumbnail
+        = image_tag 'landing_1/s3.png'
+    .col-xs-6.col-md-3
+      .thumbnail
+        = image_tag 'landing_1/s4.png'
+  .row
+    p
+      = link_to 'Facebook', 'https://www.facebook.com/pages/Colorgy/1529686803975150', target: '_blank'
+      | &nbsp;/&nbsp;
+      = link_to 'GitHub', 'https://github.com/colorgy', target: '_blank'
