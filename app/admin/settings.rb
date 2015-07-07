@@ -11,15 +11,25 @@ ActiveAdmin.register_page "Settings" do
 
         # Settings form helper methods
 
-        def f.input_setting(label_text, settings_name)
+        def f.input_setting(label_text, settings_name, hint: nil)
           label label_text
           input :name => "settings[#{settings_name.to_s}]", :type => 'text', :value => Settings[settings_name]
+          if hint.present?
+            para class: 'inline-hints' do
+              hint
+            end
+          end
         end
 
-        def f.textarea_setting(label_text, settings_name)
+        def f.textarea_setting(label_text, settings_name, hint: nil)
           label label_text
           textarea :name => "settings[#{settings_name.to_s}]" do
             Settings[settings_name]
+          end
+          if hint.present?
+            para class: 'inline-hints' do
+              hint
+            end
           end
         end
 
@@ -34,7 +44,7 @@ ActiveAdmin.register_page "Settings" do
 
         # Settings form
 
-        panel "System Settingss" do
+        panel "System Settings" do
           fieldset do
             ol do
 
@@ -43,14 +53,14 @@ ActiveAdmin.register_page "Settings" do
               end
 
               li do
-                f.textarea_setting '全站公告 (支援 markdown 語法)', :site_announcement
+                f.textarea_setting '全站公告', :site_announcement, hint: '支援 markdown 語法'
               end
 
             end
           end
         end
 
-        panel "Site Settingss" do
+        panel "Site Settings" do
           fieldset do
             ol do
 
@@ -59,7 +69,7 @@ ActiveAdmin.register_page "Settings" do
               end
 
               li do
-                f.input_setting '頁腳內容，可使用 HTML，例如： <a class="item" href="/">回首頁</a>', :page_footer
+                f.input_setting '頁腳內容', :page_footer, hint: '可使用 HTML，例如： <a class="item" href="/">回首頁</a>'
               end
 
               li do
@@ -70,7 +80,19 @@ ActiveAdmin.register_page "Settings" do
           end
         end
 
-        panel "Admin Dashboard Settingss" do
+        panel "OAuth API Settings" do
+          fieldset do
+            ol do
+
+              li do
+                f.textarea_setting 'Facebook App IDs', :fb_app_ids, hint: '允許透過 Facebook Access Token 登入取得最高權限的 Facebook App ID 白名單，一行一個'
+              end
+
+            end
+          end
+        end
+
+        panel "Admin Dashboard Settings" do
           fieldset do
             ol do
 

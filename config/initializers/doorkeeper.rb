@@ -93,9 +93,10 @@ Doorkeeper.configure do
   grant_flows %w(authorization_code client_credentials implicit password)
 
   resource_owner_from_credentials do |routes|
-    username = params[:username] || params[:email]
+    username = params[:username] || params[:email] || params[:auth_type]
     password = params[:password] || params[:access_token] || params[:token]
     case username
+    # Facebook Access Token Auth
     when 'facebook:access_token'
       debug_token_connection = HTTParty.get(
         <<-eos.squish.delete(' ')
@@ -122,7 +123,7 @@ Doorkeeper.configure do
 
         if access['id'].present?
           # the access token is owned by this app, provide full information
-          if token_info['data'].is_a?(Hash) && token_info['data']['app_id'] == ENV['FB_APP_ID']
+          if token_info['data'].is_a?(Hash) && (token_info['data']['app_id'] == ENV['FB_APP_ID'])
             facebook_auth = {
               uid: access['id'],
               credentials: {
@@ -156,7 +157,13 @@ Doorkeeper.configure do
             }
           end
 
-          u = User.from_facebook(facebook_auth)
+          # determine if the FB app is whitelisted or not
+          if token_info['data'].is_a?(Hash) && (token_info['data']['app_id'] == ENV['FB_APP_ID'] || Settings.fb_app_ids.split(/\r?\n/).include?(token_info['data']['app_id']))
+            u = User.from_facebook(facebook_auth)
+          else
+            u = User.from_facebook(facebook_auth, foreign_app: true)
+          end
+
           u
         else
           nil
@@ -165,6 +172,7 @@ Doorkeeper.configure do
         nil
       end
 
+    # Password Auth
     else
       u = User.find_for_database_authentication(email: username)
       u = User.find_for_database_authentication(username: username) if u.blank?
