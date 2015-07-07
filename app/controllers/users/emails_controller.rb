@@ -20,7 +20,7 @@ class Users::EmailsController < ApplicationController
       # or matching email patterns
       if UserIdentity.find_by(user_id: nil, email: current_user.email) ||
          EmailPattern.identify(current_user.email)
-         @email.email = current_user.email
+        @email.email = current_user.email
       end
     end
   end

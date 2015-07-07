@@ -50,7 +50,7 @@ class User < ActiveRecord::Base
                                 allow_destroy: true
 
   validates :name, presence: true, on: :update
-  validates_associated :emails, :unconfirmed_emails
+  validates_associated :data, :emails, :unconfirmed_emails
 
   before_create :generate_uuid, :build_data
   before_validation :generate_uuid, :ensure_user_has_valid_primary_identity
@@ -157,6 +157,7 @@ class User < ActiveRecord::Base
 
   INFO_ATTRS = [
     :gender,
+    :birth_year,
     :birth_day,
     :birth_month,
     :brief,
@@ -180,5 +181,17 @@ class User < ActiveRecord::Base
     :devices,
     :birth_date,
     :fb_friends
+  ]
+
+  EDITABLE_ATTRS = [
+    :username,
+    :name,
+    :gender,
+    :birth_year,
+    :birth_day,
+    :birth_month,
+    :brief,
+    :motto,
+    :url
   ]
 end
