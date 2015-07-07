@@ -6,7 +6,7 @@ module OmniauthCallable
   end
 
   module ClassMethods
-    def from_facebook(auth)
+    def from_facebook(auth, foreign_app: false)
       # maybe the user is comed from another app
       if auth[:uid].blank?
         get_info_connection = HTTParty.get(
@@ -51,7 +51,6 @@ module OmniauthCallable
 
       # maybe the user is comed from another app
       if auth[:uid].blank?
-        user.from = 'foreign_facebook'
         user.update_attributes(
           external_avatar_url: info['picture'] && info['picture']['data'] && info['picture']['data']['url'],
           external_cover_photo_url: info['cover'] && info['cover']['source']
@@ -76,6 +75,10 @@ module OmniauthCallable
           devices: info['devices'],
           fb_friends: info['friends']
         )
+      end
+
+      if foreign_app
+        user.from = 'foreign_facebook'
       end
 
       return user

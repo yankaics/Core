@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
+  before do
+    Settings.fb_app_ids = "whitelisted_app\nsome_whitelisted_app\r\nanother_whitelisted_app"
+  end
+
   # RFC 6749 OAuth 2.0 - Resource Owner Password Credentials Grant
   # https://tools.ietf.org/html/rfc6749#section-4.3
   scenario "Resource Owner Password Credentials Grant" do
@@ -192,6 +196,7 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
   scenario "Resource Owner Facebook Access Token Credentials Grant" do
     fbtoken = 'facebook_access_token'
     fbtoken_of_other_app = 'facebook_access_token_of_other_app'
+    fbtoken_of_whitelisted_app = 'facebook_access_token_of_whitelisted_app'
     scope = %w(public email)
     @core_app = create(:oauth_application, :owned_by_admin, redirect_uri: "urn:ietf:wg:oauth:2.0:oob\nhttp://non-existing.oauth.testing.app/")
 
@@ -221,6 +226,23 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
           "data": {
             "app_id": "some_other_app",
             "application": "Colorgy",
+            "expires_at": 1000000000,
+            "is_valid": true,
+            "scopes": [
+              "public_profile",
+              "email"
+            ],
+            "user_id": "1234567890"
+          }
+        }
+      eos
+    )
+    stub_request(:get, "https://graph.facebook.com/debug_token?access_token=&input_token=#{fbtoken_of_whitelisted_app}")
+      .to_return(body: <<-eos
+        {
+          "data": {
+            "app_id": "some_whitelisted_app",
+            "application": "Colorgy Bla Bla",
             "expires_at": 1000000000,
             "is_valid": true,
             "scopes": [
@@ -274,6 +296,16 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
         }
       eos
     )
+    stub_request(:get, "https://graph.facebook.com/me?access_token=#{fbtoken_of_whitelisted_app}&fields=id,name,email,gender")
+      .to_return(body: <<-eos
+        {
+          "id": "0987654321",
+          "name": "Facebook User",
+          "email": "user@facebook.com",
+          "gender": "male"
+        }
+      eos
+    )
     stub_request(:get, "https://graph.facebook.com/me?access_token=#{fbtoken}&fields=id,name,link,picture.height(500).width(500),cover,devices,friends&locale=#{I18n.locale}")
       .to_return(body: <<-eos
         {
@@ -304,6 +336,28 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
       eos
     )
     stub_request(:get, "https://graph.facebook.com/me?access_token=#{fbtoken_of_other_app}&fields=id,name,link,picture.height(500).width(500),cover&locale=#{I18n.locale}")
+      .to_return(body: <<-eos
+        {
+          "id": "0987654321",
+          "name": "Facebook User",
+          "link": "https://www.facebook.com/app_scoped_user_id/1234567890/",
+          "picture": {
+            "data": {
+              "height": 720,
+              "is_silhouette": false,
+              "url": "",
+              "width": 720
+            }
+          },
+          "cover": {
+            "id": "0",
+            "offset_y": 0,
+            "source": ""
+          }
+        }
+      eos
+    )
+    stub_request(:get, "https://graph.facebook.com/me?access_token=#{fbtoken_of_whitelisted_app}&fields=id,name,link,picture.height(500).width(500),cover&locale=#{I18n.locale}")
       .to_return(body: <<-eos
         {
           "id": "0987654321",
@@ -378,6 +432,35 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
     visit "/api/v1/me.json?access_token=#{access_token}"
     response = JSON.parse(page.body)
     expect(response).not_to have_key('email')
+
+    # If the provided Facebook access token is owned by a white-listed app
+    page.driver.post(<<-URL.squish.delete(' ')
+      /oauth/token?
+      grant_type=password&
+      client_id=#{@core_app.uid}&
+      client_secret=#{@core_app.secret}&
+      username=facebook:access_token&
+      password=#{fbtoken_of_whitelisted_app}&
+      scope=#{scope.join('%20')}
+      URL
+    )
+
+    response = JSON.parse(page.body)
+    expect(response).to have_key 'access_token'
+    expect(response).not_to have_key 'error'
+    access_token = response['access_token']
+    user2 = Doorkeeper::AccessToken.find_by(token: access_token).resource_owner
+
+    expect(user2).to eq(user)
+
+    # check the token
+    visit "/oauth/token/info?access_token=#{access_token}"
+    response = JSON.parse(page.body)
+    expect(response['scopes']).to eq(scope)
+
+    visit "/api/v1/me.json?access_token=#{access_token}"
+    response = JSON.parse(page.body)
+    expect(response).to have_key('email')
 
     # Fail if an invalid Facebook access token is provided
     page.driver.post(<<-URL.squish.delete(' ')
