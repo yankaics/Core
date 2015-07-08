@@ -80,7 +80,7 @@ ActiveAdmin.register_page "Settings" do
           end
         end
 
-        panel "OAuth API Settings" do
+        panel "Advance System Settings" do
           fieldset do
             ol do
 
