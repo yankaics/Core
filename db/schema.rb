@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150528004202) do
+ActiveRecord::Schema.define(version: 20150708132927) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace"
@@ -312,7 +312,7 @@ ActiveRecord::Schema.define(version: 20150528004202) do
     t.string   "external_avatar_url"
     t.string   "external_cover_photo_url"
     t.string   "fbid"
-    t.string   "fbtoken"
+    t.text     "fbtoken"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "uuid",                                  null: false
