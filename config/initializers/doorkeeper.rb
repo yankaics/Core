@@ -92,25 +92,28 @@ Doorkeeper.configure do
   #
   grant_flows %w(authorization_code client_credentials implicit password)
 
+  # Resource Owner Credentials Grant Flows
   resource_owner_from_credentials do |routes|
     username = params[:username] || params[:email] || params[:auth_type]
     password = params[:password] || params[:access_token] || params[:token]
+
     case username
+
     # Facebook Access Token Auth
     when 'facebook:access_token'
-      debug_token_connection = HTTParty.get(
+      get_fb_app_connection = HTTParty.get(
         <<-eos.squish.delete(' ')
-          https://graph.facebook.com/debug_token?
-            input_token=#{password}&
-            access_token=#{FacebookService.app_access_token}
+          https://graph.facebook.com/app?
+            access_token=#{password}
           eos
       )
 
-      token_info = debug_token_connection.parsed_response
-      token_info = JSON.parse(token_info) if token_info.is_a?(String)
+      fb_app_info = get_fb_app_connection.parsed_response
+      fb_app_info = JSON.parse(fb_app_info) if fb_app_info.is_a?(String)
 
-      if true
-        get_access_connection = HTTParty.get(
+      # the access token is valid, get the user's data from Facebook
+      if fb_app_info.is_a?(Hash)
+        get_fb_user_connection = HTTParty.get(
           <<-eos.squish.delete(' ')
             https://graph.facebook.com/me?
               fields=id,name,email,gender&
@@ -118,57 +121,64 @@ Doorkeeper.configure do
             eos
         )
 
-        access = get_access_connection.parsed_response
-        access = JSON.parse(access) if access.is_a?(String)
+        fb_user_info = get_fb_user_connection.parsed_response
+        fb_user_info = JSON.parse(fb_user_info) if fb_user_info.is_a?(String)
 
-        if access['id'].present?
-          # the access token is owned by this app, provide full information
-          if token_info['data'].is_a?(Hash) && (token_info['data']['app_id'] == ENV['FB_APP_ID'])
+        # the user is vaild
+        if fb_user_info['id'].present?
+
+          # the FB access token is owned by this FB App, provide full information
+          if (fb_app_info['id'] == ENV['FB_APP_ID'])
             facebook_auth = {
-              uid: access['id'],
+              uid: fb_user_info['id'],
               credentials: {
                 token: password
               },
               info: {
-                email: access['email'],
-                name: access['name']
+                email: fb_user_info['email'],
+                name: fb_user_info['name']
               },
               extra: {
                 raw_info: {
-                  gender: access['gender']
+                  gender: fb_user_info['gender']
                 }
               }
             }
-          # the access token is not owned by this app, provide limited information
+
+          # the FB access token is not owned by this FB App, provide limited information
           else
             facebook_auth = {
               credentials: {
                 token: password
               },
               info: {
-                email: access['email'],
-                name: access['name']
+                email: fb_user_info['email'],
+                name: fb_user_info['name']
               },
               extra: {
                 raw_info: {
-                  gender: access['gender']
+                  gender: fb_user_info['gender']
                 }
               }
             }
           end
 
-          # determine if the FB app is whitelisted or not
-          if token_info['data'].is_a?(Hash) && (token_info['data']['app_id'] == ENV['FB_APP_ID'] || Settings.fb_app_ids.split(/\r?\n/).include?(token_info['data']['app_id']))
+          # determine if the access token's FB App is whitelisted or not
+          if fb_app_info['id'] == ENV['FB_APP_ID'] ||
+             Settings.fb_app_ids.split(/\r?\n/).include?(fb_app_info['id'])
             u = User.from_facebook(facebook_auth)
           else
             u = User.from_facebook(facebook_auth, foreign_app: true)
           end
 
+          # return
           u
         else
+          # return
           nil
         end
       else
+        # return
         nil
       end
 
@@ -183,14 +193,19 @@ Doorkeeper.configure do
         end
 
         if u.access_locked?
+          # return
           nil
         elsif u.valid_password?(password)
           u.failed_attempts = 0 && u.save! if u.failed_attempts > 0
+
+          # return
           u
         else
           u.failed_attempts += 1
           u.save!
           u.lock_access! if u.failed_attempts > User.maximum_attempts
+
+          # return
           nil
         end
       end
@@ -199,8 +214,8 @@ Doorkeeper.configure do
 
   # Under some circumstances you might want to have applications auto-approved,
   # so that the user skips the authorization step.
-  # For example if dealing with trusted a application.
-  skip_authorization do |resource_owner, client|
+  # For example if dealing with a trusted application.
+  skip_authorization do |_resource_owner, client|
     client.application.core_app?
   end
 

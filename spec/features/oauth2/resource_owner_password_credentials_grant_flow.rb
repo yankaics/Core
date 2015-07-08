@@ -201,60 +201,28 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
     @core_app = create(:oauth_application, :owned_by_admin, redirect_uri: "urn:ietf:wg:oauth:2.0:oob\nhttp://non-existing.oauth.testing.app/")
 
     # Stub requests to Facebook
-    stub_request(:get, "https://graph.facebook.com/debug_token?access_token=&input_token=#{fbtoken}")
+    stub_request(:get, "https://graph.facebook.com/app?access_token=#{fbtoken}")
       .to_return(body: <<-eos
         {
-          "data": {
-            "app_id": "#{ENV['FB_APP_ID']}",
-            "application": "Colorgy",
-            "expires_at": 1000000000,
-            "is_valid": true,
-            "scopes": [
-              "public_profile",
-              "basic_info",
-              "email",
-              "user_friends"
-            ],
-            "user_id": "1234567890"
-          }
+          "id": "#{ENV['FB_APP_ID']}"
         }
       eos
     )
-    stub_request(:get, "https://graph.facebook.com/debug_token?access_token=&input_token=#{fbtoken_of_other_app}")
+    stub_request(:get, "https://graph.facebook.com/app?access_token=#{fbtoken_of_other_app}")
       .to_return(body: <<-eos
         {
-          "data": {
-            "app_id": "some_other_app",
-            "application": "Colorgy",
-            "expires_at": 1000000000,
-            "is_valid": true,
-            "scopes": [
-              "public_profile",
-              "email"
-            ],
-            "user_id": "1234567890"
-          }
+          "id": "some_other_app"
         }
       eos
     )
-    stub_request(:get, "https://graph.facebook.com/debug_token?access_token=&input_token=#{fbtoken_of_whitelisted_app}")
+    stub_request(:get, "https://graph.facebook.com/app?access_token=#{fbtoken_of_whitelisted_app}")
       .to_return(body: <<-eos
         {
-          "data": {
-            "app_id": "some_whitelisted_app",
-            "application": "Colorgy Bla Bla",
-            "expires_at": 1000000000,
-            "is_valid": true,
-            "scopes": [
-              "public_profile",
-              "email"
-            ],
-            "user_id": "1234567890"
-          }
+          "id": "some_whitelisted_app"
         }
       eos
     )
-    stub_request(:get, "https://graph.facebook.com/debug_token?access_token=&input_token=invalid_token")
+    stub_request(:get, "https://graph.facebook.com/app?access_token=invalid_token")
       .to_return(body: <<-eos
         {
           "error": {
