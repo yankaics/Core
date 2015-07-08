@@ -184,11 +184,6 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
     expect(response).to have_key 'refresh_token'
     access_token = response['access_token']
     refresh_token = response['refresh_token']
-
-    # the new access token will also expire in 2 hours
-    # (long_term scope should be ignored since we are issuing an user token)
-    expect(response['expires_in']).to eq(7200)
-    expect(response['scope']).not_to include('long_term')
   end
 
   # Resource Owner Facebook Access Token Credentials Grant

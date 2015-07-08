@@ -328,11 +328,11 @@ module OAuthAccessToken
 
   def set_long_expires_in_if_long_term_token
     return unless scopes.include?('long_term')
-    # only give lone-term access to app tokens (resource_owner is blank)
+
     if resource_owner_id.blank?
       self[:expires_in] = 36_741_600  # 1 year and 2 months
     else
-      self[:scopes].gsub!('long_term', '')
+      self[:expires_in] = 2.weeks.to_i
     end
   end
 end
