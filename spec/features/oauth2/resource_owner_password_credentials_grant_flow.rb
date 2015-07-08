@@ -90,7 +90,6 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
 
     response = JSON.parse(page.body)
     expect(response).to have_key 'access_token'
-    expect(response).not_to have_key 'refresh_token'
     access_token = response['access_token']
 
     # calling the API with a valid token should return corresponding data
@@ -141,7 +140,7 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
   end
 
   scenario "Resource Owner Password Credentials Grant with Refresh Token (offline_access)" do
-    # An refresh token will not be issued if the client is not verified
+    # An refresh token will be issued if the client is not verified
     scope = %w(public offline_access long_term)
 
     page.driver.post(<<-URL.squish.delete(' ')
@@ -155,8 +154,8 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
 
     response = JSON.parse(page.body)
     expect(response).to have_key 'access_token'
-    expect(response).not_to have_key 'refresh_token'
-    expect(response['scope']).not_to include('offline_access')
+    expect(response).to have_key 'refresh_token'
+    expect(response['scope']).to include('offline_access')
 
     # An refresh token will be issued if the client is verified
     page.driver.post(<<-URL.squish.delete(' ')

@@ -310,10 +310,10 @@ module OAuthAccessToken
 
   # Override the use_refresh_token? method to issue refresh token only if the scope contains 'offline_access'
   def use_refresh_token?
-    if application_id.blank? && scopes.include?('offline_access')
-      self[:scopes].gsub!('offline_access', '')
-    end
-    !!@use_refresh_token && scopes.include?('offline_access') && application_id.present?
+    # if application_id.blank? && scopes.include?('offline_access')
+    #   self[:scopes].gsub!('offline_access', '')
+    # end
+    !!@use_refresh_token && scopes.include?('offline_access') # && application_id.present?
   end
 
   private
