@@ -6,9 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <% if params[:og_image] %>
       <meta property="og:image" content="<%= params[:og_image] %>"/>
+    <% else %>
+      <meta property="og:image" content="https://i.imgur.com/w6KJwFw.png"/>
     <% end %>
 
-    <title>Colorgy</title>
+    <meta property="og:title" content="Colorgy 為你的大學生活上色">
+    <meta property="og:description" content="Colorgy 致力於創造各種讓校園生活更方便的服務，包括 Books 原文書團購：方便、安心、優惠；Tasks 大學幫找幫手、賺外快；Table 行動課程表，讓你排課更輕鬆、不再忘記教室在哪裡。">
+
+    <title>Colorgy - 為你的大學生活上色</title>
 
     <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track' => true %>
     <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
