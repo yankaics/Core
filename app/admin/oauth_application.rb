@@ -49,6 +49,7 @@ ActiveAdmin.register Doorkeeper::Application do
       f.input :redirect_uri
     end
     f.inputs "Permissions" do
+      f.input :allow_direct_data_access
       f.input :blocked
       # f.input :scopes
       f.input :sms_quota
@@ -58,7 +59,7 @@ ActiveAdmin.register Doorkeeper::Application do
 
   controller do
     def oauth_application_params
-      params.require(:doorkeeper_application).permit(:name, :description, :app_url, :redirect_uri, :scopes, :blocked, :sms_quota, :owner_id, :owner_type, :owner, :secret)
+      params.require(:doorkeeper_application).permit(:name, :description, :app_url, :redirect_uri, :scopes, :blocked, :allow_direct_data_access, :sms_quota, :owner_id, :owner_type, :owner, :secret)
     end
 
     def update

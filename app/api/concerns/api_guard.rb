@@ -51,7 +51,7 @@ module APIGuard
 
       OAuth::AccessTokenValidationService.validate!(@access_token, scopes: scopes)
 
-      @current_resource_owner = User.find(@access_token.resource_owner_id)
+      @current_resource_owner = User.find_by(id: @access_token.resource_owner_id)
       @current_user = @current_resource_owner
     end
 
@@ -66,7 +66,7 @@ module APIGuard
     end
 
     def current_resource_owner
-      @current_resource_owner ||= User.find(current_access_token.try(:resource_owner_id))
+      @current_resource_owner ||= User.find_by(id: current_access_token.try(:resource_owner_id))
     end
 
     def current_application

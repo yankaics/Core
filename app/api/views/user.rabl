@@ -1,4 +1,4 @@
-object @user
+object @user || @users
 
 set_fieldset :user, default_fields: [:id, :name, :username, :avatar_url, :cover_photo_url],
                     permitted_fields: User::PUBLIC_ATTRS + User::EMAIL_ATTRS + User::ACCOUNT_ATTRS + User::FB_ATTRS + User::INFO_ATTRS + User::IDENTITY_ATTRS + User::CORE_ATTRS

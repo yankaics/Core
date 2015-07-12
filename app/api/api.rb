@@ -16,8 +16,6 @@ class API < Grape::API
     @request_path = "#{@namespace}#{params.path}"
   end
 
-  mount API::V1
-
   get "/" do
     request_url = URI.parse(request.url)
     request_path_extname = request_url.path[/\..+$/]
@@ -31,6 +29,8 @@ class API < Grape::API
   get :ping do
     { pong: true }
   end
+
+  mount API::V1
 
   documentation_settings = {
     base_path: ->(req) { req.host.match(/^api\./) ? '/' : '/api' },
