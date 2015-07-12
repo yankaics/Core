@@ -152,7 +152,7 @@ class User < ActiveRecord::Base
 
   FB_ATTRS = [
     :fbid,
-    :fb_friends
+    :fbemail
   ]
 
   INFO_ATTRS = [

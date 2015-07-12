@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150708132927) do
+ActiveRecord::Schema.define(version: 20150712135947) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace"
@@ -176,29 +176,30 @@ ActiveRecord::Schema.define(version: 20150708132927) do
   add_index "oauth_access_tokens", ["token"], name: "index_oauth_access_tokens_on_token", unique: true
 
   create_table "oauth_applications", force: :cascade do |t|
-    t.string   "name",                                  null: false
+    t.string   "name",                                     null: false
     t.text     "description"
     t.string   "app_url"
-    t.integer  "owner_id",                              null: false
-    t.string   "owner_type",                            null: false
-    t.string   "uid",                                   null: false
-    t.string   "secret",                                null: false
-    t.text     "redirect_uri",                          null: false
-    t.string   "scopes",                default: "",    null: false
+    t.integer  "owner_id",                                 null: false
+    t.string   "owner_type",                               null: false
+    t.string   "uid",                                      null: false
+    t.string   "secret",                                   null: false
+    t.text     "redirect_uri",                             null: false
+    t.string   "scopes",                   default: "",    null: false
     t.text     "extensional_scopes"
     t.text     "data"
-    t.boolean  "blocked",               default: false, null: false
-    t.integer  "sms_quota",             default: 0,     null: false
-    t.integer  "rth",                   default: 0,     null: false
+    t.boolean  "blocked",                  default: false, null: false
+    t.integer  "sms_quota",                default: 0,     null: false
+    t.integer  "rth",                      default: 0,     null: false
     t.datetime "rth_refreshed_at"
-    t.integer  "rtd",                   default: 0,     null: false
+    t.integer  "rtd",                      default: 0,     null: false
     t.date     "rtd_refreshed_at"
-    t.integer  "core_rth",              default: 0,     null: false
+    t.integer  "core_rth",                 default: 0,     null: false
     t.datetime "core_rth_refreshed_at"
-    t.integer  "core_rtd",              default: 0,     null: false
+    t.integer  "core_rtd",                 default: 0,     null: false
     t.date     "core_rtd_refreshed_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "allow_direct_data_access", default: false, null: false
   end
 
   add_index "oauth_applications", ["owner_id", "owner_type"], name: "index_oauth_applications_on_owner_id_and_owner_type"
