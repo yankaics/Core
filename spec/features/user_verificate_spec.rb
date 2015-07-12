@@ -99,7 +99,13 @@ feature "User Verificate", :type => :feature, :retry => 3 do
 
     sleep(1)
 
-    first("input[type=submit]").click
+    tries = 10
+    while first("input[type=submit]").present?
+      first("input[type=submit]").click
+      sleep(1)
+      tries -= 1
+      break if tries == 0
+    end
 
     sleep(1)
 
