@@ -32,7 +32,7 @@ GIT
 
 GIT
   remote: git://github.com/colorgy/Style.git
-  revision: 6d42733d3f2fc7e9ae8476780307ae10562b4b46
+  revision: 8ab16661f615eaeba1d34513f067c068107e404a
   specs:
     colorgy_style (0.0.0.4)
       bootstrap-sass (~> 3.3.4.1)
@@ -95,7 +95,7 @@ GEM
       activesupport (>= 3.0.0)
     arel (6.0.0)
     attr_required (1.0.0)
-    autoprefixer-rails (5.2.0.1)
+    autoprefixer-rails (5.2.1)
       execjs
       json
     awesome_print (1.6.1)
@@ -219,7 +219,7 @@ GEM
       i18n (~> 0.5)
     faraday (0.9.1)
       multipart-post (>= 1.2, < 3)
-    ffi (1.9.8)
+    ffi (1.9.10)
     formtastic (3.1.3)
       actionpack (>= 3.2.13)
     formtastic_i18n (0.3.0)
@@ -299,7 +299,7 @@ GEM
     mail (2.6.3)
       mime-types (>= 1.16, < 3)
     mailgunner (2.2.1)
-    materialize-sass (0.96.2)
+    materialize-sass (0.97.0)
       sass (~> 3.3)
     meta-tags (2.0.0)
       actionpack (>= 3.0.0)
@@ -311,7 +311,7 @@ GEM
     mime-types (2.6.1)
     mini_portile (0.6.2)
     minitest (5.7.0)
-    multi_json (1.11.1)
+    multi_json (1.11.2)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
     netrc (0.10.3)
@@ -457,7 +457,7 @@ GEM
       rmmseg-cpp (~> 0.2)
     rubyzip (1.1.7)
     safe_yaml (1.0.4)
-    sass (3.4.14)
+    sass (3.4.16)
     sass-globbing (1.1.1)
       sass (>= 3.1)
     sass-rails (5.0.1)
@@ -499,7 +499,7 @@ GEM
     spring (1.3.6)
     spring-commands-rspec (1.0.4)
       spring (>= 0.9.1)
-    sprockets (2.12.3)
+    sprockets (2.12.4)
       hike (~> 1.2)
       multi_json (~> 1.0)
       rack (~> 1.0)

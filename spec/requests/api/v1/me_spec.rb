@@ -35,7 +35,7 @@ describe "Me API" do
       'account' => %w(sign_in_count last_sign_in_at),
       'facebook' => %w(fbid),
       'info' => %w(birth_month motto),
-      'identity' => %w(emails identities organizations department uid identity)
+      'identity' => %w(emails identities organizations uid identity organization department organization_code department_code)
     }.each do |scope, attrs|
 
       context "requested with a access token contains #{scope} scope" do
