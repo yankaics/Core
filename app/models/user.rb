@@ -174,7 +174,9 @@ class User < ActiveRecord::Base
     :organizations,
     :departments,
     :organization,
-    :department
+    :organization_code,
+    :department,
+    :department_code
   ]
 
   CORE_ATTRS = [
