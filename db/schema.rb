@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150712135947) do
+ActiveRecord::Schema.define(version: 20150713222911) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace"
@@ -92,7 +92,6 @@ ActiveRecord::Schema.define(version: 20150712135947) do
   add_index "data_apis", ["owner_writable"], name: "index_data_apis_on_owner_writable"
   add_index "data_apis", ["path"], name: "index_data_apis_on_path", unique: true
   add_index "data_apis", ["public"], name: "index_data_apis_on_public"
-  add_index "data_apis", ["table_name"], name: "index_data_apis_on_table_name", unique: true
 
   create_table "departments", force: :cascade do |t|
     t.string   "organization_code",           null: false
@@ -140,12 +139,6 @@ ActiveRecord::Schema.define(version: 20150712135947) do
   add_index "friendly_id_slugs", ["slug", "sluggable_type"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type"
   add_index "friendly_id_slugs", ["sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_id"
   add_index "friendly_id_slugs", ["sluggable_type"], name: "index_friendly_id_slugs_on_sluggable_type"
-
-  create_table "my_new_api", force: :cascade do |t|
-    t.string  "my_string"
-    t.integer "my_int"
-    t.boolean "my_bool"
-  end
 
   create_table "oauth_access_grants", force: :cascade do |t|
     t.integer  "resource_owner_id", null: false
@@ -199,6 +192,7 @@ ActiveRecord::Schema.define(version: 20150712135947) do
     t.date     "core_rtd_refreshed_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "direct_data_access",       default: false, null: false
     t.boolean  "allow_direct_data_access", default: false, null: false
   end
 
