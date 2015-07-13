@@ -83,6 +83,7 @@ class API::ExtendDocs < API
       @editable = true if @resource_owned_by_user &&
                           data_api.owned_by_user? &&
                           data_api.owner_writable?
+      owner_foreign_key = data_api.owner_foreign_key
 
       apis = []
 
@@ -182,6 +183,7 @@ class API::ExtendDocs < API
       if @editable
         data_request_params = []
         data_api.schema.each_pair do |name, attrs|
+          next if @resource_owned_by_user && name == owner_foreign_key
           type = attrs['type']
           data_request_params << {
             paramType: :form,
