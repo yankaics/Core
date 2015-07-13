@@ -74,6 +74,11 @@ describe "Users API" do
 
       expect(response).to be_success
       json = JSON.parse(response.body)
+      expect(json.first).to have_key('id')
+      expect(json.first).to have_key('uuid')
+      expect(json.first).to have_key('email')
+      expect(json.first).to have_key('name')
+      expect(json.first).to have_key('organization')
     end
   end
 
@@ -85,6 +90,10 @@ describe "Users API" do
       expect(response).to be_success
       json = JSON.parse(response.body)
       expect(json).to have_key('id')
+      expect(json).to have_key('uuid')
+      expect(json).to have_key('email')
+      expect(json).to have_key('name')
+      expect(json).to have_key('organization')
     end
   end
 
