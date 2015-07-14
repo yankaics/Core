@@ -99,9 +99,9 @@ ActiveAdmin.register DataAPI do
     para '只要資料集裡有欄位存放的是使用者的 <code>id</code>、<code>uuid</code>、<code>email</code> 或 <code>uid</code>，就能設定資料與使用者的關聯，進而開啟 OAuth 認證來取得個別使用者資料的功能。'.html_safe
     para '相關名詞解釋如下：'
     dl do
-      dt '開放使用'
+      dt '啟用'
       dd '是否開放此 API 的使用？'
-      dt '公開'
+      dt '允許公開存取'
       dd '是否讓此 API 能夠透過公開路徑存取？若開啟，則任何人可由 <code>/api/&lt;API_存取路徑&gt;</code> 存取此 API。注意這不會影響經過認證的個別使用者所屬資料存取 (<code>/api/v1/me/&lt;API_存取路徑&gt;</code>)。'.html_safe
       dt '名稱'
       dd '此 API 資源的識別名稱，僅可使用小寫字母、數字與底線。'

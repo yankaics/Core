@@ -167,7 +167,14 @@ class DataAPI < ActiveRecord::Base
 
   # Get the data model of this API Data
   def data_model
-    return DataModels.get(name.classify) if DataModels.has?(name.classify)
+    if DataModels.has?(name.classify)
+      model = DataModels.get(name.classify)
+      if model.updated_at == updated_at
+        return model
+      else
+        DataModels.remove_if_exists(name.classify)
+      end
+    end
 
     DataModels.construct(name.classify,
       database_url: get_database_url,
@@ -183,6 +190,8 @@ class DataAPI < ActiveRecord::Base
 
   def data_count
     data_model.count
+  rescue
+    0
   end
 
   def save_schema

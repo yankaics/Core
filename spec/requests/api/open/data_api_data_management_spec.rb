@@ -55,7 +55,7 @@ describe "Open Data API - Data Management" do
     expect(response).to be_success
     json = JSON.parse(response.body)
 
-    get "/api/data_management/#{data_api.path}/#{data_api.data_model.first[data_api.primary_key]}.json?key=#{data_api.management_api_key}"
+    get "/api/data_management/#{data_api.path}/#{URI.encode(data_api.data_model.first[data_api.primary_key])}.json?key=#{data_api.management_api_key}"
     expect(response).to be_success
     json = JSON.parse(response.body)
   end
