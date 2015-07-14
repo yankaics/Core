@@ -167,7 +167,10 @@ class DataAPI < ActiveRecord::Base
 
   # Get the data model of this API Data
   def data_model
-    return DataModels.get(name.classify) if DataModels.has?(name.classify)
+    if DataModels.has?(name.classify)
+      model = DataModels.get(name.classify)
+      return model if model.updated_at == updated_at
+    end
 
     DataModels.construct(name.classify,
       database_url: get_database_url,
