@@ -169,7 +169,11 @@ class DataAPI < ActiveRecord::Base
   def data_model
     if DataModels.has?(name.classify)
       model = DataModels.get(name.classify)
-      return model if model.updated_at == updated_at
+      if model.updated_at == updated_at
+        return model
+      else
+        DataModels.remove_if_exists(name.classify)
+      end
     end
 
     DataModels.construct(name.classify,
@@ -186,6 +190,8 @@ class DataAPI < ActiveRecord::Base
 
   def data_count
     data_model.count
+  rescue
+    0
   end
 
   def save_schema
