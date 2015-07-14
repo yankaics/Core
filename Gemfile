@@ -29,90 +29,101 @@ gem 'sdoc', '~> 0.4.0',          group: :doc
 # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
 gem 'spring',        group: :development
 
-# Use ActiveModel has_secure_password
-# gem 'bcrypt', '~> 3.1.7'
-
 # Use unicorn as the app server
 gem 'unicorn'
-
-# Use Capistrano for deployment
-# gem 'capistrano-rails', group: :development
-
-# Use debugger
-# gem 'debugger', group: [:development, :test]
 
 # Loads environment variables from `.env`
 gem 'dotenv-rails', :groups => [:development, :test]
 
-# Add Slim support
-gem 'slim-rails'
-
-# Markdown parser
-gem 'redcarpet'
-gem 'rouge'
-
-# Handle settings by rails-settings-cached
-gem 'rails-settings-cached', github: 'Neson/rails-settings-cached'
-
-gem 'factory_girl_rails', '~> 4.5.0'
-gem 'faker'
-gem 'letter_opener'
-
-gem 'active_model_serializers', '~> 0.8.0'
-gem 'paper_trail', '~> 3.0.6'
-
-gem 'kaminari'
-
-# Create human-friendly IDs for models
-gem 'friendly_id', '~> 5.1.0'
-gem 'babosa'
-gem 'ruby-pinyin'
+# HTTP client
+gem 'httparty', '~> 0.13.1'
 
 # Grape API
 gem 'grape', '~> 0.11.0'
 gem 'grape-rabl'
 gem 'grape-entity'
 gem 'grape-swagger'
+gem 'api_helper', github: 'Neson/api_helper'
 gem 'rack-cors', :require => 'rack/cors'
 gem 'rack-oauth2', '~> 1.1.1'
 
-gem 'api_helper', github: 'Neson/api_helper'
-
-gem 'devise', '~> 3.4.0'
-gem 'cancancan', '~> 1.10.0'
-gem 'omniauth-facebook', '~> 2.0.0'
+# OAuth 2.0 provider
 gem 'doorkeeper', '~> 2.2.0'
-gem 'httparty', '~> 0.13.1'
 
-gem 'validates_email_format_of'
+# Slim support
+gem 'slim-rails'
 
-gem 'simple_form', '~> 3.1.0'
-
-# Wrappers for 3rd service APIs
-gem 'mailgunner', '~> 2.2.0'
-gem 'nexmo'
+# Markdown parser
+gem 'redcarpet'
+gem 'rouge'
 
 # Make SEO-friendly meta tags and titles using meta-tags
 gem 'meta-tags', '~> 2.0.0'
 
-# Use activerecord-import to support bulk inserting data using ActiveRecord
-gem 'activerecord-import', '~> 0.7.0'
+# User authentication
+gem 'devise', '~> 3.4.0'
+gem 'cancancan', '~> 1.10.0'
+gem 'omniauth-facebook', '~> 2.0.0'
 
-# Use ActiveAdmin as the administration framework
+# ActiveAdmin as the administration framework
 gem 'activeadmin', github: 'activeadmin'
 gem 'active_admin_import', '2.1.2'
 
+# ActiveRecord view helpers
+gem 'simple_form', '~> 3.1.0'
+gem 'kaminari'
+
+# Serializers
+gem 'active_model_serializers', '~> 0.8.0'
+
+# ActiveRecord enhancements
+gem 'paper_trail', '~> 3.0.6'
+gem 'validates_email_format_of'
+
+# Create human-friendly IDs for models
+gem 'friendly_id', '~> 5.1.0'
+gem 'babosa'
+gem 'ruby-pinyin'
+
+# Support bulk inserting data with ActiveRecord
+gem 'activerecord-import', '~> 0.7.0'
+
+# Handle settings by rails-settings-cached
+gem 'rails-settings-cached', github: 'Neson/rails-settings-cached'
+
+# Model factory and tools
+gem 'factory_girl_rails', '~> 4.5.0'
+gem 'faker'
+gem 'timecop'
+
+# Services
+gem 'mailgunner', '~> 2.2.0'
+gem 'nexmo'
+gem 'letter_opener'
+
+# Logger
+gem 'remote_syslog_logger'
+gem 'rails_stdout_logging', :require => false
+
+# Monitoring
+gem 'newrelic_rpm'
+
+# Use Pry as the Rails console
+gem 'pry-rails'
+gem 'pry-byebug'
+gem 'awesome_print', :require => false
+gem 'hirb', :require => false
+gem 'hirb-unicode', :require => false
+
 # Development tools
 group :development do
-  gem 'rails-erd'
-  gem 'railroady'
   gem 'byebug'
   gem 'better_errors', '~> 2.1.0'
   gem 'binding_of_caller', '~> 0.7.2'
   gem 'meta_request'
   gem 'bullet'
-  # gem 'guard-livereload', require: false
-  # gem 'growl_notify', require: false
+  gem 'rails-erd'
+  gem 'railroady'
 end
 
 # RSpec
@@ -133,19 +144,7 @@ group :development, :test do
   gem 'webmock', require: false
   gem 'formulaic'
   gem 'launchy'
-  gem 'timecop'
 end
-
-# Logger and Monitoring Tools
-gem 'remote_syslog_logger'
-gem 'newrelic_rpm'
-
-# Use Pry as the Rails console
-gem 'pry-rails'
-gem 'pry-byebug'
-gem 'awesome_print', :require => false
-gem 'hirb', :require => false
-gem 'hirb-unicode', :require => false
 
 # Assets related Gems
 gem 'colorgy_style', github: 'colorgy/Style'
@@ -154,5 +153,3 @@ gem 'swagger-ui_rails', '~> 2.1.0.alpha.7.1'
 gem 'nprogress-rails', '~> 0.1.6.5'
 gem 'select2-rails', '~> 3.5.9'
 gem 'chosen-rails'
-
-gem 'rails_stdout_logging', :require => false
