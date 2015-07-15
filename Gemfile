@@ -33,7 +33,7 @@ gem 'spring',        group: :development
 gem 'unicorn'
 
 # Loads environment variables from `.env`
-gem 'dotenv-rails', :groups => [:development, :test]
+gem 'dotenv-rails'
 
 # HTTP client
 gem 'httparty', '~> 0.13.1'
