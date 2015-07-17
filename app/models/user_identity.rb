@@ -37,7 +37,7 @@ class UserIdentity < ActiveRecord::Base
   validates :organization, presence: true
   validates_with UserIdentityValidator
 
-  after_validation :ensure_user_identity_has_valid_original_department
+  before_save :ensure_user_identity_has_valid_original_department
   before_save :link_to_user
 
   def self.identity_attributes_for_select
@@ -62,7 +62,10 @@ class UserIdentity < ActiveRecord::Base
     return if email_pattern_id.present?  # don't care about generated identities
     user_email = UserEmail.confirmed.find_by(email: email)
     if user_email
-      self.user = user_email.user
+      transaction do
+        user_email.linked_associated_user_identity.destroy! if user_email.linked_associated_user_identity.present? && user_email.linked_associated_user_identity.generated?
+        self.user = user_email.user
+      end
     else
       self.user = nil
     end
