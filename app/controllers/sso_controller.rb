@@ -55,14 +55,14 @@ class SSOController < ApplicationController
       if params[:s] == 'false' && params[:sign_in_url]
         render text: <<-EOF
 <script type="text/javascript">
-  window.parent.location.href = "#{params[:sign_in_url]}";
+  if (window.self != window.parent) window.parent.location.href = "#{params[:sign_in_url]}";
 </script>
         EOF
       elsif params[:s] == 'true' && params[:user_updated_at] && params[:update_user_url] &&
             params[:user_updated_at].to_i < current_user.updated_at.to_i
         render text: <<-EOF
 <script type="text/javascript">
-  window.parent.location.href = "#{params[:update_user_url]}";
+  if (window.self != window.parent) window.parent.location.href = "#{params[:update_user_url]}";
 </script>
         EOF
       end
@@ -70,7 +70,7 @@ class SSOController < ApplicationController
       if params[:s] == 'true' && params[:sign_out_url]
         render text: <<-EOF
 <script type="text/javascript">
-  window.parent.location.href = "#{params[:sign_out_url]}";
+  if (window.self != window.parent) window.parent.location.href = "#{params[:sign_out_url]}";
 </script>
         EOF
       end
