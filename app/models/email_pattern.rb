@@ -54,6 +54,8 @@ class EmailPattern < ActiveRecord::Base
       end
     end
 
+    hash[:original_department_code] = hash[:department_code]
+
     return hash
   end
   private_class_method :parse_email_matches

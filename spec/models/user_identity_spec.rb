@@ -31,6 +31,10 @@ RSpec.describe UserIdentity, :type => :model do
       user.reload
       expect(user.organization).to eq user_identity.organization
     end
+
+    it "destroys the generated user user_identity with the same email automatically" do
+      # this is tested at UserEmail spec #re_identify!, context "there is a newly created predefined user_identity while the original one is generated"
+    end
   end
 
   describe "instantiation" do

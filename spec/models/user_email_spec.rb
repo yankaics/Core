@@ -196,12 +196,149 @@ RSpec.describe UserEmail, :type => :model do
 
       it "re-identifies itself" do
         # we don't have an Email Pattern for students of NTUST before, but now we did
+        email.reload
+        expect(email.linked_associated_user_identity.identity).to eq('staff')
         create(:ntust_student_email_pattern)
 
         email.re_identify!
         user.reload
         expect(user.organization_code).to eq('NTUST')
         expect(user.identity).to eq('student')
+        expect(user.primary_identity.original_department_code).to eq('D32')
+      end
+
+      it "keeps the old user changable attributes" do
+        # user changes their department code
+        identity = user.primary_identity
+        identity.department_code = 'U01'
+        identity.save!
+
+        # we don't have an Email Pattern for students of NTUST before, but now we did
+        email.reload
+        expect(email.linked_associated_user_identity.identity).to eq('staff')
+        create(:ntust_student_email_pattern)
+
+        email.re_identify!
+        user.reload
+        expect(user.organization_code).to eq('NTUST')
+        expect(user.identity).to eq('student')
+
+        # the old department_code remains even if its invalid
+        expect(user.department_code).to eq('U01')
+        # the user_identity becomes invalid because it's original_department has changed to a different group
+        expect(user.primary_identity.save).to eq(false)
+      end
+    end
+
+    context "with an out-dated generated identity" do
+      before do
+        # suppose we only have a simple email pattern in the past
+        ntust = create(:ntust_organization)
+        EmailPattern.destroy_all
+        create(:email_pattern, priority: 30, organization: ntust, corresponded_identity: UserIdentity::IDENTITIES[:student], email_regexp: '^(?<uid>.+)@mail\\.ntust\\.edu\\.tw$', uid_postparser: "n.toLowerCase()", permit_changing_department_in_organization: true)
+        expect(student_user.organization_code).to eq('NTUST')
+        expect(student_user.identity).to eq('student')
+        expect(staff_user.organization_code).to eq('NTUST')
+        expect(staff_user.identity).to eq('student')
+      end
+
+      let(:student_email) { e = create(:user_email, email: 'b10132023@mail.ntust.edu.tw'); e.confirm!; e }
+      let(:student_user) { student_email.user }
+      let(:staff_email) { e = create(:user_email, email: 'staff@mail.ntust.edu.tw'); e.confirm!; e }
+      let(:staff_user) { staff_email.user }
+
+      it "re-identifies itself" do
+        # we only have a simple email pattern in before, but now we have detailed ones
+        EmailPattern.destroy_all
+        create(:ntust_student_email_pattern)
+        create(:ntust_staff_email_pattern)
+
+        student_email.re_identify!
+        student_user.reload
+        expect(student_user.organization_code).to eq('NTUST')
+        expect(student_user.identity).to eq('student')
+        expect(student_user.primary_identity.original_department_code).to eq('D32')
+
+        staff_email.re_identify!
+        staff_user.reload
+        expect(staff_user.organization_code).to eq('NTUST')
+        expect(staff_user.identity).to eq('staff')
+      end
+    end
+
+    context "the pattern doesn't change" do
+      before do
+        create(:ntust_organization)
+      end
+
+      let(:email) { e = create(:user_email, email: 'b10132023@mail.ntust.edu.tw'); e.confirm!; e }
+      let(:user) { email.user }
+
+      it "does nothing" do
+        prev_identity_id = user.primary_identity.id
+
+        email.re_identify!
+        user.reload
+        after_identity_id = user.primary_identity.id
+
+        expect(after_identity_id).to eq(prev_identity_id)
+      end
+
+      it "does nothing even if the identity's changable attributes has changed" do
+        prev_identity = user.primary_identity
+        prev_identity.department_code = 'D10'
+        prev_identity.save!
+        prev_identity_id = prev_identity.id
+
+        email.reload
+        email.re_identify!
+        user.reload
+        after_identity_id = user.primary_identity.id
+
+        expect(after_identity_id).to eq(prev_identity_id)
+      end
+    end
+
+    context "the associated user_identity is predefined" do
+      before do
+        create(:ntust_organization)
+        create(:user_identity, email: 'b10132023@mail.ntust.edu.tw', identity: 'staff')
+        expect(user.identity).to eq('staff')
+      end
+
+      let(:email) { e = create(:user_email, email: 'b10132023@mail.ntust.edu.tw'); e.confirm!; e }
+      let(:user) { email.user }
+
+      it "does nothing" do
+        prev_identity_id = user.primary_identity.id
+
+        email.re_identify!
+        user.reload
+        after_identity_id = user.primary_identity.id
+
+        expect(after_identity_id).to eq(prev_identity_id)
+      end
+    end
+
+    context "there is a newly created predefined user_identity while the original one is generated" do
+      # this test is associated with UserIdentity spec context "created after a matched confirmed UserEmail exists", it "destroys the generated user user_identity with the same email automatically"
+      before do
+        create(:ntust_organization)
+      end
+
+      let(:email) { e = create(:user_email, email: 'b10132023@mail.ntust.edu.tw'); e.confirm!; e }
+      let(:user) { email.user }
+
+      it "links the new user_identity and destroy the old one" do
+        expect(user.identity).to eq('student')
+        prev_identity_id = user.primary_identity.id
+
+        create(:user_identity, email: 'b10132023@mail.ntust.edu.tw', identity: 'staff')
+        email.re_identify!
+
+        user.reload
+        expect(user.identity).to eq('staff')
+        expect(UserIdentity.find_by(id: prev_identity_id)).to be nil
       end
     end
   end

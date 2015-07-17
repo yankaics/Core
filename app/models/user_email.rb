@@ -58,32 +58,62 @@ class UserEmail < ActiveRecord::Base
     associated_user_identity.user_id == user_id ? associated_user_identity : nil
   end
 
+  def identify
+    # find if there is a predefined identity with this email
+    identity = UserIdentity.find_by(user_id: nil, email: email)
+    if identity
+      identity.user = user
+      identity.department_code = department_code unless department_code.blank?
+    # or matching email patterns
+    elsif (pattern_identity = EmailPattern.identify(email))
+      identity = user.identities.build(pattern_identity)
+      identity.department_code = department_code unless department_code.blank?
+    end
+
+    return identity
+  end
+
   def identify!
-    ActiveRecord::Base.transaction do
-      # find if there is a predefined identity with this email
-      identity = UserIdentity.find_by(user_id: nil, email: email)
-      if identity
-        identity.update(user: user)
-        identity.update(department_code: department_code) unless department_code.blank?
-      # or matching email patterns
-      elsif (pattern_identity = EmailPattern.identify(email))
-        identity = user.identities.create!(pattern_identity)
-        identity.update(department_code: department_code) unless department_code.blank?
-      end
+    # skip if already identified
+    return if linked_associated_user_identity.present?
+
+    transaction do
+      identity = identify
+      identity.save! if identity
     end
   end
 
   def re_identify!
+    reload
+
+    # skip if the associated user_identity is predefined
     return if linked_associated_user_identity.present? && !linked_associated_user_identity.generated?
-    ActiveRecord::Base.transaction do
-      linked_associated_user_identity.destroy if linked_associated_user_identity.present?
-      identify!
+
+    # get the new expected identity and check if it equals the old one
+    new_identity = identify
+    if (new_identity.present? &&
+        linked_associated_user_identity.present? &&
+        linked_associated_user_identity.attributes.except('id', 'department_code', 'created_at', 'updated_at') !=
+        new_identity.attributes.except('id', 'department_code', 'created_at', 'updated_at')) ||
+       (new_identity.present? && linked_associated_user_identity.blank?)
+
+      # use the new one
+      transaction do
+        if linked_associated_user_identity.present?
+          # set the user changeable attributes of the new identity to those of the old one
+          new_identity.department_code = linked_associated_user_identity.department_code
+          # destroy the old user_identity
+          linked_associated_user_identity.destroy!
+        end
+
+        new_identity.save!(validate: false)
+      end
     end
   end
 
   def confirm
     return false unless valid?
-    ActiveRecord::Base.transaction do
+    transaction do
       update(confirmed_at: Time.now, confirmation_token: nil)
       identify!
     end
