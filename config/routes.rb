@@ -65,6 +65,10 @@ Rails.application.routes.draw do
   get '/_rsa.pub' => 'sso#get_rsa_public_key'
   get '/_sst' => 'sso#get_sst'
   get '/refresh_sst' => 'sso#refresh_sst'
+  get '/sso_status' => 'sso#get_sso_status'
+  get '/sso_status_iframe' => 'sso#get_sso_status'
+  get '/sso_redirect_iframe' => 'sso#get_sso_redirect_iframe'
+  get '/sso_new_session' => 'sso#get_sso_new_session'
 
   # Developers
   scope '/developers' do
