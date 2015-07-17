@@ -68,6 +68,7 @@ Rails.application.routes.draw do
   get '/sso_status' => 'sso#get_sso_status'
   get '/sso_status_iframe' => 'sso#get_sso_status'
   get '/sso_redirect_iframe' => 'sso#get_sso_redirect_iframe'
+  get '/sso_new_session' => 'sso#get_sso_new_session'
 
   # Developers
   scope '/developers' do

@@ -79,6 +79,30 @@ class SSOController < ApplicationController
     render nothing: true unless performed?
   end
 
+  def get_sso_new_session
+    if params[:access_token].present?
+      headers['Access-Control-Allow-Origin'] = '*'
+      headers['X-Frame-Options'] = 'ALLOWALL'
+      render nothing: true and return if params[:access_token] == '_'
+
+      @access_token = Doorkeeper::AccessToken.by_token(params[:access_token])
+      if @access_token &&
+         OAuth::AccessTokenValidationService.validate(@access_token) == :valid &&
+         @access_token.application && @access_token.application.core_app?
+        @user = User.find_by(id: @access_token.resource_owner_id)
+
+        if @user
+          sign_in @user
+          SignonStatusTokenService.write_to_cookie(cookies, @user)
+        end
+      end
+
+      redirect_to sso_new_session_path and return
+    end
+
+    render nothing: true unless performed?
+  end
+
   # GET the RSA public key
   def get_rsa_public_key
     render text: CoreRSAKeyService.public_key_string
