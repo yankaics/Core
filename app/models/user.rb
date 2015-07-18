@@ -1,5 +1,6 @@
 class User < ActiveRecord::Base
   include OmniauthCallable
+  include FacebookSyncable
   devise :database_authenticatable, :timeoutable, :registerable, :confirmable,
          :lockable, :recoverable, :rememberable, :trackable, :validatable,
          :omniauthable, :omniauth_providers => [:facebook]
@@ -43,8 +44,8 @@ class User < ActiveRecord::Base
            :mobile_confirmation_sent_at=, :mobile_confirm_tries=,
            :gender,  :birth_year,  :birth_month,  :birth_day,  :birth_date,
            :gender=, :birth_year=, :birth_month=, :birth_day=, :birth_date=,
-           :url,  :brief,  :motto,  :fb_friends,  :devices,
-           :url=, :brief=, :motto=, :fb_friends=, :devices=,
+           :url,  :brief,  :motto,  :fb_friends,  :fb_devices,
+           :url=, :brief=, :motto=, :fb_friends=, :fb_devices=,
            to: :data, prefix: false, allow_nil: true
   accepts_nested_attributes_for :emails, :unconfirmed_emails,
                                 allow_destroy: true
@@ -180,9 +181,9 @@ class User < ActiveRecord::Base
   ]
 
   CORE_ATTRS = [
-    :devices,
     :birth_date,
-    :fb_friends
+    :fb_friends,
+    :fb_devices
   ]
 
   EDITABLE_ATTRS = [

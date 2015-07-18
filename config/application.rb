@@ -32,6 +32,9 @@ module Core
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
     config.i18n.default_locale = :"zh-TW"
+    config.i18n.locale = :"zh-TW"
+
+    config.active_job.queue_adapter = :sidekiq
 
     config.middleware.use(Rack::Config) do |env|
       env['api.tilt.root'] = Rails.root.join "app", "api", "views"

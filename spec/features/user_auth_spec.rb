@@ -2,74 +2,55 @@ require 'rails_helper'
 
 feature "User Auth", :type => :feature, :retry => 3 do
   before do
-    stub_request(:get, "https://graph.facebook.com/me?access_token=mock_token&fields=id,name,link,picture.height(500).width(500),cover,devices,friends&locale=zh-TW")
+    ENV['FB_APP_ADDITIONAL_SCOPES'] = 'user_friends,user_birthday'
+    ActiveJob::Base.queue_adapter = :inline
+
+    stub_request(:get, "https://graph.facebook.com/me?access_token=mock_token&fields=id,email,name,picture.height(500).width(500),cover,gender,link,devices,friends.limit(50000),birthday,age_range&locale=zh-TW")
       .to_return(:status => 200, :body => (<<-eod
 {
-   "id": "87654321",
-   "name": "FB User",
-   "link": "https://www.facebook.com/app_scoped_user_id/87654321/",
-   "picture": {
-      "data": {
-         "height": 720,
-         "is_silhouette": false,
-         "url": "http://placehold.it/500x500",
-         "width": 720
-      }
-   },
-   "cover": {
-      "id": "87654321",
-      "offset_y": 55,
-      "source": "http://placehold.it/1280x600"
-   },
-   "devices": [
+  "id": "87654321",
+  "name": "FB User",
+  "picture": {
+    "data": {
+      "height": 720,
+      "is_silhouette": false,
+      "url": "https://picture.com/picture",
+      "width": 720
+    }
+  },
+  "gender": "male",
+  "link": "https://www.facebook.com/app_scoped_user_id/87654321/",
+  "devices": [
+    {
+      "os": "Android"
+    },
+    {
+      "hardware": "iPad",
+      "os": "iOS"
+    }
+  ],
+  "friends": {
+    "data": [
       {
-         "os": "Android"
+        "name": "Facebook User2",
+        "id": "12345678"
       },
       {
-         "hardware": "iPad",
-         "os": "iOS"
+        "name": "Facebook User3",
+        "id": "87655678"
       }
-   ],
-   "friends": {
-      "data": [
-         {
-            "name": "Facebook User2",
-            "id": "12345678"
-         },
-         {
-            "name": "Facebook User3",
-            "id": "87655678"
-         }
-      ],
-      "paging": {
-         "next": "https://graph.facebook.com/friends_get_next_page"
-      },
-      "summary": {
-         "total_count": 52
-      }
-   }
-}
-eod
-      ), :headers => {})
-    stub_request(:get, "https://graph.facebook.com/friends_get_next_page")
-      .to_return(:status => 200, :body => (<<-eod
-{
-   "data": [
-     {
-        "name": "Facebook User4",
-        "id": "12344321"
-     },
-     {
-        "name": "Facebook User5",
-        "id": "23455432"
-     }
-   ],
-   "paging": {
-      "previous": ""
-   },
-   "summary": {
+    ],
+    "paging": {
+      "next": "..."
+    },
+    "summary": {
       "total_count": 52
-   }
+    }
+  },
+  "birthday": "05/02/1994",
+  "age_range": {
+    "min": 21
+  }
 }
 eod
       ), :headers => {})
@@ -85,6 +66,13 @@ eod
     expect(user).to be_confirmed
     expect(user.name).to eq('FB User')
     expect(user.gender).to eq('male')
+    expect(user.avatar_url).to eq('https://picture.com/picture')
+    expect(user.birth_month).to eq(5)
+    expect(user.birth_day).to eq(2)
+    expect(user.birth_year).to eq(1994)
+    expect(user.fb_friends).to have_key('data')
+    expect(user.fb_friends).not_to have_key('paging')
+    expect(user.fb_devices.length).to eq(2)
 
     # Users should be redirected to the new email page after their first login
     expect(current_path).to eq new_my_account_email_path

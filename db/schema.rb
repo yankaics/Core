@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150713222911) do
+ActiveRecord::Schema.define(version: 20150718135427) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace"
@@ -234,7 +234,7 @@ ActiveRecord::Schema.define(version: 20150713222911) do
     t.string   "mobile_confirmation_token"
     t.datetime "mobile_confirmation_sent_at"
     t.integer  "mobile_confirm_tries",                  default: 0,  null: false
-    t.text     "devices"
+    t.text     "fb_devices"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.text     "fb_friends"

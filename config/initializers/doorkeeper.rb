@@ -127,49 +127,29 @@ Doorkeeper.configure do
         # the user is vaild
         if fb_user_info['id'].present?
 
-          # the FB access token is owned by this FB App, provide full information
-          if (fb_app_info['id'] == ENV['FB_APP_ID'])
-            facebook_auth = {
-              uid: fb_user_info['id'],
-              credentials: {
-                token: password
-              },
-              info: {
-                email: fb_user_info['email'],
-                name: fb_user_info['name']
-              },
-              extra: {
-                raw_info: {
-                  gender: fb_user_info['gender']
-                }
+          facebook_auth = {
+            uid: fb_user_info['id'],
+            credentials: {
+              token: password
+            },
+            info: {
+              email: fb_user_info['email'],
+              name: fb_user_info['name']
+            },
+            extra: {
+              raw_info: {
+                gender: fb_user_info['gender']
               }
             }
+          }
 
-          # the FB access token is not owned by this FB App, provide limited information
-          else
-            facebook_auth = {
-              credentials: {
-                token: password
-              },
-              info: {
-                email: fb_user_info['email'],
-                name: fb_user_info['name']
-              },
-              extra: {
-                raw_info: {
-                  gender: fb_user_info['gender']
-                }
-              }
-            }
-          end
+          # is the Facebook App an foreign_app (the App is not same as that this system uses)?
+          foreign_app = !(fb_app_info['id'] == ENV['FB_APP_ID'])
 
           # determine if the access token's FB App is whitelisted or not
-          if fb_app_info['id'] == ENV['FB_APP_ID'] ||
-             Settings.fb_app_ids.split(/\r?\n/).include?(fb_app_info['id'])
-            u = User.from_facebook(facebook_auth)
-          else
-            u = User.from_facebook(facebook_auth, foreign_app: true)
-          end
+          whitelisted_app = Settings.fb_app_ids.split(/\r?\n/).include?(fb_app_info['id'])
+
+          u = User.from_facebook(facebook_auth, foreign_app: foreign_app, whitelisted_app: whitelisted_app)
 
           # return
           u
