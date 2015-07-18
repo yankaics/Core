@@ -7,6 +7,9 @@ gem 'rails', '4.2.2'
 # Use sqlite3 or pg as the database for Active Record
 gem 'sqlite3', :groups => [:development, :test]
 gem 'pg'
+# Redis
+gem 'redis'
+gem 'redis-namespace'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0.1'
 gem 'compass-rails', '~> 2.0.0'
@@ -32,11 +35,17 @@ gem 'spring',        group: :development
 # Use unicorn as the app server
 gem 'unicorn'
 
+gem 'sinatra', :require => nil
+
 # Loads environment variables from `.env`
 gem 'dotenv-rails'
 
 # HTTP client
 gem 'httparty', '~> 0.13.1'
+
+# Job runner and clock
+gem 'sidekiq', '~> 3.4.2'
+gem 'clockwork', '~> 1.2.0'
 
 # Grape API
 gem 'grape', '~> 0.11.0'
