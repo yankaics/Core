@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
   before do
+    ENV['FB_APP_ADDITIONAL_SCOPES'] = ''
     Settings.fb_app_ids = "whitelisted_app\nsome_whitelisted_app\r\nanother_whitelisted_app"
   end
 
@@ -35,7 +36,7 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
     visit "/api/v1/me"
     response = JSON.parse(page.body)
     expect(response['name']).to eq @user.name
-    expect(response).not_to have_key 'devices'
+    expect(response).not_to have_key 'fb_devices'
 
     # This grant flow also accept using username
     page.driver.post(<<-URL.squish.delete(' ')
@@ -96,7 +97,7 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
     page.driver.browser.header 'Authorization', "Bearer #{access_token}"
     visit "/api/v1/me"
     response = JSON.parse(page.body)
-    expect(response).to have_key 'devices'
+    expect(response).to have_key 'fb_devices'
 
     # The user's access will be locked if having too many failed attempts
     15.times do
@@ -268,7 +269,7 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
         }
       eos
     )
-    stub_request(:get, "https://graph.facebook.com/me?access_token=#{fbtoken}&fields=id,name,link,picture.height(500).width(500),cover,devices,friends&locale=#{I18n.locale}")
+    stub_request(:get, "https://graph.facebook.com/me?access_token=#{fbtoken}&fields=id,email,name,picture.height(500).width(500),cover,gender,link,devices&locale=#{I18n.locale}")
       .to_return(body: <<-eos
         {
           "id": "1234567890",
@@ -293,50 +294,6 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
             "summary": {
               "total_count": 0
             }
-          }
-        }
-      eos
-    )
-    stub_request(:get, "https://graph.facebook.com/me?access_token=#{fbtoken_of_other_app}&fields=id,name,link,picture.height(500).width(500),cover&locale=#{I18n.locale}")
-      .to_return(body: <<-eos
-        {
-          "id": "0987654321",
-          "name": "Facebook User",
-          "link": "https://www.facebook.com/app_scoped_user_id/1234567890/",
-          "picture": {
-            "data": {
-              "height": 720,
-              "is_silhouette": false,
-              "url": "",
-              "width": 720
-            }
-          },
-          "cover": {
-            "id": "0",
-            "offset_y": 0,
-            "source": ""
-          }
-        }
-      eos
-    )
-    stub_request(:get, "https://graph.facebook.com/me?access_token=#{fbtoken_of_whitelisted_app}&fields=id,name,link,picture.height(500).width(500),cover&locale=#{I18n.locale}")
-      .to_return(body: <<-eos
-        {
-          "id": "0987654321",
-          "name": "Facebook User",
-          "link": "https://www.facebook.com/app_scoped_user_id/1234567890/",
-          "picture": {
-            "data": {
-              "height": 720,
-              "is_silhouette": false,
-              "url": "",
-              "width": 720
-            }
-          },
-          "cover": {
-            "id": "0",
-            "offset_y": 0,
-            "source": ""
           }
         }
       eos

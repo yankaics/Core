@@ -224,7 +224,7 @@ ActiveAdmin.register User do
 
         row(:remember_created_at)
 
-        row(:devices)
+        row(:fb_devices)
       end
     end if current_admin.root?
   end
