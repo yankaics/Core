@@ -1,5 +1,4 @@
-#!/usr/bin/env ruby
-$0 = 'console/rails'
-ENV['CONSOLE'] = 'true'
-ARGV.unshift('console')
-load File.expand_path("../rails", __FILE__)
+#!/usr/bin/env sh
+BASEDIR=$(dirname "$0")
+cd "$(dirname "$BASEDIR")"
+./bin/rails console
