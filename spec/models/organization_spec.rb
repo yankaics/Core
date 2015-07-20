@@ -35,9 +35,9 @@ RSpec.describe Organization, :type => :model do
 
     it "returns an array for all organization selections" do
       selections = Organization.all_for_select
-      expect(selections).to include([org_1.name, org_1.code])
-      expect(selections).to include([org_2.name, org_2.code])
-      expect(selections).to include([org_3.name, org_3.code])
+      expect(selections).to include(["#{org_1.name} (#{org_1.code})", org_1.code])
+      expect(selections).to include(["#{org_2.name} (#{org_2.code})", org_2.code])
+      expect(selections).to include(["#{org_3.name} (#{org_3.code})", org_3.code])
     end
   end
 

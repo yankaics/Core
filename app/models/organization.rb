@@ -22,7 +22,7 @@ class Organization < ActiveRecord::Base
   # end
 
   def self.all_for_select
-    select(:name, :code).all.map { |u| ["u.name (#{u.code})", u.code] }
+    select(:name, :code).all.map { |u| ["#{u.name} (#{u.code})", u.code] }
   end
 
   def self.short_name_list
