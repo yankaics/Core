@@ -9,8 +9,8 @@ class APIDocsController < ApplicationController
       user_extend: '使用者 API'
     }
 
-    Organization.select(:id, :code, :short_name).find_each do |org|
-      @api_collections["org_#{org.code}"] = "#{org.short_name} (#{org.code}) API"
+    Organization.select(:id, :code, :short_name).order(:code).each do |org|
+      @api_collections["org_#{org.code}"] = "#{org.code} - #{org.short_name} API"
     end
 
     # Get the API collection to be explored
@@ -46,6 +46,15 @@ class APIDocsController < ApplicationController
       end]
 
       @applications.merge!(user_apps)
+    end
+
+    if current_admin.present? && current_admin.root?
+      # Get a list of the core apps
+      core_apps = Hash[Doorkeeper::Application.core_apps.select(:id, :name, :uid).map do |app|
+        [app.uid, { name: "#{app.name} (Core App)" }]
+      end]
+
+      @applications.merge!(core_apps)
     end
   end
 
