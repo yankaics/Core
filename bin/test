@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+BASEDIR=$(dirname "$0")
+cd "$(dirname "$BASEDIR")"
+n=0
+until [ $n -ge 3 ]; do
+  n=$((n + 1))
+  bundle exec rake && break
+done

@@ -44,6 +44,8 @@ Run the following command to execute all test suites:
 $ bundle exec rake
 ```
 
+For CI or continuous deployment servers, use the `bin/test` command to automatically retry the entire test suite on failure for up to 3 times.
+
 
 ## Chat
 
