@@ -80,9 +80,10 @@ class SSOController < ApplicationController
   end
 
   def get_sso_new_session
+    headers['Access-Control-Allow-Origin'] = '*'
+    headers['X-Frame-Options'] = 'ALLOWALL'
+
     if params[:access_token].present?
-      headers['Access-Control-Allow-Origin'] = '*'
-      headers['X-Frame-Options'] = 'ALLOWALL'
       render nothing: true and return if params[:access_token] == '_'
 
       @access_token = Doorkeeper::AccessToken.by_token(params[:access_token])
