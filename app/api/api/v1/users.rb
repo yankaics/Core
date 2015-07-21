@@ -1,22 +1,11 @@
 class API::V1::Users < API::V1
   rescue_from :all
-  guard_all!
 
-  # Only permitted applications can use this API
-  # (using their applications access token)
-  before do
-    if current_application.blank? ||
-       !current_application.allow_direct_data_access ||
-       current_user.present?
-      error! 403, 403
-    end
-  end
-
-  resources :users, desc: "[Private API] Operations about the users" do
+  resources :users, desc: "Get user data" do
     desc "Get data of users", {
       http_codes: APIGuard.access_token_error_codes,
       notes:  <<-NOTE
-        Only accessible for permitted applications. Requires an application access token to access (can get one using OAuth 2.0 Client Credentials Grant Flow).
+        Accessiable fields will change while using access token with different permissions
       NOTE
     }
     params do
@@ -40,12 +29,19 @@ class API::V1::Users < API::V1
     get rabl: 'user' do
       permitted_attrs = []
       permitted_attrs += User::PUBLIC_ATTRS
-      permitted_attrs += User::EMAIL_ATTRS
-      permitted_attrs += User::ACCOUNT_ATTRS
-      permitted_attrs += User::FB_ATTRS
-      permitted_attrs += User::INFO_ATTRS
-      permitted_attrs += User::IDENTITY_ATTRS
-      permitted_attrs += User::CORE_ATTRS
+
+      # Applications with direct data access permitted can access all data from the user
+      # (using their application access token)
+      if current_application.present? &&
+         current_application.allow_direct_data_access &&
+         current_user.blank?
+        permitted_attrs += User::EMAIL_ATTRS
+        permitted_attrs += User::ACCOUNT_ATTRS
+        permitted_attrs += User::FB_ATTRS
+        permitted_attrs += User::INFO_ATTRS
+        permitted_attrs += User::IDENTITY_ATTRS
+        permitted_attrs += User::CORE_ATTRS
+      end
 
       fieldset_for :user, default: true, permitted_fields: permitted_attrs,
                           defaults_to_permitted_fields: true
@@ -56,7 +52,7 @@ class API::V1::Users < API::V1
 
       inclusion_for :user, default: true
 
-      @users = filter(User.all)
+      @users = filter(User.all, filterable_fields: permitted_attrs)
       sortable
       pagination @users.size
 
@@ -66,7 +62,7 @@ class API::V1::Users < API::V1
     desc "Get data of a user", {
       http_codes: APIGuard.access_token_error_codes,
       notes:  <<-NOTE
-        Only accessible for permitted applications. Requires an application access token to access (can get one using OAuth 2.0 Client Credentials Grant Flow).
+        Accessiable fields will change while using access token with different permissions.
       NOTE
     }
     params do
@@ -77,12 +73,19 @@ class API::V1::Users < API::V1
     get :':id', rabl: 'user' do
       permitted_attrs = []
       permitted_attrs += User::PUBLIC_ATTRS
-      permitted_attrs += User::EMAIL_ATTRS
-      permitted_attrs += User::ACCOUNT_ATTRS
-      permitted_attrs += User::FB_ATTRS
-      permitted_attrs += User::INFO_ATTRS
-      permitted_attrs += User::IDENTITY_ATTRS
-      permitted_attrs += User::CORE_ATTRS
+
+      # Applications with direct data access permitted can access all data from the user
+      # (using their application access token)
+      if current_application.present? &&
+         current_application.allow_direct_data_access &&
+         current_user.blank?
+        permitted_attrs += User::EMAIL_ATTRS
+        permitted_attrs += User::ACCOUNT_ATTRS
+        permitted_attrs += User::FB_ATTRS
+        permitted_attrs += User::INFO_ATTRS
+        permitted_attrs += User::IDENTITY_ATTRS
+        permitted_attrs += User::CORE_ATTRS
+      end
 
       fieldset_for :user, default: true, permitted_fields: permitted_attrs,
                           defaults_to_permitted_fields: true
@@ -103,7 +106,7 @@ class API::V1::Users < API::V1
     desc "Update data for a user", {
       http_codes: APIGuard.access_token_error_codes,
       notes:  <<-NOTE
-        Only accessible for permitted applications. Requires an application access token to access (can get one using OAuth 2.0 Client Credentials Grant Flow).
+        Accessiable fields will change while using access tokens with different permissions.
       NOTE
     }
     params do
@@ -113,6 +116,14 @@ class API::V1::Users < API::V1
       end
     end
     patch :':id', rabl: 'user' do
+      # Only permitted applications can use this API
+      # (using their applications access token)
+      if current_application.blank? ||
+         !current_application.allow_direct_data_access ||
+         current_user.present?
+        error! 403, 403
+      end
+
       permitted_attrs = []
       permitted_attrs += User::PUBLIC_ATTRS
       permitted_attrs += User::EMAIL_ATTRS

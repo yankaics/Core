@@ -8,18 +8,50 @@ describe "Users API" do
   end
 
   context "requested with no token" do
-    it "fails" do
+    it "only return user's public data" do
       get "/api/v1/users.json"
-      expect(response).not_to be_success
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json.first).to have_key('id')
+      expect(json.first).to have_key('uuid')
+      expect(json.first).to have_key('username')
+      expect(json.first).to have_key('name')
+      expect(json.first).to have_key('avatar_url')
+      expect(json.first).to have_key('cover_photo_url')
+      expect(json.first).not_to have_key('email')
+      expect(json.first).not_to have_key('sign_in_count')
+      expect(json.first).not_to have_key('fbid')
+      expect(json.first).not_to have_key('birth_year')
+      expect(json.first).not_to have_key('organization_code')
+      expect(json.first).not_to have_key('birth_date')
+
       get "/api/v1/users/#{User.last.id}.json"
-      expect(response).not_to be_success
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json).to have_key('id')
+      expect(json).to have_key('uuid')
+      expect(json).to have_key('username')
+      expect(json).to have_key('name')
+      expect(json).to have_key('avatar_url')
+      expect(json).to have_key('cover_photo_url')
+      expect(json).not_to have_key('email')
+      expect(json).not_to have_key('sign_in_count')
+      expect(json).not_to have_key('fbid')
+      expect(json).not_to have_key('birth_year')
+      expect(json).not_to have_key('organization_code')
+      expect(json).not_to have_key('birth_date')
+
       patch "/api/v1/users/#{User.last.id}.json", 'user[username]' => 'hi'
       expect(response).not_to be_success
+      get "/api/v1/users/#{User.last.id}.json"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json['username']).not_to eq('hi')
     end
   end
 
   context "requested with an unpremitted app token" do
-    it "fails" do
+    it "only return user's public data" do
       post '/oauth/token', grant_type: 'client_credentials',
                            client_id: unpremitted_app.uid,
                            client_secret: unpremitted_app.secret
@@ -28,16 +60,48 @@ describe "Users API" do
       access_token = json['access_token']
 
       get "/api/v1/users.json?access_token=#{access_token}"
-      expect(response).not_to be_success
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json.first).to have_key('id')
+      expect(json.first).to have_key('uuid')
+      expect(json.first).to have_key('username')
+      expect(json.first).to have_key('name')
+      expect(json.first).to have_key('avatar_url')
+      expect(json.first).to have_key('cover_photo_url')
+      expect(json.first).not_to have_key('email')
+      expect(json.first).not_to have_key('sign_in_count')
+      expect(json.first).not_to have_key('fbid')
+      expect(json.first).not_to have_key('birth_year')
+      expect(json.first).not_to have_key('organization_code')
+      expect(json.first).not_to have_key('birth_date')
+
       get "/api/v1/users/#{User.last.id}.json?access_token=#{access_token}"
-      expect(response).not_to be_success
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json).to have_key('id')
+      expect(json).to have_key('uuid')
+      expect(json).to have_key('username')
+      expect(json).to have_key('name')
+      expect(json).to have_key('avatar_url')
+      expect(json).to have_key('cover_photo_url')
+      expect(json).not_to have_key('email')
+      expect(json).not_to have_key('sign_in_count')
+      expect(json).not_to have_key('fbid')
+      expect(json).not_to have_key('birth_year')
+      expect(json).not_to have_key('organization_code')
+      expect(json).not_to have_key('birth_date')
+
       patch "/api/v1/users/#{User.last.id}.json?access_token=#{access_token}", 'user[username]' => 'hi'
       expect(response).not_to be_success
+      get "/api/v1/users/#{User.last.id}.json"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json['username']).not_to eq('hi')
     end
   end
 
   context "requested with an premitted app token" do
-    it "successes" do
+    it "returns the full user data and is writable" do
       post '/oauth/token', grant_type: 'client_credentials',
                            client_id: premitted_app.uid,
                            client_secret: premitted_app.secret
@@ -47,23 +111,83 @@ describe "Users API" do
 
       get "/api/v1/users.json?access_token=#{access_token}"
       expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json.first).to have_key('id')
+      expect(json.first).to have_key('uuid')
+      expect(json.first).to have_key('username')
+      expect(json.first).to have_key('name')
+      expect(json.first).to have_key('avatar_url')
+      expect(json.first).to have_key('cover_photo_url')
+      expect(json.first).to have_key('email')
+      expect(json.first).to have_key('sign_in_count')
+      expect(json.first).to have_key('fbid')
+      expect(json.first).to have_key('birth_year')
+      expect(json.first).to have_key('organization_code')
+      expect(json.first).to have_key('birth_date')
+
       get "/api/v1/users/#{User.last.id}.json?access_token=#{access_token}"
       expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json).to have_key('id')
+      expect(json).to have_key('uuid')
+      expect(json).to have_key('username')
+      expect(json).to have_key('name')
+      expect(json).to have_key('avatar_url')
+      expect(json).to have_key('cover_photo_url')
+      expect(json).to have_key('email')
+      expect(json).to have_key('sign_in_count')
+      expect(json).to have_key('fbid')
+      expect(json).to have_key('birth_year')
+      expect(json).to have_key('organization_code')
+      expect(json).to have_key('birth_date')
+
       patch "/api/v1/users/#{User.last.id}.json?access_token=#{access_token}", 'user[username]' => 'hi'
       expect(response).to be_success
     end
   end
 
   context "requested with an premitted app user token" do
-    it "fails" do
+    it "only return user's public data" do
       access_token = create(:oauth_access_token, application: premitted_app, resource_owner_id: User.last.id).token
 
       get "/api/v1/users.json?access_token=#{access_token}"
-      expect(response).not_to be_success
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json.first).to have_key('id')
+      expect(json.first).to have_key('uuid')
+      expect(json.first).to have_key('username')
+      expect(json.first).to have_key('name')
+      expect(json.first).to have_key('avatar_url')
+      expect(json.first).to have_key('cover_photo_url')
+      expect(json.first).not_to have_key('email')
+      expect(json.first).not_to have_key('sign_in_count')
+      expect(json.first).not_to have_key('fbid')
+      expect(json.first).not_to have_key('birth_year')
+      expect(json.first).not_to have_key('organization_code')
+      expect(json.first).not_to have_key('birth_date')
+
       get "/api/v1/users/#{User.last.id}.json?access_token=#{access_token}"
-      expect(response).not_to be_success
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json).to have_key('id')
+      expect(json).to have_key('uuid')
+      expect(json).to have_key('username')
+      expect(json).to have_key('name')
+      expect(json).to have_key('avatar_url')
+      expect(json).to have_key('cover_photo_url')
+      expect(json).not_to have_key('email')
+      expect(json).not_to have_key('sign_in_count')
+      expect(json).not_to have_key('fbid')
+      expect(json).not_to have_key('birth_year')
+      expect(json).not_to have_key('organization_code')
+      expect(json).not_to have_key('birth_date')
+
       patch "/api/v1/users/#{User.last.id}.json?access_token=#{access_token}", 'user[username]' => 'hi'
       expect(response).not_to be_success
+      get "/api/v1/users/#{User.last.id}.json"
+      expect(response).to be_success
+      json = JSON.parse(response.body)
+      expect(json['username']).not_to eq('hi')
     end
   end
 

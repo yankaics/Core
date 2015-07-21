@@ -11,8 +11,7 @@ class API::V1 < API
   version 'v1'
 
   mount Me
+  mount Users
   mount Organizations
   mount Utilities
-
-  mount Users
 end
