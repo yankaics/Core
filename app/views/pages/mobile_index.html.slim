@@ -1,0 +1,29 @@
+css:
+  .container .row {
+    padding: 8px;
+  }
+
+  .container .row > * {
+    padding: 8px;
+  }
+
+  .container .row > * > * {
+    padding-bottom: 65%;
+  }
+
+
+.container
+  .row
+    .col-xs-6
+      - if current_user
+        .bg-blue.card 嗨，#{current_user.name}
+      - else
+        .bg-blue.card 尚未登入
+    .col-xs-6
+      .bg-aquamarine.card Colorgy Books
+    .col-xs-6
+      .bg-orange.card Colorgy Tasks
+    .col-xs-6
+      .bg-yellow.card Colorgu Bus
+    .col-xs-6
+      .bg-purple.card My Account
