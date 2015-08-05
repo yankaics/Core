@@ -1,6 +1,11 @@
 class PagesController < ApplicationController
+  layout '_base', only: [:mobile_index]
 
   def index
+
+  end
+
+  def mobile_index
 
   end
 

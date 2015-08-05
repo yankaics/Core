@@ -26,6 +26,7 @@ Rails.application.routes.draw do
 
   # Index Page
   root 'pages#index'
+  get '/mobile-index' => 'pages#mobile_index'
 
   # Static Pages
   get '/eula' => 'pages#eula'
