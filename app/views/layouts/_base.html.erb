@@ -13,7 +13,11 @@
     <%= csrf_meta_tags %>
   </head>
 
-  <body class="<%= "c-#{controller.controller_name} c-#{controller.controller_name}-#{controller.action_name}" %>">
+  <body class="<%= "c-#{controller.controller_name} c-#{controller.controller_name}-#{controller.action_name}" %>" style="<%= "background-image: url('#{@body_background_image}');" if @body_background_image.present? %>">
+
+    <%= render 'common/fb_js_sdk' %>
+    <%= render 'common/flash_messages' %>
     <%= yield %>
+    <%= render 'common/google_analytics' %>
   </body>
 </html>

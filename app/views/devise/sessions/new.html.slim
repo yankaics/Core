@@ -1,0 +1,19 @@
+.container.max-width-800px
+  .card.bg-fix.text-center(style="margin-top: 180px; background-image: linear-gradient(rgba(255,255,255, .32), rgba(255,255,255, .32)), url('#{@body_background_image_blur}')")
+    - if @invited_guest_identity
+      .card.card--sm.bg-theme
+        .card-title 嗨，#{@invited_guest_identity.name} #{UserIdentity.human_identity_title(@invited_guest_identity.identity)}
+        p 您可以建立一個新的帳號，或使用現有帳號登入！
+        p= link_to "不是 #{@invited_guest_identity.name} 嗎？", invitations_reject_path
+    - else
+      .h2 登入／註冊
+    .row
+      .col-md-12
+        .card.bg-transparent
+          = link_to image_tag('login_with_facebook.png', height: '52px'), user_omniauth_authorize_path(:facebook)
+        p
+          div(class="fb-login-button" data-max-rows="1" data-size="icon" data-show-faces="true")
+        p
+          | 登入時視同您已同意本站之
+          a(href=eula_path target="_blank") 用戶許可協議
+          | 。

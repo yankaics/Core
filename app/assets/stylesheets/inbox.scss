@@ -254,3 +254,22 @@ body.c-pages-index {
 		display: block;
 	}
 }
+
+.fb_iframe_widget {
+	max-width: 100%;
+	overflow: hidden;
+}
+
+.bg-transparent {
+	background-color: transparent !important;
+}
+
+body.c-sessions {
+	background-color: #eee;
+}
+
+body, .bg-fix {
+	background-size: 100%;
+	background-size: cover;
+	background-attachment: fixed;
+}
