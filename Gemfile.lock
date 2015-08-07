@@ -32,7 +32,7 @@ GIT
 
 GIT
   remote: git://github.com/colorgy/Style.git
-  revision: 8ab16661f615eaeba1d34513f067c068107e404a
+  revision: 65811e571f34842f36dc8cdac9776fdf578f2ed3
   specs:
     colorgy_style (0.0.0.4)
       bootstrap-sass (~> 3.3.4.1)
@@ -95,10 +95,15 @@ GEM
       activesupport (>= 3.0.0)
     arel (6.0.0)
     attr_required (1.0.0)
-    autoprefixer-rails (5.2.1)
+    autoprefixer-rails (5.2.1.1)
       execjs
       json
     awesome_print (1.6.1)
+    aws-sdk (1.64.0)
+      aws-sdk-v1 (= 1.64.0)
+    aws-sdk-v1 (1.64.0)
+      json (~> 1.4)
+      nokogiri (>= 1.4.4)
     axiom-types (0.1.1)
       descendants_tracker (~> 0.0.4)
       ice_nine (~> 0.11.0)
@@ -148,9 +153,13 @@ GEM
       railties (>= 3.0)
       sass-rails (>= 3.2)
     chunky_png (1.3.4)
+    climate_control (0.0.3)
+      activesupport (>= 3.0)
     clockwork (1.2.0)
       activesupport
       tzinfo
+    cocaine (0.5.7)
+      climate_control (>= 0.0.3, < 1.0)
     codeclimate-test-reporter (0.4.7)
       simplecov (>= 0.7.1, < 1.0.0)
     coderay (1.1.0)
@@ -315,8 +324,9 @@ GEM
       railties (>= 3.0.0, < 5.0.0)
     method_source (0.8.2)
     mime-types (2.6.1)
+    mimemagic (0.3.0)
     mini_portile (0.6.2)
-    minitest (5.7.0)
+    minitest (5.8.0)
     multi_json (1.11.2)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
@@ -344,6 +354,12 @@ GEM
     paper_trail (3.0.8)
       activerecord (>= 3.0, < 5.0)
       activesupport (>= 3.0, < 5.0)
+    paperclip (4.3.0)
+      activemodel (>= 3.2.0)
+      activesupport (>= 3.2.0)
+      cocaine (~> 0.5.5)
+      mime-types
+      mimemagic (= 0.3.0)
     pg (0.18.1)
     polyamorous (1.2.0)
       activerecord (>= 3.0)
@@ -587,6 +603,7 @@ DEPENDENCIES
   activerecord-import (~> 0.7.0)
   api_helper!
   awesome_print
+  aws-sdk (~> 1.6)
   babosa
   better_errors (~> 2.1.0)
   binding_of_caller (~> 0.7.2)
@@ -631,6 +648,7 @@ DEPENDENCIES
   nprogress-rails (~> 0.1.6.5)
   omniauth-facebook (~> 2.0.0)
   paper_trail (~> 3.0.6)
+  paperclip (~> 4.3)
   pg
   pry-byebug
   pry-rails

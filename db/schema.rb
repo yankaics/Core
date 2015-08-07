@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150718135427) do
+ActiveRecord::Schema.define(version: 20150807062723) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace"
@@ -208,6 +208,35 @@ ActiveRecord::Schema.define(version: 20150718135427) do
   end
 
   add_index "organizations", ["code"], name: "index_organizations_on_code", unique: true
+
+  create_table "service_navigations", force: :cascade do |t|
+    t.string   "name",                                            null: false
+    t.string   "url",                                             null: false
+    t.string   "color"
+    t.string   "icon_file_name"
+    t.string   "icon_content_type"
+    t.integer  "icon_file_size"
+    t.datetime "icon_updated_at"
+    t.string   "background_image_file_name"
+    t.string   "background_image_content_type"
+    t.integer  "background_image_file_size"
+    t.datetime "background_image_updated_at"
+    t.string   "background_pattern_file_name"
+    t.string   "background_pattern_content_type"
+    t.integer  "background_pattern_file_size"
+    t.datetime "background_pattern_updated_at"
+    t.string   "description"
+    t.text     "introduction"
+    t.integer  "order",                           default: 100,   null: false
+    t.boolean  "visible",                         default: false, null: false
+    t.boolean  "opened",                          default: false, null: false
+    t.boolean  "show_on_index",                   default: false, null: false
+    t.boolean  "show_on_mobile_index",            default: false, null: false
+    t.integer  "index_order",                     default: 100,   null: false
+    t.integer  "index_size",                      default: 1,     null: false
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
+  end
 
   create_table "settings", force: :cascade do |t|
     t.string   "var",                   null: false
