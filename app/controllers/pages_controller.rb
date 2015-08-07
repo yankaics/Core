@@ -3,7 +3,7 @@ class PagesController < ApplicationController
 
   def index
     render 'landing' if current_user.blank?
-    @service_navigations = ServiceNavigation.where(visible: true, show_on_index: true).order(:index_order).limit(20)
+    @service_navigations = ServiceNavigation.where(visible: true, show_on_index: true).order(index_order: :asc).limit(20)
     @all_service_navigations = ServiceNavigation.where(visible: true, opened: true).order(:order).limit(100)
   end
 
