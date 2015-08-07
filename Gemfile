@@ -43,6 +43,8 @@ gem 'dotenv-rails'
 # HTTP client
 gem 'httparty', '~> 0.13.1'
 
+gem 'aws-sdk', '~> 1.6'
+
 # Job runner and clock
 gem 'sidekiq', '~> 3.4.2'
 gem 'clockwork', '~> 1.2.0'
@@ -86,6 +88,7 @@ gem 'kaminari'
 gem 'active_model_serializers', '~> 0.8.0'
 
 # ActiveRecord enhancements
+gem 'paperclip', '~> 4.3'
 gem 'paper_trail', '~> 3.0.6'
 gem 'validates_email_format_of'
 

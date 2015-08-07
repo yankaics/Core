@@ -34,6 +34,10 @@ module Core
     config.i18n.default_locale = :"zh-TW"
     config.i18n.locale = :"zh-TW"
 
+    if ENV['FILE_STORAGE'].try(:upcase) == 'S3'
+      config.paperclip_defaults = { storage: :s3, s3_credentials: { bucket: ENV['S3_BUCKET'], access_key_id: ENV['S3_ACCESS_KEY_ID'], secret_access_key: ENV['S3_SECRET_ACCESS_KEY'] }, s3_host_name: ENV['S3_HOST_NAME'], s3_permissions: :public_read, s3_protocol: :https }
+    end
+
     config.active_job.queue_adapter = :sidekiq
 
     config.middleware.use(Rack::Config) do |env|
