@@ -1,6 +1,7 @@
 class Users::SessionsController < Devise::SessionsController
   include RedirectCheckingHelper
 
+  before_action :random_body_background_image, only: [:new]
   after_filter :refresh_signon_status_token, only: [:destroy, :new, :create]
   after_filter :refresh_site_identity_token, only: [:destroy, :new, :create]
   protect_from_forgery except: :destroy
