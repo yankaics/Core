@@ -1,11 +1,11 @@
 .container.max-width-1200px
   .box-grid-4.clearfix.visible-lg-block
-    - service_navigations = @service_navigations.to_a
+    - service_navigations = @service_navigations.clone.to_a
 
     - quene = []
     - space_left = 3
     - while space_left > 0 && service_navigations.present? do
-      - service_navigation = service_navigations.pop
+      - service_navigation = service_navigations.shift
       - quene << service_navigation and next if service_navigation.index_size > space_left
       - space_left -= service_navigation.index_size
       = render partial: 'partials/index_desktop_service_navigation_item', locals: { service_navigation: service_navigation }
@@ -23,7 +23,7 @@
     - quene = []
     - space_left = 1
     - while space_left > 0 && service_navigations.present? do
-      - service_navigation = service_navigations.pop
+      - service_navigation = service_navigations.shift
       - quene << service_navigation and next if service_navigation.index_size > space_left
       - space_left -= service_navigation.index_size
       = render partial: 'partials/index_desktop_service_navigation_item', locals: { service_navigation: service_navigation }
@@ -57,7 +57,7 @@
     - quene = []
     - space_left = 1
     - while space_left > 0 && service_navigations.present? do
-      - service_navigation = service_navigations.pop
+      - service_navigation = service_navigations.shift
       - quene << service_navigation and next if service_navigation.index_size > space_left
       - space_left -= service_navigation.index_size
       = render partial: 'partials/index_desktop_service_navigation_item', locals: { service_navigation: service_navigation }
@@ -66,7 +66,7 @@
     - quene = []
     - space_left = 4
     - while space_left > 0 && service_navigations.present? do
-      - service_navigation = service_navigations.pop
+      - service_navigation = service_navigations.shift
       - quene << service_navigation and next if service_navigation.index_size > space_left
       - space_left -= service_navigation.index_size
       = render partial: 'partials/index_desktop_service_navigation_item', locals: { service_navigation: service_navigation }
@@ -104,6 +104,7 @@ javascript:
     $('*[data-tooltip]').tooltip();
     $('.box-grid').masonry({
       itemSelector: '.box-grid-box',
-      percentPosition: true
+      percentPosition: true,
+      columnWidth: $('.box-grid .box-grid-box').first().width() / 2
     });
   });
