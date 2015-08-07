@@ -10,6 +10,6 @@ FactoryGirl.define do
     order { Faker::Number.between(1, 100) }
     show_on_index { [true, false].sample }
     index_order { Faker::Number.between(1, 100) }
-    index_size { Faker::Number.between(1, 100) }
+    index_size { Faker::Number.between(1, 2) }
   end
 end

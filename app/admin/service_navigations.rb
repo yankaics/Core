@@ -1,5 +1,5 @@
 ActiveAdmin.register ServiceNavigation do
-  menu priority: 45, label: "服務導覽", if: proc { current_admin.root? }
+  menu priority: 70, label: "服務導覽選單", if: proc { current_admin.root? }
 
   scope_to(if: proc { current_admin.scoped? }) { current_admin }
 

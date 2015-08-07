@@ -1,5 +1,5 @@
 ActiveAdmin.register Doorkeeper::Application do
-  menu priority: 50, label: "應用程式", if: proc { current_admin.root? }
+  menu priority: 80, label: "應用程式", if: proc { current_admin.root? }
 
   scope_to(if: proc { current_admin.scoped? }) { current_admin }
 

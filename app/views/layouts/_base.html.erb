@@ -8,11 +8,12 @@
     <title>Colorgy</title>
 
     <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track' => true %>
+    <%= stylesheet_link_tag 'inbox', media: 'all', 'data-turbolinks-track' => true %>
     <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
     <%= csrf_meta_tags %>
   </head>
 
-  <body>
+  <body class="<%= "c-#{controller.controller_name} c-#{controller.controller_name}-#{controller.action_name}" %>">
     <%= yield %>
   </body>
 </html>

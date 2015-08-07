@@ -1,0 +1,20 @@
+- box_class ||= ''
+- if service_navigation.index_size == 1
+  .box-grid-box(class="#{box_class}")
+    .box-grid-box-body.background-pattern(style="background-image: url('#{service_navigation.background_pattern.url}');")
+    a.box-grid-box-body.card.service-card(style="background-color: #{service_navigation.color}; background-image: url('#{service_navigation.background_image.url}');" href=service_navigation.url)
+      .card-title.service-name= service_navigation.name
+      .service-description= service_navigation.description
+- else
+  .box-grid-box.box-grid-box--lg(class="#{box_class}")
+    - if service_navigation.background_image.present? && service_navigation.description.present?
+      a.box-grid-box-body.card.service-card(href=service_navigation.url)
+        .card-image(style="background-color: #{service_navigation.color}; background-image: url('#{service_navigation.background_image.url}');")
+          span.card-title= service_navigation.name
+        .card-content
+          p= service_navigation.introduction
+    - else
+      .box-grid-box-body.background-pattern(style="background-image: url('#{service_navigation.background_pattern.url}');")
+      a.box-grid-box-body.card.service-card(style="background-color: #{service_navigation.color}; background-image: url('#{service_navigation.background_image.url}');" href=service_navigation.url)
+        .card-title.service-name= service_navigation.name
+        .service-description= service_navigation.description

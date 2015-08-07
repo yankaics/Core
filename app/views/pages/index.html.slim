@@ -1,83 +1,109 @@
-css:
+.container.max-width-1200px
+  .box-grid-4.clearfix.visible-lg-block
+    - service_navigations = @service_navigations.to_a
 
-  .col-description {
-    padding-left: 40px;
-    padding-right: 40px;
-    min-height: 400px;
-    margin-top: 20px;
-  }
+    - quene = []
+    - space_left = 3
+    - while space_left > 0 && service_navigations.present? do
+      - service_navigation = service_navigations.pop
+      - quene << service_navigation and next if service_navigation.index_size > space_left
+      - space_left -= service_navigation.index_size
+      = render partial: 'partials/index_desktop_service_navigation_item', locals: { service_navigation: service_navigation }
+    - service_navigations = quene + service_navigations
 
-  .col-description > h2 {
-    text-align: center;
-  }
+    .box-grid-box.box-grid-box
+      .box-grid-box-body.card.more-services-card.bg-white
+        .card-content
+          - @all_service_navigations.each do |navigation|
+            = link_to navigation.name, navigation.url
+        a.more-services.card-supporting-text(data-tooltip="Coming Soon")
+          | 更多服務
+          i.icon.pull-right apps
 
-  .col-description > p {
-    text-align: left;
-    padding: 10px;
-    margin: 10px;
-    font-size: 120%;
-  }
+    - quene = []
+    - space_left = 1
+    - while space_left > 0 && service_navigations.present? do
+      - service_navigation = service_navigations.pop
+      - quene << service_navigation and next if service_navigation.index_size > space_left
+      - space_left -= service_navigation.index_size
+      = render partial: 'partials/index_desktop_service_navigation_item', locals: { service_navigation: service_navigation }
+    - service_navigations = quene + service_navigations
 
-  .col-description > .button {
-    bottom: 60px;
-    position: absolute;
-    left: calc(50% - 65px);
-  }
 
-  .button {
-    text-align: center !important;
-  }
+    .box-grid-box.box-grid-box--lg
+      - if current_user
+        .box-grid-box-body.card.user-card.bg-theme
+          .card-image(style="background-image: url('#{current_user.cover_photo_url}')")
+            .card-title
+              = current_user.name
+              | &nbsp;
+              small= current_user.email
+          .card-content
+            = link_to '個人檔案', '#', 'data-tooltip' => 'Coming Soon'
+            | ・
+            = link_to '我的帳號', '#', 'data-tooltip' => 'Coming Soon'
+            | ・
+            = link_to '偏好設定', '#', 'data-tooltip' => 'Coming Soon'
+          .card-supporting-text
+            = link_to '查看個人資料', new_user_session_path, class: 'btn btn--highlighted visible-lg-inline-block', 'data-tooltip' => 'Coming Soon'
+      - else
+        .box-grid-box-body.card.user-card.bg-theme.valign-wrapper.text-center
+          .card-content.valign.margin-center
+            h1.h3
+              | 歡迎進入 Colorgy
+              span.visible-lg-inline &nbsp;平台
+            = link_to '立即登入', new_user_session_path, class: 'btn btn--highlighted'
 
-  .icon-image {
-    text-align: center;
-  }
+    - quene = []
+    - space_left = 1
+    - while space_left > 0 && service_navigations.present? do
+      - service_navigation = service_navigations.pop
+      - quene << service_navigation and next if service_navigation.index_size > space_left
+      - space_left -= service_navigation.index_size
+      = render partial: 'partials/index_desktop_service_navigation_item', locals: { service_navigation: service_navigation }
+    - service_navigations = quene + service_navigations
 
-  .icon-image > img {
-    height: 100px;
-  }
+    - quene = []
+    - space_left = 4
+    - while space_left > 0 && service_navigations.present? do
+      - service_navigation = service_navigations.pop
+      - quene << service_navigation and next if service_navigation.index_size > space_left
+      - space_left -= service_navigation.index_size
+      = render partial: 'partials/index_desktop_service_navigation_item', locals: { service_navigation: service_navigation }
+    - service_navigations = quene + service_navigations
 
-  .jumbotron {
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center center;
-    min-height: 500px;
-    padding-top: 120px;
-  }
+  .box-grid
+    .box-grid-box.box-grid-box--lg.hidden-lg
+      - if current_user
+        .box-grid-box-body.card.user-card.bg-theme
+          .card-image(style="background-image: url('#{current_user.cover_photo_url}')")
+            .card-title
+              = current_user.name
+              | &nbsp;
+              small= current_user.email
+          .card-content
+            = link_to '個人檔案', '#', 'data-tooltip' => 'Coming Soon'
+            | ・
+            = link_to '我的帳號', '#', 'data-tooltip' => 'Coming Soon'
+            | ・
+            = link_to '偏好設定', '#', 'data-tooltip' => 'Coming Soon'
+          .card-supporting-text
+            = link_to '查看個人資料', new_user_session_path, class: 'btn btn--highlighted visible-lg-inline-block', 'data-tooltip' => 'Coming Soon'
+      - else
+        .box-grid-box-body.card.user-card.bg-theme.valign-wrapper.text-center
+          .card-content.valign.margin-center
+            h1.h3
+              | 歡迎進入 Colorgy
+              span.visible-lg-inline &nbsp;平台
+            = link_to '立即登入', new_user_session_path, class: 'btn btn--highlighted'
+    - @service_navigations.each do |service_navigation|
+      = render partial: 'partials/index_desktop_service_navigation_item', locals: { service_navigation: service_navigation, box_class: 'hidden-lg' }
 
-  .home-header > h1 {
-    color: rgb(120,120,120);
-    text-shadow: 1px 1px rgba(0,0,0,0.3);
-    text-align: center;
-    font-size: 600%;
-  }
-
-  .home-header > p {
-    color: rgb(120,120,120);
-    text-shadow: 1px 1px rgba(0,0,0,0.3);
-    text-align: center;
-    font-size: 200%;
-  }
-
-.jumbotron
-  .container.home-header
-    h1 歡迎進入 Colorgy 平台
-    p Colorgy is the hub of college life.
-    p 目前提供服務於 #{Organization.short_name_list.join(t(:comma, scope: :general))}。
-    p
-      a.btn.btn-primary.btn-lg.home-btn(href="#{contact_url}" target="_blank" role="button") 聯繫我們 &raquo;
-
-.container
-  .row
-    .col-md-6.col-description
-      .icon-image= image_tag 'professor.png'
-      h2 教授
-      p 感謝您登入 Colorgy 平台，希望您願意支持我們的理念，至 Colorgy Books 惠予確認您開設之課程與用書，讓同學們能夠提早方便的團購您的指定用書。
-      p.button
-        a.btn.btn-default.home-btn href="http://books.colorgy.io/lecturer/" role="button"  教授上書 &raquo;
-    .col-md-6.col-description
-      .icon-image= image_tag 'student.png'
-      h2 同學
-      p 您可以註冊，享受我們方便的服務，敬請關注原文書團訂的時間。
-      p.button
-        a.btn.btn-default.home-btn href="./login" role="button" 同學註冊 &raquo;
-  hr/
+javascript:
+  $(document).ready(function () {
+    $('*[data-tooltip]').tooltip();
+    $('.box-grid').masonry({
+      itemSelector: '.box-grid-box',
+      percentPosition: true
+    });
+  });

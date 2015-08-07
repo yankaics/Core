@@ -1,0 +1,53 @@
+= render layout: 'layouts/base' do
+
+  .mobile-slide.mobile-side-nav
+    .mobile-side-nav-menu
+      - @service_navigations = ServiceNavigation.where(visible: true, opened: true, show_on_index: true).order(:index_order).limit(10)
+      ul
+        - @service_navigations.each do |service_navigation|
+          li
+            = link_to service_navigation.name, service_navigation.url
+
+    - if current_user
+      .mobile-side-nav-head.mobile-user-info(style="background-image: url('#{current_user.cover_photo_url}');")
+        .mobile-user-info-avatar= image_tag current_user.avatar_url
+        a.mobile-user-info-name(data-toggle="collapse" data-target="#mobile-nav-user-info-menu" href="#")
+          p= current_user.name
+          p= current_user.email
+          .mobile-user-info-toggle
+      .mobile-side-nav-menu#mobile-nav-user-info-menu.collapse
+        ul
+          li
+            a(href=destroy_user_session_path)
+              span.icon
+                i.i-lock
+              span 登出
+    - else
+      .mobile-side-nav-head.bg-dark.align-center-wrapper
+        .align-center-body
+          a.valign.btn(href=new_user_session_path) 登入
+
+  .wrapper#wrapper
+
+    .mobile-head.mobile-slide-trigger-button.position-fixed.visible-xs-block
+      .container
+        .i-menu.pull-left.position-absolute
+        = image_tag 'colorgy/colorgy_logo_white_small.svg'
+    .mobile-head-placeholder.visible-xs-block
+
+    .mini-nav.hidden-xs
+      .container
+        ul.mini-nav-nav.mini-nav-nav--right
+          - if current_user
+            li
+              a.dropdown-toggle(href="#" data-toggle="dropdown")
+                | Hi, #{current_user.name}
+                = image_tag current_user.avatar_url
+                .caret
+              ul.dropdown-menu.dropdown-menu--right
+                li= link_to '登出', destroy_user_session_path
+          - else
+            li= link_to '登入', new_user_session_path
+    = render 'common/flash_messages'
+    = yield
+    = render 'common/google_analytics'
