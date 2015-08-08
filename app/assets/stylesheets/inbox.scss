@@ -129,6 +129,14 @@ body.c-pages-index {
 		text-decoration: none !important;
 	}
 
+	.box-grid-box, a {
+
+		&.disabled {
+			opacity: .5;
+			cursor: not-allowed;
+		}
+	}
+
 	.service-card {
 		background-size: cover;
 		overflow: hidden;
