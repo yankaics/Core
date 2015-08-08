@@ -91,6 +91,65 @@ feature "User Verificate", :type => :feature, :retry => 3 do
     logout(:user)
   end
 
+  scenario "User verifies an email matching an EmailPattern and changes the starting time", :js => true do
+    # Permit changing started_at
+    @ntust_email_pattern = EmailPattern.find_by(organization_code: 'NTUST', corresponded_identity: 1)
+    @ntust_email_pattern.permit_changing_started_at = true
+    @ntust_email_pattern.save
+
+    # Login and go to the new email verification page
+    login_as @user_a1
+    visit(new_my_account_email_path)
+
+    # Try to enter an email and waites for the select dropdown to appear
+    tries = 10
+    success = false
+    until success
+      fill_in('user_email_email', with: '')
+      fill_in('user_email_email', with: 'b10132023@mail.ntust.edu.tw')
+      execute_script("$('input[type=submit]')[0].focus()")
+
+      sleep(3)
+
+      begin
+        # Select an different started_at
+        within 'select#started-at-select', visible: false do
+          find('option[value="2015"]', visible: false).select_option
+        end
+
+        success = true
+      rescue
+      end
+      sleep(0.1)
+      tries -= 1
+      break if tries == 0
+    end
+
+    sleep(1)
+
+    first("input[type=submit]").click
+
+    sleep(2)
+
+    # An new UserEmail should be created
+    new_email = @user_a1.unconfirmed_emails.last
+    expect(new_email.email).to eq 'b10132023@mail.ntust.edu.tw'
+
+    # Find the confirmation_path in identity confirmation email
+    confirmation_path = open_last_email.body.match(/user_emails\/confirmation\?confirmation_token=[^"]+/)
+
+    # Visiting the confirmation_path should confirms that email
+    expect do
+      visit "/#{confirmation_path}"
+      new_email.reload
+    end.to change { new_email.confirmed? }.from(false).to(true)
+
+    @user_a1.reload
+
+    # And creates the corresponding identity with the changed started_at date
+    expect(@user_a1.identities.first.started_at.to_s).to eq '2015-07-01'
+  end
+
   scenario "User verifies an email with predefined identity", :js => true do
     # Create the predefined identity
     user_identity = create(:user_identity)

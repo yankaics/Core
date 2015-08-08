@@ -99,6 +99,6 @@ class Users::EmailsController < ApplicationController
   private
 
   def user_email_params
-    params.require(:user_email).permit(:email, :department_code)
+    params.require(:user_email).permit(:email, :department_code, :started_at)
   end
 end

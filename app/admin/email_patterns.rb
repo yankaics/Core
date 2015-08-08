@@ -11,7 +11,7 @@ ActiveAdmin.register EmailPattern do
   end
 
   permit_params do
-    params = [:priority, :corresponded_identity, :email_regexp, :uid_postparser, :department_code_postparser, :identity_detail_postparser, :started_at_postparser, :permit_changing_department_in_group, :permit_changing_department_in_organization, :skip_confirmation]
+    params = [:priority, :corresponded_identity, :email_regexp, :uid_postparser, :department_code_postparser, :identity_detail_postparser, :started_at_postparser, :permit_changing_department_in_group, :permit_changing_department_in_organization, :permit_changing_started_at, :skip_confirmation]
     params.concat [:organization_code, :organization] if current_admin.root?
     params
   end
@@ -21,6 +21,7 @@ ActiveAdmin.register EmailPattern do
   filter :name
   filter :permit_changing_department_in_group
   filter :permit_changing_department_in_organization
+  filter :permit_changing_started_at
   filter :created_at
   filter :updated_at
 
@@ -85,6 +86,7 @@ ActiveAdmin.register EmailPattern do
 
       f.input :permit_changing_department_in_group
       f.input :permit_changing_department_in_organization
+      f.input :permit_changing_started_at
       f.input :skip_confirmation
     end
     f.actions

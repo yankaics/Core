@@ -84,6 +84,7 @@ NewUserEmailBox = React.createClass
       started_at: null
       permit_changing_department_in_group: null
       permit_changing_department_in_organization: null
+      permit_changing_started_at: null
       emailSelections: null
       submitActivate: false
 
@@ -137,11 +138,11 @@ NewUserEmailBox = React.createClass
             matchEmailPattern = emailPattern
 
     if matchEmailPattern
-      {corresponded_identity, organization_code, permit_changing_department_in_group, permit_changing_department_in_organization} = matchEmailPattern
+      { corresponded_identity, organization_code, permit_changing_department_in_group, permit_changing_department_in_organization, permit_changing_started_at } = matchEmailPattern
       if outerMatchEmailPattern
-        {uid, identity_detail, department_code, started_at} = matchEmailPattern
+        { uid, identity_detail, department_code, started_at } = matchEmailPattern
       else
-        {uid, identity_detail, department_code, started_at} = matchData
+        { uid, identity_detail, department_code, started_at } = matchData
 
       @_fetchDepartments(organization_code)
 
@@ -168,6 +169,7 @@ NewUserEmailBox = React.createClass
       uid = corresponded_identity = identity_detail = organization_code = department_code = started_at = null
       permit_changing_department_in_group = false
       permit_changing_department_in_organization = false
+      permit_changing_started_at = false
       organization_name = '?'
 
     @setState
@@ -180,18 +182,20 @@ NewUserEmailBox = React.createClass
       started_at: started_at
       permit_changing_department_in_group: permit_changing_department_in_group
       permit_changing_department_in_organization: permit_changing_department_in_organization
+      permit_changing_started_at: permit_changing_started_at
       emailSelections: emailSelections
 
   render: ->
 
     permit_changing_department_in_group = @state.permit_changing_department_in_group
     permit_changing_department_in_organization = @state.permit_changing_department_in_organization
+    permit_changing_started_at = @state.permit_changing_started_at
 
     @state.department = @state.departments[@state.department_code]
     baseGroup = @state.department?.group
+
     if (@state.permit_changing_department_in_group && @state.department) || @state.permit_changing_department_in_organization
       departments = @state.departments
-      window.dd = departments
       departments = $.extend({0: {code: '', name: '請選擇系所／部門'}}, departments) if @state.permit_changing_department_in_organization
 
       department_selector =
@@ -210,7 +214,25 @@ NewUserEmailBox = React.createClass
         </select>`
 
     else
-      department_selector = this.state.department_name
+      department_selector = @state.department_name
+
+    if @state.permit_changing_started_at
+      current_year = (new Date().getFullYear())
+      selections = []
+      [current_year..(current_year - 20)].forEach (i) ->
+        selections.push `<option key={i}
+                                 value={i} >
+                           {i} 年度入學
+                         </option>`
+      started_at_selector =
+        `<select ref="started-at-select"
+          id="started-at-select"
+          className="chosen-select"
+          name="user_email[started_at]" >
+          {selections}
+        </select>`
+    else
+      started_at_selector = "#{@state.started_at?.getFullYear() || '未知'} 年度入學"
 
     submitButtonClassName = classNames
       'btn btn--highlighted': true
@@ -249,8 +271,8 @@ NewUserEmailBox = React.createClass
           <div className="col-sm-6 col-md-4 hidden-sm identity-detail">
             <div className="">
               <div className="caption">
-                <p>{this.state.department_code}</p>
                 <p>{this.state.uid}</p>
+                <p key={this.state.i++}>{started_at_selector}</p>
               </div>
             </div>
           </div>
@@ -288,15 +310,31 @@ NewUserEmailBox = React.createClass
 
   componentDidUpdate: ->
     document.getElementById('department-select')?.value = @state.department_code || ''
+    document.getElementById('started-at-select')?.value = @state.started_at?.getFullYear() || (new Date().getFullYear())
+
     $('#department-select').select2()
-    $('.select2-choice').hover ->
-      $('.select2-choice')[0].focus()
+    $('#started-at-select').select2()
+
+    $('.organization .select2-choice').hover ->
+      $('.organization .select2-choice')[0].focus()
     , ->
-      $('.select2-choice')[0].blur()
+      $('.organization .select2-choice')[0].blur()
+
+    $('.identity .select2-choice').hover ->
+      $('.identity .select2-choice')[0].focus()
+    , ->
+      $('.identity .select2-choice')[0].blur()
+
+    $('.identity-detail .select2-choice').hover ->
+      $('.identity-detail .select2-choice')[0].focus()
+    , ->
+      $('.identity-detail .select2-choice')[0].blur()
+
     $('input[type="submit"]').hover ->
       $('input[type="submit"]')[0].focus()
     , ->
       $('input[type="submit"]')[0].blur()
+
     $("form#new_user_email").submit (e) =>
       if not @state.submitActivate
         e.preventDefault()

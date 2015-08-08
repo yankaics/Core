@@ -25,6 +25,7 @@ class EmailPattern < ActiveRecord::Base
 
         matchdata_hash[:permit_changing_department_in_group] = pattern.permit_changing_department_in_group
         matchdata_hash[:permit_changing_department_in_organization] = pattern.permit_changing_department_in_organization
+        matchdata_hash[:permit_changing_started_at] = pattern.permit_changing_started_at
         matchdata_hash[:skip_confirmation] = pattern.skip_confirmation
 
         return parse_email_matches(matchdata_hash, pattern)
