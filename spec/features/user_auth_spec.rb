@@ -225,7 +225,7 @@ eod
     @invitation_code = InvitationCodeService.generate(@identity.email)
 
     # Go to the invitation URL and click on 'login_with_facebook' button
-    visit invitations_path(code: @invitation_code, redirect_to: '/my_account/emails')
+    visit invitations_path(code: @invitation_code, redirect_to: new_my_account_email_path)
     expect(page).to have_content(@identity.name)
     click_on('login_with_facebook', match: :first)
 
@@ -235,7 +235,7 @@ eod
     expect(@user.organization_code).to eq(@identity.organization_code)
 
     # The user should be redirected to the given path
-    expect(current_path).to eq('/my_account/emails')
+    expect(current_path).to eq(new_my_account_email_path)
 
     # On background: sign-on status token (sst) cookie should be set
     expect(page.driver.request.cookies['_sst'])
@@ -254,7 +254,7 @@ eod
     expect(@user.identities).not_to include(@identity)
 
     # Go to the invitation URL and click on 'login_with_facebook' button
-    visit invitations_path(code: @invitation_code, redirect_to: '/my_account/emails')
+    visit invitations_path(code: @invitation_code, redirect_to: new_my_account_email_path)
     expect(page).to have_content(@identity.name)
     click_on('login_with_facebook', match: :first)
 
@@ -264,7 +264,7 @@ eod
     expect(@user.identities).to include(@identity)
 
     # The user should be redirected to the given path
-    expect(current_path).to eq('/my_account/emails')
+    expect(current_path).to eq(new_my_account_email_path)
 
     # On background: sign-on status token (sst) cookie should be set
     expect(page.driver.request.cookies['_sst'])
@@ -283,7 +283,7 @@ eod
     user_login_credentials = user_rigister_credentials.slice(:email, :password)
 
     # Go to the invitation URL and fill the registration form
-    visit invitations_path(code: @invitation_code, redirect_to: '/my_account/emails')
+    visit invitations_path(code: @invitation_code, redirect_to: new_my_account_email_path)
     expect(page).to have_content(@identity.name)
     within ".registration" do
       fill_form_and_submit(:user, user_rigister_credentials)
@@ -295,7 +295,7 @@ eod
     expect(@user.organization_code).to eq(@identity.organization_code)
 
     # The user should be redirected to the given path
-    expect(current_path).to eq('/my_account/emails')
+    expect(current_path).to eq(new_my_account_email_path)
 
     # On background: sign-on status token (sst) cookie should be maintained because the user is automatically signed in
     sst_string = page.driver.request.cookies['_sst']
@@ -322,7 +322,7 @@ eod
     user_login_credentials = user_rigister_credentials.slice(:email, :password)
 
     # Go to the invitation URL and fill the registration form
-    visit invitations_path(code: @invitation_code, redirect_to: '/my_account/emails')
+    visit invitations_path(code: @invitation_code, redirect_to: new_my_account_email_path)
     expect(page).to have_content(@identity.name)
     within ".registration" do
       fill_form_and_submit(:user, user_rigister_credentials)
@@ -359,7 +359,7 @@ eod
     expect(page.driver.request.cookies['_identity_token']).not_to be_blank
 
     # Go to the invitation URL and login (again. users should be signed out after clicking the invitation link)
-    visit invitations_path(code: @invitation_code, redirect_to: '/my_account/emails')
+    visit invitations_path(code: @invitation_code, redirect_to: new_my_account_email_path)
     expect(page).to have_content(@identity.name)
     expect(page.driver.request.cookies['_sst']).to be_blank
     expect(page.driver.request.cookies['_identity_token']).to be_blank
@@ -373,7 +373,7 @@ eod
     expect(@user.identities).to include(@identity)
 
     # The user should be redirected to the given path
-    expect(current_path).to eq('/my_account/emails')
+    expect(current_path).to eq(new_my_account_email_path)
 
     expect(page.driver.request.cookies['_sst'])
       .not_to be_blank
@@ -385,7 +385,7 @@ eod
     @identity = create(:user_identity)
     @invitation_code = InvitationCodeService.generate(@identity.email)
 
-    visit invitations_path(code: @invitation_code, redirect_to: '/my_account/emails')
+    visit invitations_path(code: @invitation_code, redirect_to: new_my_account_email_path)
     expect(page).to have_content(@identity.name)
 
     visit(invitations_reject_path)

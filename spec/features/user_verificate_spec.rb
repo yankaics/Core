@@ -12,6 +12,7 @@ feature "User Verificate", :type => :feature, :retry => 3 do
     @user_a2.confirm!
     @user_b1.confirm!
     @user_b2.confirm!
+    page.driver.try(:block_unknown_urls)
   end
 
   scenario "User verifies an email matching an EmailPattern and changes the department", :js => true do
@@ -31,6 +32,8 @@ feature "User Verificate", :type => :feature, :retry => 3 do
 
     expect(page).to have_content('國立臺灣科技大學')
     expect(page).to have_content('電資學士班')
+
+    sleep(1)
 
     # Select an different department
     within 'select#department-select', visible: false do
