@@ -252,7 +252,7 @@ NewUserEmailBox = React.createClass
     if @state.email
       infoRow = `<div key="info-row" className="info-row">
         <div className="row clearfix">
-          <div className="col-sm-6 col-md-4 organization">
+          <div className="col-sm-6 col-md-4 organization hidden-sm">
             <div className="">
               <div className="caption">
                 <p>{this.state.organization_code}</p>
@@ -268,10 +268,11 @@ NewUserEmailBox = React.createClass
               </div>
             </div>
           </div>
-          <div className="col-sm-6 col-md-4 hidden-sm identity-detail">
+          <div className="col-sm-6 col-md-4 identity-detail">
             <div className="">
               <div className="caption">
-                <p>{this.state.uid}</p>
+                <p className="hidden-sm">{this.state.uid}</p>
+                <p className="visible-sm-block">{this.state.organization_name}</p>
                 <p key={this.state.i++}>{started_at_selector}</p>
               </div>
             </div>

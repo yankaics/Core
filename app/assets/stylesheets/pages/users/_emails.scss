@@ -91,18 +91,21 @@ body.c-emails.c-emails-new {
 	.info-row .row {
 		position: relative;
 
-		&::before {
-			content: '';
-			display: block;
-			position: absolute;
-			top: 0;
-			left: 0;
-			right: 50%;
-			bottom: 0;
-			border-right: 1px solid rgba($white, .3);
+		@media screen and (min-width: $screen-sm-min) {
+
+			&::before {
+				content: '';
+				display: block;
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 50%;
+				bottom: 0;
+				border-right: 1px solid rgba($white, .3);
+			}
 		}
 
-		@media screen and (min-width: 992px) {
+		@media screen and (min-width: $screen-md-min) {
 
 			&::before {
 				left: 33%;
