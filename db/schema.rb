@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150807062723) do
+ActiveRecord::Schema.define(version: 20150808104946) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace"
@@ -122,6 +122,7 @@ ActiveRecord::Schema.define(version: 20150807062723) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "skip_confirmation",                                    default: false, null: false
+    t.boolean  "permit_changing_started_at",                           default: false, null: false
   end
 
   add_index "email_patterns", ["organization_code"], name: "index_email_patterns_on_organization_code"
@@ -192,7 +193,6 @@ ActiveRecord::Schema.define(version: 20150807062723) do
     t.date     "core_rtd_refreshed_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "direct_data_access",       default: false, null: false
     t.boolean  "allow_direct_data_access", default: false, null: false
   end
 
@@ -304,6 +304,7 @@ ActiveRecord::Schema.define(version: 20150807062723) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "skip_confirmation",                          default: false, null: false
+    t.boolean  "permit_changing_started_at",                 default: false, null: false
   end
 
   add_index "user_identities", ["email"], name: "index_user_identities_on_email"

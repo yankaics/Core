@@ -112,6 +112,10 @@ body.c-emails.c-emails-new {
 			}
 		}
 
+		p {
+			margin-bottom: 8px;
+		}
+
 		.organization {
 
 			p:last-child {
@@ -122,6 +126,13 @@ body.c-emails.c-emails-new {
 		.identity {
 
 			p:first-child {
+				font-size: 130% !important;
+			}
+		}
+
+		.identity-detail {
+
+			p:last-child {
 				font-size: 130% !important;
 			}
 		}

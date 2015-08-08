@@ -5,7 +5,7 @@ class UserEmail < ActiveRecord::Base
   belongs_to :user, touch: true
   has_one :associated_user_identity, class_name: UserIdentity, primary_key: :email, foreign_key: :email
 
-  store :options, accessors: [:department_code]
+  store :options, accessors: [:department_code, :started_at]
 
   delegate :organization, :organization_name, :organization_short_name,
            :department, :department_name, :department_short_name,
@@ -63,11 +63,27 @@ class UserEmail < ActiveRecord::Base
     identity = UserIdentity.find_by(user_id: nil, email: email)
     if identity
       identity.user = user
-      identity.department_code = department_code unless department_code.blank?
     # or matching email patterns
     elsif (pattern_identity = EmailPattern.identify(email))
       identity = user.identities.build(pattern_identity)
+    end
+
+    # modify the identity according to the user specified on verifing this email
+    if identity
       identity.department_code = department_code unless department_code.blank?
+
+      if identity.permit_changing_started_at && started_at.present?
+        if started_at.to_i.to_s == started_at  # the data may be a year
+          # change the start time of the identity only if the year dosen't match
+          identity.started_at = Date.parse("#{started_at}/7/1") if (identity.started_at && identity.started_at.year) != started_at.to_i
+        else  # or the data may be a date string
+          # try to parse the date
+          begin
+            identity.started_at = Date.parse(started_at)
+          rescue
+          end
+        end
+      end
     end
 
     return identity
@@ -91,10 +107,14 @@ class UserEmail < ActiveRecord::Base
 
     # get the new expected identity and check if it equals the old one
     new_identity = identify
+
+    identity_attributes_exceptions = ['id', 'department_code', 'started_at', 'created_at', 'updated_at']
+    identity_attributes_exceptions = ['id', 'department_code', 'created_at', 'updated_at'] if !new_identity.permit_changing_started_at
+
     if (new_identity.present? &&
         linked_associated_user_identity.present? &&
-        linked_associated_user_identity.attributes.except('id', 'department_code', 'created_at', 'updated_at') !=
-        new_identity.attributes.except('id', 'department_code', 'created_at', 'updated_at')) ||
+        linked_associated_user_identity.attributes.except(*identity_attributes_exceptions) !=
+        new_identity.attributes.except(*identity_attributes_exceptions)) ||
        (new_identity.present? && linked_associated_user_identity.blank?)
 
       # use the new one

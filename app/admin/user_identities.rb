@@ -24,7 +24,7 @@ ActiveAdmin.register UserIdentity do
   scope :unlinked
 
   permit_params do
-    params = [:name, :email, :identity, :uid, :department, :department_code, :original_department, :original_department_code, :permit_changing_department_in_group, :permit_changing_department_in_organization, :skip_confirmation, :email_pattern, :email_pattern_id]
+    params = [:name, :email, :identity, :uid, :department, :department_code, :original_department, :original_department_code, :permit_changing_department_in_group, :permit_changing_department_in_organization, :permit_changing_started_at, :skip_confirmation, :email_pattern, :email_pattern_id]
     params.concat [:organization_code, :organization] if current_admin.root?
     params
   end
@@ -110,6 +110,7 @@ ActiveAdmin.register UserIdentity do
   filter :uid
   filter :permit_changing_department_in_group
   filter :permit_changing_department_in_organization
+  filter :permit_changing_started_at
   filter :created_at
   filter :updated_at
 
@@ -151,6 +152,7 @@ ActiveAdmin.register UserIdentity do
     column(:uid)
     column(:permit_changing_department_in_group)
     column(:permit_changing_department_in_organization)
+    column(:permit_changing_started_at)
     id_column
     actions
   end
@@ -168,6 +170,7 @@ ActiveAdmin.register UserIdentity do
       f.input :uid
       f.input :permit_changing_department_in_group
       f.input :permit_changing_department_in_organization
+      f.input :permit_changing_started_at
       f.input :skip_confirmation
       f.input :email_pattern_id, hint: "User Identities with no belonging Email Pattern will be treated as predefined identity data, and will not be deleted if it's user deletes the corresponding email."
     end

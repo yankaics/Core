@@ -43,7 +43,7 @@
             li
               a.dropdown-toggle(href="#" data-toggle="dropdown")
                 | Hi, #{current_user.name}
-                = image_tag current_user.avatar_url
+                =< image_tag current_user.avatar_url
                 .caret
               ul.dropdown-menu.dropdown-menu--right
                 li= link_to '登出', destroy_user_session_path
