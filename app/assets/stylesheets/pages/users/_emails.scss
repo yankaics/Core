@@ -1,0 +1,129 @@
+body.c-emails.c-emails-new {
+
+	.steps-section {
+		border-top: 1px solid rgba(255,255,255, .3);
+		border-bottom: 1px solid rgba(255,255,255, .3);
+
+		.steps {
+			margin-left: auto;
+			margin-right: auto;
+			border: 0;
+		}
+
+		.steps-step {
+
+			&::after {
+				border-bottom: 1px solid rgba(255,255,255, .3);
+				border-right: 1px solid rgba(255,255,255, .3);
+			}
+		}
+
+		.steps-step.active {
+			background: rgba(255,255,255, .3);
+
+			&::before {
+				background: rgba(255,255,255, 0);
+			}
+
+			&::after {
+				background: rgba(255,255,255, .3);
+			}
+		}
+	}
+
+	.form-control {
+		margin-bottom: 0;
+	}
+
+	.action,
+	.actions {
+		margin-top: 2px;
+	}
+
+	.card .row {
+		margin-bottom: 0;
+		margin-top: 20px;
+	}
+
+	.select2-choice {
+		background-color: rgba($white, .3);
+	}
+
+	.select2-dropdown-open .select2-choice {
+		border-bottom-color: transparent;
+		-webkit-box-shadow: 0 1px 0 #fff inset;
+		box-shadow: 0 1px 0 #fff inset;
+		border-bottom-left-radius: 0;
+		border-bottom-right-radius: 0;
+		background-color: #eee;
+		background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #fff), color-stop(0.5, #eee));
+		background-image: -webkit-linear-gradient(center bottom, #fff 0%, #eee 50%);
+		background-image: -moz-linear-gradient(center bottom, #fff 0%, #eee 50%);
+		background-image: linear-gradient(to top, #fff 0%, #eee 50%);
+	}
+
+	.select2-chosen {
+		line-height: 24px !important;
+	}
+
+	.info-row-fade-in-enter {
+		opacity: 0.01;
+		max-height: 0;
+	}
+
+	.info-row-fade-in-enter.info-row-fade-in-enter-active {
+		opacity: 1;
+		max-height: 400px;
+		transition: all .3s ease;
+	}
+
+	.info-row-fade-in-leave {
+		opacity: 1;
+		max-height: 400px;
+	}
+
+	.info-row-fade-in-leave.info-row-fade-in-leave-active {
+		opacity: 0.01;
+		max-height: 0;
+		transition: all .3s ease;
+	}
+
+	.info-row .row {
+		position: relative;
+
+		&::before {
+			content: '';
+			display: block;
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 50%;
+			bottom: 0;
+			border-right: 1px solid rgba($white, .3);
+		}
+
+		@media screen and (min-width: 992px) {
+
+			&::before {
+				left: 33%;
+				right: 33%;
+				border-left: 1px solid rgba($white, .3);
+				border-right: 1px solid rgba($white, .3);
+			}
+		}
+
+		.organization {
+
+			p:last-child {
+				font-size: 150% !important;
+			}
+		}
+
+		.identity {
+
+			p:first-child {
+				font-size: 130% !important;
+			}
+		}
+	}
+}

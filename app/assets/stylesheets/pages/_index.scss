@@ -1,0 +1,114 @@
+@import "compass/css3/images";
+
+body.c-pages-index {
+	background-image: url(image_path('colorgy/background_blur_1_dark.jpg'));
+	background-size: cover;
+	background-attachment: fixed;
+
+	.box-grid-box-body {
+		text-decoration: none !important;
+	}
+
+	.box-grid-box, a {
+
+		&.disabled {
+			opacity: .5;
+			cursor: not-allowed;
+		}
+	}
+
+	.service-card {
+		background-size: cover;
+		overflow: hidden;
+
+		.service-name {
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			margin: 0;
+			color: $white;
+			text-decoration: none !important;
+		}
+
+		.service-description {
+			text-align: right;
+			font-style: italic;
+			color: $white;
+			font-weight: 200;
+			opacity: .5;
+			text-decoration: none !important;
+		}
+
+		.card-image {
+			height: 70px;
+			height: 70%;
+			background-size: cover;
+			color: $white;
+		}
+
+		.card-content {
+			&::after {
+				content: '';
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				width: 100%;
+				height: 18%;
+				@include background-image(linear-gradient(top, rgba($white, 0) 0%, rgba($white, 1) 90%));
+			}
+		}
+	}
+
+	.more-services-card {
+
+		.card-content a {
+
+			&::after {
+				content: ' / ';
+				opacity: .5;
+			}
+
+			&:last-child::after {
+				content: none;
+			}
+		}
+
+		.more-services {
+			position: absolute;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			margin: 0;
+			text-decoration: none !important;
+		}
+	}
+
+	.user-card {
+
+		.card-title {
+			color: $white;
+			text-shadow: 0 0 4px rgba(black, .8), 0 0 14px rgba(black, .5);
+
+			small {
+				font-size: 14px;
+				font-style: italic;
+				opacity: .8;
+			}
+		}
+
+		.card-image {
+			height: 70px;
+			height: 70%;
+			background-size: cover;
+		}
+
+		.card-supporting-text {
+			position: absolute;
+			right: 0;
+			bottom: 0;
+			margin: 0;
+			background-color: transparent;
+		}
+	}
+}
