@@ -32,7 +32,7 @@ GIT
 
 GIT
   remote: git://github.com/colorgy/Style.git
-  revision: 14093406a33dd8a369f39eac7bc6da58acd9b426
+  revision: 8988244fbb18e41d22cecda4c531e86d3ed7cddf
   specs:
     colorgy_style (0.0.0.4)
       bootstrap-sass (~> 3.3.4.1)
