@@ -22,7 +22,7 @@ var AutocompleteInput = React.createClass({
   },
 
   render: function() {
-    var className = React.addons.classSet(
+    var className = classNames(
       'react-autocomplete-input',
       this.state.isResultsShown ? 'is-results-shown' : null
     );
@@ -242,7 +242,7 @@ var AutocompleteInputResults = React.createClass({
 
   render: function() {
     return (
-      <ul className={this.props.className} onClick={this.handleSelect} onMouseOver={this.handleMouseOver}>
+      <ul style={{ display: 'block' }} className={this.props.className} onClick={this.handleSelect} onMouseOver={this.handleMouseOver}>
         {this.props.options.map(function(opt) {
           className = (opt == this.props.activeOption) ? 'active' : '';
           return <li className={className} key={opt} data-value={opt}><a data-value={opt}>{opt}</a></li>;

@@ -1,29 +1,32 @@
-.container
+.container.max-width-800px
+  .card.bg-fix.text-center.box-margin-top(style="background-image: linear-gradient(rgba(255,255,255, .32), rgba(255,255,255, .32)), url('#{@body_background_image_blur}')")
 
-  h1 認證身份
+    h1
+      | 認證身份
+      br.visible-sm-block.visible-xs-block
+      small< email 驗證
 
-  = simple_form_for @email, url: my_account_emails_path do |f|
-    = react_component(:NewUserEmailBox, emailPatterns: @email_patterns, email: @email)
+    .card-image.steps-section.visible-lg-block
+      .steps
+        .steps-step
+          .steps-step-title 登入會員
+          .steps-step-description 註冊並登入為 #{ENV['APP_NAME']} 會員
+        .steps-step.active
+          .steps-step-title 填寫 email
+          .steps-step-description 使用您的學校 email 以供身份驗證
+        .steps-step
+          .steps-step-title 收取認證信
+          .steps-step-description 開啟認證信並點擊認證連結
 
-  p 目前提供服務於 #{Organization.short_name_list.join(t(:comma, scope: :general))}。
+    .card-content
+      p 為了使用平台的完整功能，您必須使用 email 驗證並開通對應身份。輸入您的 email，確認身份後讓我們寄出驗證信吧！
+      = simple_form_for @email, url: my_account_emails_path do |f|
+        = react_component(:NewUserEmailBox, emailPatterns: @email_patterns, email: @email)
 
-css:
-  .row h3 {
-    margin-top: 8px;
-  }
-  .row .thumbnail {
-    text-align: center;
-  }
-  .react-autocomplete-input-results {
-    position: absolute;
-    display: block;
-  }
-  input.email {
-    border-radius: 4px !important;
-    border-top-left-radius: 0 !important;
-    border-bottom-left-radius: 0 !important;
-  }
-  form .action {
-    text-align: center;
-    padding: 12px;
-  }
+    p
+      small.opacity-5
+        | 提供服務於 #{Organization.short_name_list.join(t(:comma, scope: :general))}。
+        - if ENV['APP_CONTACT_URL']
+          | 任何疑問？
+          = link_to '聯繫我們', ENV['APP_CONTACT_URL'], target: '_blank'
+          | ！

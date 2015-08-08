@@ -1,4 +1,5 @@
 class Users::EmailsController < ApplicationController
+  before_action :random_body_background_image, only: [:new]
   before_action :authenticate_user!, except: [:confirm]
   after_action :refresh_signon_status_token, only: [:confirm, :destroy]
   after_action :refresh_site_identity_token, only: [:confirm, :destroy]

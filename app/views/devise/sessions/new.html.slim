@@ -1,5 +1,5 @@
 .container.max-width-800px
-  .card.bg-fix.text-center(style="margin-top: 180px; background-image: linear-gradient(rgba(255,255,255, .32), rgba(255,255,255, .32)), url('#{@body_background_image_blur}')")
+  .card.bg-fix.text-center.box-margin-top(style="background-image: linear-gradient(rgba(255,255,255, .32), rgba(255,255,255, .32)), url('#{@body_background_image_blur}')")
     - if @invited_guest_identity
       .card.card--sm.bg-theme
         .card-title 嗨，#{@invited_guest_identity.name} #{UserIdentity.human_identity_title(@invited_guest_identity.identity)}

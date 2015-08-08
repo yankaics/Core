@@ -1,3 +1,5 @@
+ReactCSSTransitionGroup = React.addons.CSSTransitionGroup
+
 NewUserEmailBox = React.createClass
   mixins: [React.addons.LinkedStateMixin]
   propTypes:
@@ -70,6 +72,7 @@ NewUserEmailBox = React.createClass
 
   handleEmailChange: (email, outerMatchEmailPattern, outerFound) ->
     @setState
+      email: email
       organization_name: null
       uid: null
       corresponded_identity: null
@@ -199,7 +202,7 @@ NewUserEmailBox = React.createClass
           {Object.keys(departments).map(function(value, index) {
             d = departments[value];
             if (d.name && (baseGroup == d.group || permit_changing_department_in_organization))
-              return (<option
+              return (<option key={d.code}
                   value={d.code} >
                     {d.name}
                 </option>);
@@ -209,20 +212,52 @@ NewUserEmailBox = React.createClass
     else
       department_selector = this.state.department_name
 
-    submitButtonClassName = React.addons.classSet(
-      'btn btn-default',
-      (if @state.submitActivate then '' else 'disabled'))
+    submitButtonClassName = classNames
+      'btn btn--highlighted': true
+      'disabled': !@state.submitActivate
 
-    inputContainerClassName = React.addons.classSet(
-      'form-group has-feedback',
-      (if @state.submitActivate then 'has-success' else ''))
+    inputContainerClassName = classNames
+      'form-group has-feedback': true
+      'has-success': @state.submitActivate
 
     if @state.submitActivate
-      successIcon = `<span className="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>`
+      # successIcon = `<span className="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>`
     else
       successIcon = ''
 
     defaultValue = @props.email?.email
+
+    if @state.email
+      infoRow = `<div key="info-row" className="info-row">
+        <div className="row clearfix">
+          <div className="col-sm-6 col-md-4 organization">
+            <div className="">
+              <div className="caption">
+                <p>{this.state.organization_code}</p>
+                <p>{this.state.organization_name}</p>
+              </div>
+            </div>
+          </div>
+          <div className="col-sm-6 col-md-4 identity">
+            <div className="">
+              <div className="caption">
+                <p key={this.state.i++}>{department_selector}</p>
+                <p>{this.state.corresponded_identity}</p>
+              </div>
+            </div>
+          </div>
+          <div className="col-sm-6 col-md-4 hidden-sm identity-detail">
+            <div className="">
+              <div className="caption">
+                <p>{this.state.department_code}</p>
+                <p>{this.state.uid}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>`
+    else
+      infoRow = null
 
     `<div>
       <div className={inputContainerClassName}>
@@ -240,34 +275,14 @@ NewUserEmailBox = React.createClass
         </div>
         {successIcon}
       </div>
+      <ReactCSSTransitionGroup transitionName="info-row-fade-in">
+        {infoRow}
+      </ReactCSSTransitionGroup>
+      <div>&nbsp;</div>
       <div className="action">
-        <input className={submitButtonClassName} name="commit" type="submit" value="驗證" />
-      </div>
-      <div className="row">
-        <div className="col-sm-6 col-md-4">
-          <div className="thumbnail">
-            <div className="caption">
-              <p>{this.state.organization_code}</p>
-              <h3>{this.state.organization_name}</h3>
-            </div>
-          </div>
-        </div>
-        <div className="col-sm-6 col-md-4">
-          <div className="thumbnail">
-            <div className="caption">
-              <h3 key={this.state.i++}>{department_selector}</h3>
-              <p>{this.state.corresponded_identity}</p>
-            </div>
-          </div>
-        </div>
-        <div className="col-sm-6 col-md-4 hidden-sm">
-          <div className="thumbnail">
-            <div className="caption">
-              <h3>{this.state.department_code}</h3>
-              <p>{this.state.uid}</p>
-            </div>
-          </div>
-        </div>
+        <a className="btn btn--flat btn--gray" href="/">取消</a>
+        &nbsp;&nbsp;
+        <input className={submitButtonClassName} name="commit" type="submit" value="寄出驗證信" />
       </div>
     </div>`
 
