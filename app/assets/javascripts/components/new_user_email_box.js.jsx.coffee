@@ -305,7 +305,6 @@ NewUserEmailBox = React.createClass
       <div>&nbsp;</div>
       <div className="action">
         <a className="btn btn--flat btn--gray" href="/">取消</a>
-        &nbsp;&nbsp;
         <input className={submitButtonClassName} name="commit" type="submit" value="寄出驗證信" />
       </div>
     </div>`
