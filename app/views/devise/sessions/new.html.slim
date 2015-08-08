@@ -1,5 +1,5 @@
-.container.max-width-800px.valign-wrapper.height-100
-  .card.bg-fix.valign.margin-center.text-center(style="background-image: linear-gradient(rgba(255,255,255, .32), rgba(255,255,255, .32)), url('#{@body_background_image_blur}')")
+.container.max-width-800px.valign-lg-wrapper.height-100.vertical-padding-20px
+  .card.bg-fix.valign-lg.margin-center.text-center(style="background-image: linear-gradient(rgba(255,255,255, .32), rgba(255,255,255, .32)), url('#{@body_background_image_blur}')")
     - if @invited_guest_identity
       .card.card--sm.bg-theme
         .card-title 嗨，#{@invited_guest_identity.name} #{UserIdentity.human_identity_title(@invited_guest_identity.identity)}
