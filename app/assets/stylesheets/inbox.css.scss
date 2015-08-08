@@ -1,0 +1,39 @@
+/*
+ * Write new CSS here for faster development and organize them later.
+ */
+
+.mobile-head {
+	position: fixed;
+	left: 0;
+	right: 0;
+	height: 50px;
+	font-size: 30px;
+	line-height: 50px;
+	text-align: center;
+	background-color: #263238;
+	color: white;
+
+	img {
+		margin: 2px;
+		max-height: 50px - (2px * 2);
+	}
+}
+
+.mobile-head-placeholder {
+	height: 50px;
+}
+
+.input-group-addon {
+	position: absolute;
+	margin-top: 8px;
+	margin-left: 12px;
+}
+
+.input-group-addon + .form-control,
+.input-group-addon + * > .form-control {
+	padding-left: 40px;
+}
+
+.react-autocomplete-input {
+	position: relative;
+}

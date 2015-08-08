@@ -29,13 +29,14 @@
 
   .wrapper#wrapper
 
-    .mobile-head.mobile-slide-trigger-button.position-fixed.visible-xs-block
+    .mobile-head.z-index-navbar-fixed.mobile-slide-trigger-button.position-fixed.visible-xs-block
       .container
         .i-menu.pull-left.position-absolute
         = image_tag 'colorgy/colorgy_logo_white_small.svg'
+        .i-menu.pull-right.position-absolute.opacity-0
     .mobile-head-placeholder.visible-xs-block
 
-    .mini-nav.hidden-xs
+    .mini-nav.z-index-navbar-fixed.hidden-xs
       .container
         ul.mini-nav-nav.mini-nav-nav--right
           - if current_user
