@@ -16,6 +16,7 @@
 //= require colorgy
 //= require react
 //= require react_ujs
+//= require classnames
 //= require chosen-jquery
 //= require select2
 //= require select2_locale_zh-TW

@@ -51,7 +51,7 @@ Rails.application.routes.draw do
     get '/refresh_it' => 'users/sessions#refresh_it'
   end
 
-  resource :my_account, controller: 'users/my_account' do
+  resource :my_account, controller: 'users/my_account', path: 'my-account' do
     resources :emails, controller: 'users/emails'
   end
 
