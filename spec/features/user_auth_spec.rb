@@ -57,9 +57,9 @@ eod
   end
 
   scenario "new User signs in with Facebook" do
-    # Go to the login page and click on 'Sign in with Facebook' button
+    # Go to the login page and click on 'login_with_facebook' button
     visit(new_user_session_path)
-    click_on('Sign in with Facebook', match: :first)
+    click_on('login_with_facebook', match: :first)
 
     # Get the newly created user, he/she should be confirmed
     user = User.last
@@ -108,11 +108,11 @@ eod
     # An existing user with identity, but not linked with an FB account
     user = create(:user, :with_identity, email: 'mock_user@facebook.com')
 
-    # Go to the login page and click on 'Sign in with Facebook' button
+    # Go to the login page and click on 'login_with_facebook' button
     # this should login the user with that corresponding email,
     # and links the user with his/her FB account
     visit(new_user_session_path)
-    click_on('Sign in with Facebook', match: :first)
+    click_on('login_with_facebook', match: :first)
     user.reload
     expect(user.fbid).to eq '87654321'
 
@@ -147,7 +147,7 @@ eod
       .to be_blank
   end
 
-  scenario "new User signs up with email" do
+  xscenario "new User signs up with email" do
     # Prepare the new user's credentials
     user_rigister_credentials = attributes_for(:user).slice(:name, :email, :password, :password_confirmation)
     user_login_credentials = user_rigister_credentials.slice(:email, :password)
@@ -224,10 +224,10 @@ eod
     @identity = create(:user_identity)
     @invitation_code = InvitationCodeService.generate(@identity.email)
 
-    # Go to the invitation URL and click on 'Sign in with Facebook' button
+    # Go to the invitation URL and click on 'login_with_facebook' button
     visit invitations_path(code: @invitation_code, redirect_to: '/my_account/emails')
     expect(page).to have_content(@identity.name)
-    click_on('Sign in with Facebook', match: :first)
+    click_on('login_with_facebook', match: :first)
 
     # Get the newly created user, he/she should be confirmed and have the corresponding identity
     @user = User.last
@@ -253,10 +253,10 @@ eod
     @user = create(:user, :with_identity, email: 'mock_user@facebook.com')
     expect(@user.identities).not_to include(@identity)
 
-    # Go to the invitation URL and click on 'Sign in with Facebook' button
+    # Go to the invitation URL and click on 'login_with_facebook' button
     visit invitations_path(code: @invitation_code, redirect_to: '/my_account/emails')
     expect(page).to have_content(@identity.name)
-    click_on('Sign in with Facebook', match: :first)
+    click_on('login_with_facebook', match: :first)
 
     # The user should has the corresponding identity
     @user.reload
@@ -274,7 +274,7 @@ eod
       .not_to be_blank
   end
 
-  scenario "new User signs up using an invitation code with email" do
+  xscenario "new User signs up using an invitation code with email" do
     @identity = create(:user_identity)
     @invitation_code = InvitationCodeService.generate(@identity.email)
 
@@ -313,7 +313,7 @@ eod
       .to eq SiteIdentityTokenService.generate(@user)[0..-4]
   end
 
-  scenario "new User signs up using an invitation code with a different email" do
+  xscenario "new User signs up using an invitation code with a different email" do
     @identity = create(:user_identity)
     @invitation_code = InvitationCodeService.generate(@identity.email)
 
@@ -343,7 +343,7 @@ eod
     end.to change { @user.confirmed? }.from(false).to(true)
   end
 
-  scenario "old User signs in using an invitation code with email" do
+  xscenario "old User signs in using an invitation code with email" do
     @identity = create(:user_identity)
     @invitation_code = InvitationCodeService.generate(@identity.email)
     user_rigister_credentials = attributes_for(:user).slice(:name, :email, :password, :password_confirmation)

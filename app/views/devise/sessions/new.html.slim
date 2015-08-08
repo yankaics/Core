@@ -10,7 +10,7 @@
     .row
       .col-md-12
         .card.bg-transparent
-          = link_to image_tag('login_with_facebook.png', height: '52px'), user_omniauth_authorize_path(:facebook)
+          = link_to image_tag('login_with_facebook.png', height: '52px'), user_omniauth_authorize_path(:facebook), id: 'login_with_facebook'
         p
           div(class="fb-login-button" data-max-rows="1" data-size="icon" data-show-faces="true")
         p
