@@ -292,7 +292,6 @@ NewUserEmailBox = React.createClass
             className="string email required form-control"
             id="user_email_email"
             name="user_email[email]"
-            type="email"
             placeholder="請輸入您的學校 email"
             value={defaultValue}
             autofocus="true" />
