@@ -76,6 +76,10 @@ ActiveAdmin.register_page "Settings" do
                 f.textarea_setting 'Site EULA (supports Markdown)', :site_eula
               end
 
+              li do
+                f.textarea_setting '服務特色文案', :service_features
+              end
+
             end
           end
         end
