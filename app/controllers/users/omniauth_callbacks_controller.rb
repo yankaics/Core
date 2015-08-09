@@ -18,7 +18,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
 
       # redirect new users to update their identity
       if @user.created_at > 1.minute.ago &&
-         ENV['SKIP_3RD_PARTY_LOGIN_ACCOUNT_UPDATE'] != 'true'
+         !Settings.skip_3rd_party_login_account_update
         session['user.new_password'] = @user.new_password
         sign_in @user
         redirect_to edit_user_registration_path(new: 'go')
@@ -26,7 +26,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
       # redirect new users to verify their identity
       elsif @user.primary_identity_id.blank? &&
             @user.created_at > 2.hours.ago &&
-            ENV['SKIP_NEW_USER_IDENTITY_VERIFICATION'] != 'true'
+            !Settings.skip_new_user_identity_verification
         sign_in @user
         redirect_to new_my_account_email_path
 

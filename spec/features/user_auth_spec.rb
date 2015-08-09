@@ -57,7 +57,7 @@ eod
   end
 
   scenario "new User signs in with Facebook" do
-    ENV['SKIP_3RD_PARTY_LOGIN_ACCOUNT_UPDATE'] = 'false'
+    Settings.skip_3rd_party_login_account_update = false
 
     # Go to the login page and click on 'login_with_facebook' button
     visit(new_user_session_path)
@@ -113,7 +113,7 @@ eod
   end
 
   scenario "new User signs in with Facebook with new account update disabled" do
-    ENV['SKIP_3RD_PARTY_LOGIN_ACCOUNT_UPDATE'] = 'true'
+    Settings.skip_3rd_party_login_account_update = true
 
     # Go to the login page and click on 'login_with_facebook' button
     visit(new_user_session_path)
@@ -266,7 +266,7 @@ eod
   end
 
   scenario "new User signs in using an invitation code with Facebook" do
-    ENV['SKIP_3RD_PARTY_LOGIN_ACCOUNT_UPDATE'] = 'false'
+    Settings.skip_3rd_party_login_account_update = false
 
     @identity = create(:user_identity)
     @invitation_code = InvitationCodeService.generate(@identity.email)
