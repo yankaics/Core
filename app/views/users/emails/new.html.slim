@@ -19,7 +19,12 @@
           .steps-step-description 開啟認證信並點擊認證連結
 
     .card-content
-      p 為了使用平台的完整功能，您必須使用 email 驗證並開通對應身份。輸入您的 email，確認身份後讓我們寄出驗證信吧！
+      p 為了使用平台的完整功能，您必須使用 email 驗證並開通對應身份。
+      p
+        | 還不知道學校的 email 也沒關係，只要在上一步驟填寫了您的學校與系級，就可以到&nbsp;
+        = link_to 'Colorgy Table', 'https://table.colorgy.io/'
+        | &nbsp;搶先使用我們的排課服務囉！
+        = link_to '立即前往。', 'https://table.colorgy.io/'
       = simple_form_for @email, url: my_account_emails_path do |f|
         = react_component(:NewUserEmailBox, emailPatterns: @email_patterns, email: @email)
 
