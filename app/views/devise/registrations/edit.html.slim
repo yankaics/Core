@@ -1,66 +1,118 @@
-.container.max-width-800px.valign-lg-wrapper.height-100.vertical-padding-20px
+.container.valign-lg-wrapper.height-100.vertical-padding-20px(class=(Settings.service_features.present? ? 'max-width-1024px' : 'max-width-800px'))
   .card.bg-fix.valign-lg.margin-center.text-center(style="background-image: linear-gradient(rgba(255,255,255, .5), rgba(255,255,255, .5)), url('#{@body_background_image_blur}')")
     = simple_form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f|
 
-      - if @new
-        = hidden_field_tag 'new', 'true'
-        h1
-          | 確認帳號資料
-          br.visible-sm-block.visible-xs-block
-          small< 
+      .row.valign-wrapper
+        div(class=(Settings.service_features.present? ? 'col-md-7 col-sm-12 col-xs-12 valign' : 'col-md-12'))
 
-        - if ENV['SKIP_NEW_USER_IDENTITY_VERIFICATION'] != 'true'
-          .card-image.steps-section.visible-lg-block
-            .steps
-              .steps-step.active
-                .steps-step-title 登入會員
-                .steps-step-description 註冊並登入為 #{ENV['APP_NAME']} 會員
-              .steps-step
-                .steps-step-title 填寫 email
-                .steps-step-description 使用您的學校 email 以供身份驗證
-              .steps-step
-                .steps-step-title 收取認證信
-                .steps-step-description 開啟認證信並點擊認證連結
+          - if @new
+            = hidden_field_tag 'new', 'true'
+            h1
+              | 填寫帳號資料
+              br.visible-sm-block.visible-xs-block
+              small< 
 
-      - else
-        h1
-          | 更新帳號資料
+          - else
+            h1
+              | 更新帳號資料
 
-      .card-content
-        - if @new
-          .form-inputs
-            p 想在最常用的 email 信箱收取通知信件嗎？如果這個 email 信箱不是你要的，就修改他吧！若你更改了這個欄位，我們會發送一封確認信到你指定的新 email 信箱。
-            .input-field
-              = f.input_field :email, class: 'form-control validate', id: 'user-email-input'
-              div(data-error="喔喔！格式不對。" data-success="看起來挺好！")
-              = f.label :email, for: 'user-email-input'
-            p 您可以設定一個密碼，未來就可以直接使用慣用電子郵件信箱與密碼登入，若不需要請將以下欄位留空。
-            .input-field
-              = f.input_field :password, class: 'form-control validate', id: 'user-password-input', autocomplete: 'off', min_length: 8
-              div(data-error="密碼太短！" data-success="不錯！")
-              = f.label :password, for: 'user-password-input'
-            .input-field
-              = f.input_field :password_confirmation, class: 'form-control validate', id: 'user-password_confirmation-input', autocomplete: 'off', eq_to: '#user-password-input'
-              div(data-error="密碼確認不符！" data-success="好！")
-              = f.label :password_confirmation, for: 'user-password_confirmation-input'
-          .form-actions
-            = f.button :submit, '確認資料', class: 'btn btn--highlighted'
-          p &nbsp;
+          .card-content
+            - if @new
+              .form-inputs
 
-          - if ENV['APP_CONTACT_URL']
-            p
-              small.opacity-5
-                | 任何疑問？
-                = link_to '聯繫我們', ENV['APP_CONTACT_URL'], target: '_blank'
-                | ！
+                .input-field
+                  = f.input_field :email, class: 'form-control validate', id: 'user-email-input'
+                  div(data-error="喔喔！格式不對。" data-success="看起來挺好！")
+                  = f.label :email, for: 'user-email-input'
+                - if Settings.enable_user_unconfirmed_identity
+                  .form-group
+                    = f.label '學校'
+                    = f.input_field :unconfirmed_organization_code, as: :select, collection: Organization.all_for_select
+                  .form-group
+                    = f.label '系別'
+                    = f.input_field :unconfirmed_department_code
+                  .form-group
+                    = f.label '入學年度'
+                    = f.input_field :unconfirmed_started_year
+                  p &nbsp;
+                .row
+                  .col-md-12
+                    p
+                      small 您可以設定一個密碼，未來就可以直接使用慣用電子郵件信箱與密碼登入，若不需要請將以下欄位留空。
+                  .col-md-6
+                    .input-field
+                      = f.input_field :password, class: 'form-control validate', id: 'user-password-input', autocomplete: 'off', 'min-length': 8
+                      div(data-error="密碼太短！" data-success="不錯！")
+                      = f.label :password, for: 'user-password-input'
+                  .col-md-6
+                    .input-field
+                      = f.input_field :password_confirmation, class: 'form-control validate', id: 'user-password_confirmation-input', autocomplete: 'off', 'eq-to': '#user-password-input'
+                      div(data-error="密碼確認不符！" data-success="好！")
+                      = f.label :password_confirmation, for: 'user-password_confirmation-input'
+              .form-actions
+                = f.button :submit, '確認資料', class: 'btn btn--highlighted'
+              p &nbsp;
 
-        - else
-          .form-inputs
-            = f.input :email, required: true, autofocus: true
-            - if devise_mapping.confirmable? && resource.pending_reconfirmation?
-              p Currently waiting confirmation for: #{resource.unconfirmed_email}
-            = f.input :password, autocomplete: "off", hint: "leave it blank if you don't want to change it"
-            = f.input :password_confirmation, required: false
-            = f.input :current_password, hint: "we need your current password to confirm your changes"
-          .form-actions
-            = f.button :submit, "Update"
+              - if ENV['APP_CONTACT_URL']
+                p
+                  small.opacity-5
+                    | 任何疑問？
+                    = link_to '聯繫我們', ENV['APP_CONTACT_URL'], target: '_blank'
+                    | ！
+
+            - else
+              .form-inputs
+                = f.input :email, required: true, autofocus: true
+                - if devise_mapping.confirmable? && resource.pending_reconfirmation?
+                  p Currently waiting confirmation for: #{resource.unconfirmed_email}
+                = f.input :password, autocomplete: "off", hint: "leave it blank if you don't want to change it"
+                = f.input :password_confirmation, required: false
+                = f.input :current_password, hint: "we need your current password to confirm your changes"
+              .form-actions
+                = f.button :submit, "Update"
+
+        - if Settings.service_features.present?
+          div.service-features-col.col-md-5.valign.visible-lg-block.visible-md-block
+            section.service-features
+              = markdown(Settings.service_features)
+
+javascript:
+  $('#user_unconfirmed_organization_code').select2();
+
+  $('#user_unconfirmed_department_code').select2({
+    query: function (query) {
+      var data = {
+        results: [
+          { id: 0, text: "請先選擇學校", disabled: true }
+        ]
+      };
+      query.callback(data);
+    }
+  });
+
+  yearSelections = [];
+  currentYear = (new Date()).getFullYear();
+
+  for (var i = 0; i < 50; i++) {
+    yearSelections.push({ id: (currentYear - i), text: ((currentYear - i) + ' 年') });
+  }
+
+  $('#user_unconfirmed_started_year').select2({ data: { results: yearSelections } });
+
+  $('#user_unconfirmed_organization_code').on('change', function (e) {
+    var orgCode = (e.val || e.value);
+
+    $.ajax({
+      method: 'GET',
+      url: "/api/v1/organizations/" + orgCode + ".json",
+      dataType: 'json',
+    }).done(function(data, textStatus, xhr) {
+      var deps = data.departments;
+      var selections = deps.map(function (obj) {
+        return { id: obj.code, text: obj.name };
+      });
+      var selectData = { results: selections };
+
+      $('#user_unconfirmed_department_code').select2({ data: selectData });
+    });
+  });

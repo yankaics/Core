@@ -33,12 +33,17 @@ ActiveAdmin.register_page "Settings" do
           end
         end
 
-        def f.checkbox_setting(label_text, settings_name)
+        def f.checkbox_setting(label_text, settings_name, hint: nil)
           label label_text
           input :id => "cb-#{settings_name}", :type => 'checkbox', :onchange => "if (this.checked) { document.getElementById('ip-#{settings_name}').value = 'true'; } else { document.getElementById('ip-#{settings_name}').value = 'false'; }", :onload => "alert('aa')", "#{Settings[settings_name] ? 'checked' : 'not_checked'}" => 'checked'
           input :name => "settings[#{settings_name}]", :id => "ip-#{settings_name}", :type => 'hidden'
           script type: 'text/javascript' do
             "$('#cb-#{settings_name}').change();".html_safe
+          end
+          if hint.present?
+            para class: 'inline-hints' do
+              hint
+            end
           end
         end
 
@@ -90,6 +95,10 @@ ActiveAdmin.register_page "Settings" do
 
               li do
                 f.textarea_setting 'Facebook App IDs', :fb_app_ids, hint: '允許透過 Facebook Access Token 登入取得最高權限的 Facebook App ID 白名單，一行一個'
+              end
+
+              li do
+                f.checkbox_setting '啟用使用者的「未經驗證身份」資料欄位', :enable_user_unconfirmed_identity, hint: '讓使用者在註冊和帳號設定時，可以自由填寫他們「未經確認的身份資料」'
               end
 
             end

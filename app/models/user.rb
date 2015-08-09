@@ -46,6 +46,8 @@ class User < ActiveRecord::Base
            :gender=, :birth_year=, :birth_month=, :birth_day=, :birth_date=,
            :url,  :brief,  :motto,  :fb_friends,  :fb_devices,
            :url=, :brief=, :motto=, :fb_friends=, :fb_devices=,
+           :unconfirmed_organization_code, :unconfirmed_department_code, :unconfirmed_started_year,
+           :unconfirmed_organization_code=, :unconfirmed_department_code=, :unconfirmed_started_year=,
            to: :data, prefix: false, allow_nil: true
   accepts_nested_attributes_for :emails, :unconfirmed_emails,
                                 allow_destroy: true
@@ -78,6 +80,14 @@ class User < ActiveRecord::Base
 
   def department_codes
     identities.map(&:department_code)
+  end
+
+  def possible_organization_code
+    organization_code || unconfirmed_organization_code
+  end
+
+  def possible_department_code
+    department_code || unconfirmed_department_code
   end
 
   def verified?
@@ -177,7 +187,9 @@ class User < ActiveRecord::Base
     :organization,
     :organization_code,
     :department,
-    :department_code
+    :department_code,
+    :possible_organization_code,
+    :possible_department_code
   ]
 
   CORE_ATTRS = [
