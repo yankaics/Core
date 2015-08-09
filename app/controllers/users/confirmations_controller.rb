@@ -4,7 +4,8 @@ class Users::ConfirmationsController < Devise::ConfirmationsController
       # sign in and redirect to new_my_account_email_path,
       # only for new users (.unconfirmed_email.blank?)
       # without identity (.primary_identity_id.blank?)
-      if user && user.created_at &&
+      if ENV['SKIP_NEW_USER_IDENTITY_VERIFICATION'] != 'true' &&
+         user && user.created_at &&
          user.primary_identity_id.blank? &&
          user.unconfirmed_email.blank?
         sign_in user

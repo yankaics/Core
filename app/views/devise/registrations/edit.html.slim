@@ -1,0 +1,65 @@
+.container.max-width-800px.valign-lg-wrapper.height-100.vertical-padding-20px
+  .card.bg-fix.valign-lg.margin-center.text-center(style="background-image: linear-gradient(rgba(255,255,255, .32), rgba(255,255,255, .32)), url('#{@body_background_image_blur}')")
+    = simple_form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f|
+
+      - if @new
+        = hidden_field_tag 'new', 'true'
+        h1
+          | 確認帳號資料
+          br.visible-sm-block.visible-xs-block
+          small< 
+
+        - if ENV['SKIP_NEW_USER_IDENTITY_VERIFICATION'] != 'true'
+          .card-image.steps-section.visible-lg-block
+            .steps
+              .steps-step.active
+                .steps-step-title 登入會員
+                .steps-step-description 註冊並登入為 #{ENV['APP_NAME']} 會員
+              .steps-step
+                .steps-step-title 填寫 email
+                .steps-step-description 使用您的學校 email 以供身份驗證
+              .steps-step
+                .steps-step-title 收取認證信
+                .steps-step-description 開啟認證信並點擊認證連結
+
+      - else
+        h1
+          | 更新帳號資料
+
+      .card-content
+        - if @new
+          .form-inputs
+            p 想在最常用的 email 信箱收取通知信件嗎？如果這個 email 信箱不是你要的，就修改他吧！若你更改了這個欄位，我們會發送一封確認信到你指定的新 email 信箱。
+            .input-field
+              = f.input_field :email, class: 'form-control validate', id: 'user-email-input'
+              div(data-error="喔喔！格式不對。" data-success="看起來挺好！")
+              = f.label :email, for: 'user-email-input'
+            p 您可以設定一個密碼，未來就可以直接使用慣用電子郵件信箱與密碼登入，若不需要請將以下欄位留空。
+            .input-field
+              = f.input_field :password, class: 'form-control validate', id: 'user-password-input', autocomplete: 'off', min_length: 8
+              div(data-error="密碼太短！" data-success="不錯！")
+              = f.label :password, for: 'user-password-input'
+            .input-field
+              = f.input_field :password_confirmation, class: 'form-control validate', id: 'user-password_confirmation-input', autocomplete: 'off', eq_to: '#user-password-input'
+              div(data-error="密碼確認不符！" data-success="好！")
+              = f.label :password_confirmation, for: 'user-password_confirmation-input'
+          .form-actions
+            = f.button :submit, '確認資料', class: 'btn btn--highlighted'
+          p
+            small.opacity-5
+              | 提供服務於 #{Organization.short_name_list.join(t(:comma, scope: :general))}。
+              - if ENV['APP_CONTACT_URL']
+                | 任何疑問？
+                = link_to '聯繫我們', ENV['APP_CONTACT_URL'], target: '_blank'
+                | ！
+
+        - else
+          .form-inputs
+            = f.input :email, required: true, autofocus: true
+            - if devise_mapping.confirmable? && resource.pending_reconfirmation?
+              p Currently waiting confirmation for: #{resource.unconfirmed_email}
+            = f.input :password, autocomplete: "off", hint: "leave it blank if you don't want to change it"
+            = f.input :password_confirmation, required: false
+            = f.input :current_password, hint: "we need your current password to confirm your changes"
+          .form-actions
+            = f.button :submit, "Update"
