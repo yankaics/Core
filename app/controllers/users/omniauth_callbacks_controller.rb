@@ -16,12 +16,20 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
         redirect_to @redirect_url and return if @redirect_url
       end
 
+      # redirect new users to update their identity
+      if @user.created_at > 1.minute.ago &&
+         ENV['SKIP_3RD_PARTY_LOGIN_ACCOUNT_UPDATE'] != 'true'
+        session['user.new_password'] = @user.new_password
+        sign_in @user
+        redirect_to edit_user_registration_path(new: 'go')
+
       # redirect new users to verify their identity
-      if @user.primary_identity_id.blank? &&
-         @user.created_at > 2.hours.ago &&
-         ENV['SKIP_NEW_USER_IDENTITY_VERIFICATION'] != 'true'
+      elsif @user.primary_identity_id.blank? &&
+            @user.created_at > 2.hours.ago &&
+            ENV['SKIP_NEW_USER_IDENTITY_VERIFICATION'] != 'true'
         sign_in @user
         redirect_to new_my_account_email_path
+
       else
         sign_in_and_redirect @user, event: :authentication
       end

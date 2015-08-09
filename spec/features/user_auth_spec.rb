@@ -57,6 +57,64 @@ eod
   end
 
   scenario "new User signs in with Facebook" do
+    ENV['SKIP_3RD_PARTY_LOGIN_ACCOUNT_UPDATE'] = 'false'
+
+    # Go to the login page and click on 'login_with_facebook' button
+    visit(new_user_session_path)
+    click_on('login_with_facebook', match: :first)
+
+    # Get the newly created user, he/she should be confirmed
+    user = User.last
+    expect(user).to be_confirmed
+    expect(user.name).to eq('FB User')
+    expect(user.gender).to eq('male')
+    expect(user.avatar_url).to eq('https://picture.com/picture')
+    expect(user.birth_month).to eq(5)
+    expect(user.birth_day).to eq(2)
+    expect(user.birth_year).to eq(1994)
+    expect(user.fb_friends).to have_key('data')
+    expect(user.fb_friends).not_to have_key('paging')
+    expect(user.fb_devices.length).to eq(2)
+
+    # Users should be redirected to update their account after first login
+    expect(current_path).to eq edit_user_registration_path
+
+    # Change account info
+    fill_in('user-email-input', with: 'someone@some.where')
+    fill_in('user-password-input', with: 'abcd1234')
+    fill_in('user-password_confirmation-input', with: 'abcd1234')
+    find("input[type=submit]").click
+    user.reload
+
+    # The user can use the new password
+    expect(user.valid_password?('abcd1234')).to be true
+
+    # Find the email confirmation_path from the user's email inbox
+    confirmation_path = open_last_email.body.match(/confirmation\?confirmation_token=[^"]+/)
+
+    # Confirm the email by visiting the confirmation path
+    visit "/#{confirmation_path}"
+    user.reload
+
+    expect(user.email).to eq('someone@some.where')
+
+    # On background: sign-on status token (sst) cookie should be set
+    sst_string = page.driver.request.cookies['_sst']
+    sst = SignonStatusTokenService.decode(sst_string)
+    expect(sst['id']).to eq(user.id)
+    expect(sst['uuid']).to eq(user.uuid)
+
+    # After logout
+    visit('/logout')
+
+    # On background: sign-on status token (sst) cookie should be cleared
+    expect(page.driver.request.cookies['_sst'])
+      .to be_blank
+  end
+
+  scenario "new User signs in with Facebook with new account update disabled" do
+    ENV['SKIP_3RD_PARTY_LOGIN_ACCOUNT_UPDATE'] = 'true'
+
     # Go to the login page and click on 'login_with_facebook' button
     visit(new_user_session_path)
     click_on('login_with_facebook', match: :first)
@@ -83,24 +141,11 @@ eod
     expect(sst['id']).to eq(user.id)
     expect(sst['uuid']).to eq(user.uuid)
 
-    # On background: identity_token cookie should be set
-    # (ignoring the small time difference)
-    if (page.driver.request.cookies['_identity_token'] !=
-        SiteIdentityTokenService.generate(user))
-      visit('/refresh_it')
-    end
-    expect(page.driver.request.cookies['_identity_token'][0..-4])
-      .to eq SiteIdentityTokenService.generate(user)[0..-4]
-
     # After logout
     visit('/logout')
 
     # On background: sign-on status token (sst) cookie should be cleared
     expect(page.driver.request.cookies['_sst'])
-      .to be_blank
-
-    # On background: identity_token cookie should be cleared
-    expect(page.driver.request.cookies['_identity_token'])
       .to be_blank
   end
 
@@ -147,7 +192,7 @@ eod
       .to be_blank
   end
 
-  xscenario "new User signs up with email" do
+  scenario "new User signs up with email" do
     # Prepare the new user's credentials
     user_rigister_credentials = attributes_for(:user).slice(:name, :email, :password, :password_confirmation)
     user_login_credentials = user_rigister_credentials.slice(:email, :password)
@@ -221,11 +266,13 @@ eod
   end
 
   scenario "new User signs in using an invitation code with Facebook" do
+    ENV['SKIP_3RD_PARTY_LOGIN_ACCOUNT_UPDATE'] = 'false'
+
     @identity = create(:user_identity)
     @invitation_code = InvitationCodeService.generate(@identity.email)
 
     # Go to the invitation URL and click on 'login_with_facebook' button
-    visit invitations_path(code: @invitation_code, redirect_to: new_my_account_email_path)
+    visit invitations_path(code: @invitation_code, redirect_to: new_application_path)
     expect(page).to have_content(@identity.name)
     click_on('login_with_facebook', match: :first)
 
@@ -235,7 +282,7 @@ eod
     expect(@user.organization_code).to eq(@identity.organization_code)
 
     # The user should be redirected to the given path
-    expect(current_path).to eq(new_my_account_email_path)
+    expect(current_path).to eq(new_application_path)
 
     # On background: sign-on status token (sst) cookie should be set
     expect(page.driver.request.cookies['_sst'])
@@ -274,7 +321,7 @@ eod
       .not_to be_blank
   end
 
-  xscenario "new User signs up using an invitation code with email" do
+  scenario "new User signs up using an invitation code with email" do
     @identity = create(:user_identity)
     @invitation_code = InvitationCodeService.generate(@identity.email)
 
@@ -313,7 +360,7 @@ eod
       .to eq SiteIdentityTokenService.generate(@user)[0..-4]
   end
 
-  xscenario "new User signs up using an invitation code with a different email" do
+  scenario "new User signs up using an invitation code with a different email" do
     @identity = create(:user_identity)
     @invitation_code = InvitationCodeService.generate(@identity.email)
 
@@ -343,7 +390,7 @@ eod
     end.to change { @user.confirmed? }.from(false).to(true)
   end
 
-  xscenario "old User signs in using an invitation code with email" do
+  scenario "old User signs in using an invitation code with email" do
     @identity = create(:user_identity)
     @invitation_code = InvitationCodeService.generate(@identity.email)
     user_rigister_credentials = attributes_for(:user).slice(:name, :email, :password, :password_confirmation)
