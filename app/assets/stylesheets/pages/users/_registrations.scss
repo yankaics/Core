@@ -1,4 +1,4 @@
-body.c-registrations.c-registrations-edit {
+body.c-registrations {
 
 	.steps-section {
 		border-top: 1px solid rgba(255,255,255, .3);
@@ -29,5 +29,17 @@ body.c-registrations.c-registrations-edit {
 				background: rgba(255,255,255, .3);
 			}
 		}
+	}
+
+	.service-features-col {
+		border-left: 1px solid rgba(255,255,255, .3);
+	}
+
+	.select2-container {
+		width: 100%;
+	}
+
+	.form-group {
+		text-align: left;
 	}
 }

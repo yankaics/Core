@@ -27,3 +27,31 @@ body {
 		color: $white;
 	}
 }
+
+.service-features {
+	opacity: .9;
+
+	h1 {
+		@extend .h3;
+	}
+
+	h2 {
+		@extend .h4;
+	}
+
+	h3 {
+		@extend .h5;
+	}
+
+	h4 {
+		@extend .h6;
+	}
+
+	h5 {
+		@extend .h6;
+	}
+
+	h6 {
+		@extend .h6;
+	}
+}

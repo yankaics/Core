@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150808104946) do
+ActiveRecord::Schema.define(version: 20150809085552) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace"
@@ -193,6 +193,7 @@ ActiveRecord::Schema.define(version: 20150808104946) do
     t.date     "core_rtd_refreshed_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "direct_data_access",       default: false, null: false
     t.boolean  "allow_direct_data_access", default: false, null: false
   end
 
@@ -250,23 +251,26 @@ ActiveRecord::Schema.define(version: 20150808104946) do
   add_index "settings", ["thing_type", "thing_id", "var"], name: "index_settings_on_thing_type_and_thing_id_and_var", unique: true
 
   create_table "user_data", force: :cascade do |t|
-    t.integer  "user_id",                                            null: false
-    t.integer  "gender",                      limit: 1, default: 0,  null: false
+    t.integer  "user_id",                                              null: false
+    t.integer  "gender",                        limit: 1, default: 0,  null: false
     t.integer  "birth_year"
-    t.integer  "birth_month",                 limit: 1
-    t.integer  "birth_day",                   limit: 1
-    t.string   "url",                                   default: "", null: false
-    t.text     "brief",                                 default: "", null: false
-    t.text     "motto",                                 default: "", null: false
+    t.integer  "birth_month",                   limit: 1
+    t.integer  "birth_day",                     limit: 1
+    t.string   "url",                                     default: "", null: false
+    t.text     "brief",                                   default: "", null: false
+    t.text     "motto",                                   default: "", null: false
     t.string   "mobile"
     t.string   "unconfirmed_mobile"
     t.string   "mobile_confirmation_token"
     t.datetime "mobile_confirmation_sent_at"
-    t.integer  "mobile_confirm_tries",                  default: 0,  null: false
+    t.integer  "mobile_confirm_tries",                    default: 0,  null: false
     t.text     "fb_devices"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.text     "fb_friends"
+    t.string   "unconfirmed_organization_code"
+    t.string   "unconfirmed_department_code"
+    t.string   "unconfirmed_started_year"
   end
 
   add_index "user_data", ["user_id"], name: "index_user_data_on_user_id"

@@ -1,5 +1,5 @@
 .container.max-width-800px.valign-lg-wrapper.height-100.vertical-padding-20px
-  .card.bg-fix.valign-lg.margin-center.text-center(style="background-image: linear-gradient(rgba(255,255,255, .32), rgba(255,255,255, .32)), url('#{@body_background_image_blur}')")
+  .card.bg-fix.valign-lg.margin-center.text-center(style="background-image: linear-gradient(rgba(255,255,255, .5), rgba(255,255,255, .5)), url('#{@body_background_image_blur}')")
     - if @invited_guest_identity
       .card.card--sm.bg-theme
         .card-title 嗨，#{@invited_guest_identity.name} #{UserIdentity.human_identity_title(@invited_guest_identity.identity)}
@@ -7,8 +7,8 @@
         p= link_to "不是 #{@invited_guest_identity.name} 嗎？", invitations_reject_path
     - else
       .h2 登入／註冊
-    .row
-      .col-md-12
+    .row.valign-wrapper
+      div(class=(Settings.service_features.present? ? 'col-md-7 col-sm-12 col-xs-12 valign' : 'col-md-12'))
         .card.social-login.bg-transparent
           = link_to image_tag('login_with_facebook.png', height: '52px'), user_omniauth_authorize_path(:facebook), id: 'login_with_facebook'
         p
@@ -17,6 +17,11 @@
           | 登入時視同您已同意本站之
           a(href=eula_path target="_blank") 用戶許可協議
           | 。
+
+      - if Settings.service_features.present?
+        div.service-features-col.col-md-5.valign.visible-lg-block.visible-md-block
+          section.service-features
+            = markdown(Settings.service_features)
 
     a(href="#more-login-form" data-toggle="collapse")
       small 其他登入／註冊方式
