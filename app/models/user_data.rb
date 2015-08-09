@@ -9,10 +9,22 @@ class UserData < ActiveRecord::Base
   }
 
   belongs_to :user, touch: true
+  belongs_to :unconfirmed_organization, class_name: :Organization,
+                                        primary_key: :code,
+                                        foreign_key: :unconfirmed_organization_code
+  belongs_to :unconfirmed_department,
+             ->(o) { (o && o.respond_to?(:organization_code)) ? where(organization_code: o.unconfirmed_organization_code) : all },
+             class_name: :Department,
+             primary_key: :code, foreign_key: :unconfirmed_department_code
 
   enum gender: GENDERS
   serialize :fb_friends
   serialize :fb_devices
+
+  delegate :name, :short_name,
+           to: :unconfirmed_organization, prefix: true, allow_nil: true
+  delegate :name, :short_name,
+           to: :unconfirmed_department, prefix: true, allow_nil: true
 
   validates :user, presence: true
   validates :birth_month, inclusion: { in: (1..12) }, allow_nil: true
