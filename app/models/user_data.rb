@@ -14,6 +14,7 @@ class UserData < ActiveRecord::Base
                                         foreign_key: :unconfirmed_organization_code
   belongs_to :unconfirmed_department,
              ->(o) { (o && o.respond_to?(:organization_code)) ? where(organization_code: o.unconfirmed_organization_code) : all },
+             class_name: :Department,
              primary_key: :code, foreign_key: :unconfirmed_department_code
 
   enum gender: GENDERS
