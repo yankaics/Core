@@ -48,6 +48,9 @@ class User < ActiveRecord::Base
            :url=, :brief=, :motto=, :fb_friends=, :fb_devices=,
            :unconfirmed_organization_code, :unconfirmed_department_code, :unconfirmed_started_year,
            :unconfirmed_organization_code=, :unconfirmed_department_code=, :unconfirmed_started_year=,
+           :unconfirmed_organization, :unconfirmed_department,
+           :unconfirmed_organization_name, :unconfirmed_organization_short_name,
+           :unconfirmed_department_name, :unconfirmed_department_short_name,
            to: :data, prefix: false, allow_nil: true
   accepts_nested_attributes_for :emails, :unconfirmed_emails,
                                 allow_destroy: true

@@ -52,7 +52,11 @@ ActiveAdmin.register User do
       link_to truncate(user.fbid, length: 8), "https://facebook.com/#{user.fbid}", :target => "_blank" if user.fbid
     end
     column :identity do |user|
-      link_to "#{truncate(user.organization_short_name, length: 5)} #{truncate(user.department_short_name, length: 5)} #{UserIdentity.human_enum_value(:identity, user.identity)}", admin_user_identity_path(user.primary_identity) if user.primary_identity
+      if user.primary_identity
+        link_to "#{truncate(user.organization_short_name, length: 5)} #{truncate(user.department_short_name, length: 5)} #{UserIdentity.human_enum_value(:identity, user.identity)}", admin_user_identity_path(user.primary_identity)
+      elsif user.unconfirmed_organization
+        "(未驗證) #{truncate(user.unconfirmed_organization_short_name, length: 5)} #{truncate(user.unconfirmed_department_short_name, length: 5)}"
+      end
     end
     column :confirmed_at
     column :sign_in_count
@@ -131,6 +135,9 @@ ActiveAdmin.register User do
       row(:organization)
       row(:department)
       row(:uid)
+      row(:unconfirmed_organization)
+      row(:unconfirmed_department)
+      row(:unconfirmed_started_year)
 
       row(:avatar_url)
       row(:cover_photo_url)
@@ -252,6 +259,9 @@ ActiveAdmin.register User do
       f.input :unlock_token if current_admin.root?
       f.input :locked_at if current_admin.root?
       f.input :primary_identity_id if current_admin.root?
+      f.input :unconfirmed_organization_code if current_admin.root?
+      f.input :unconfirmed_department_code if current_admin.root?
+      f.input :unconfirmed_started_year if current_admin.root?
       # f.input :avatar_url
       # f.input :cover_photo_url
       f.input :fbtoken if current_admin.root?
