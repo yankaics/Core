@@ -1,5 +1,5 @@
 .container.max-width-800px.valign-lg-wrapper.height-100.vertical-padding-20px
-  .card.bg-fix.valign-lg.margin-center.text-center(style="background-image: linear-gradient(rgba(255,255,255, .32), rgba(255,255,255, .32)), url('#{@body_background_image_blur}')")
+  .card.bg-fix.valign-lg.margin-center.text-center(style="background-image: linear-gradient(rgba(255,255,255, .5), rgba(255,255,255, .5)), url('#{@body_background_image_blur}')")
     = simple_form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f|
 
       - if @new
@@ -45,10 +45,11 @@
               = f.label :password_confirmation, for: 'user-password_confirmation-input'
           .form-actions
             = f.button :submit, '確認資料', class: 'btn btn--highlighted'
-          p
-            small.opacity-5
-              | 提供服務於 #{Organization.short_name_list.join(t(:comma, scope: :general))}。
-              - if ENV['APP_CONTACT_URL']
+          p &nbsp;
+
+          - if ENV['APP_CONTACT_URL']
+            p
+              small.opacity-5
                 | 任何疑問？
                 = link_to '聯繫我們', ENV['APP_CONTACT_URL'], target: '_blank'
                 | ！
