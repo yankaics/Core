@@ -101,6 +101,14 @@ ActiveAdmin.register_page "Settings" do
                 f.checkbox_setting '啟用使用者的「未經驗證身份」資料欄位', :enable_user_unconfirmed_identity, hint: '讓使用者在註冊和帳號設定時，可以自由填寫他們「未經確認的身份資料」'
               end
 
+              li do
+                f.checkbox_setting '略過新使用者的帳號資料確認步驟', :skip_3rd_party_login_account_update, hint: '使用第三方登入註冊帳號時，不顯示「填寫帳號資料」頁面'
+              end
+
+              li do
+                f.checkbox_setting '略過新使用者的身份驗證步驟', :skip_new_user_identity_verification, hint: '讓新使用者在註冊帳號完成時，不會被自動導向到「驗證身份」頁面'
+              end
+
             end
           end
         end

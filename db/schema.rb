@@ -193,7 +193,6 @@ ActiveRecord::Schema.define(version: 20150809085552) do
     t.date     "core_rtd_refreshed_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "direct_data_access",       default: false, null: false
     t.boolean  "allow_direct_data_access", default: false, null: false
   end
 

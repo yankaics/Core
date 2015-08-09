@@ -70,7 +70,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
         # redirect new users to verify their identity
         if @user.primary_identity_id.blank? &&
            @user.created_at > 2.hours.ago &&
-           ENV['SKIP_NEW_USER_IDENTITY_VERIFICATION'] != 'true'
+           !Settings.skip_new_user_identity_verification
           redirect_to new_my_account_email_path and return
         else
           redirect_to root_path and return
