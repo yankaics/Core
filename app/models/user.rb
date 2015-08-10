@@ -61,15 +61,15 @@ class User < ActiveRecord::Base
   has_attached_file :avatar,
                     processors: [:avatar_cropper],
                     styles: { medium: '512x512>#', thumb: '256x256>#', grayscale: '512x512>#', blur_1: '256x256#', blur_2: '256x256#', blur_3: '256x256#', blur_4: '256x256#', blur_5: '256x256#', blur_6: '256x256#', blur_7: '256x256#' },
-                    convert_options: { grayscale: '-colorspace Gray', blur_1: '-blur 0x2', blur_2: '-blur 0x4', blur_3: '-blur 0x8', blur_4: '-blur 0x16', blur_5: '-blur 0x32', blur_6: '-blur 0x64', blur_7: '-blur 0x128' },
+                    convert_options: { grayscale: '-colorspace Gray', blur_1: '-blur 0x2', blur_2: '-blur 0x4', blur_3: '-blur 0x8', blur_4: '-blur 0x12', blur_5: '-blur 0x16', blur_6: '-blur 0x32', blur_7: '-blur 0x64' },
                     url: '/system/users/avatars/:style/:hash.:extension',
                     hash_data: ':class/:attachment/:id/:style',
                     hash_secret: ENV['SECRET_KEY_BASE'],
                     preserve_files: true
   validates_attachment_content_type :avatar, content_type: %r{\Aimage\/.*\Z}
   has_attached_file :cover_photo,
-                    styles: { large: '2048x2048>', medium: '1024x1024>', thumb: '256x256>', blur_1: '1024x1024', blur_2: '1024x1024', blur_3: '1024x1024' },
-                    convert_options: { blur_1: '-blur 0x8', blur_2: '-blur 0x32', blur_3: '-blur 0x64' },
+                    styles: { large: '2048x2048>', medium: '1024x1024>', thumb: '256x256>', grayscale: '2048x2048>', blur_1: '1024x1024^', blur_2: '1024x1024^', blur_3: '1024x1024^' },
+                    convert_options: { grayscale: '-colorspace Gray', blur_1: '-blur 0x8', blur_2: '-blur 0x32', blur_3: '-blur 0x64' },
                     url: '/system/users/cover_photos/:style/:hash.:extension',
                     hash_data: ':class/:attachment/:id/:style',
                     hash_secret: ENV['SECRET_KEY_BASE'],
@@ -85,6 +85,7 @@ class User < ActiveRecord::Base
   before_validation :generate_uuid, :ensure_user_has_valid_primary_identity
   after_touch :validate_after_touch
   after_save :clear_association_cache
+  before_update :download_external_avatar_if_needed, :download_external_cover_photo_if_needed
 
   def self.scoped(org_code)
     if org_code.blank?
@@ -147,6 +148,18 @@ class User < ActiveRecord::Base
     external_cover_photo_url
   end
 
+  %w(grayscale blur_1 blur_2 blur_3 blur_4 blur_5 blur_6 blur_7).each do |avatar_style|
+    define_method "avatar_url_#{avatar_style}" do
+      avatar_url(avatar_style)
+    end
+  end
+
+  %w(grayscale blur_1 blur_2 blur_3).each do |cover_photo_style|
+    define_method "cover_photo_url_#{cover_photo_style}" do
+      cover_photo_url(cover_photo_style)
+    end
+  end
+
   def download_external_avatar!
     self.avatar_url = external_avatar_url
     self.save!
@@ -155,6 +168,16 @@ class User < ActiveRecord::Base
   def download_external_cover_photo!
     self.cover_photo_url = external_cover_photo_url
     self.save!
+  end
+
+  def download_external_avatar_if_needed
+    return unless avatar_updated_at_changed?
+    download_external_avatar! if external_avatar_url.present? && avatar.blank?
+  end
+
+  def download_external_cover_photo_if_needed
+    return unless cover_photo_updated_at_changed?
+    download_external_cover_photo! if external_cover_photo_url.present? && cover_photo.blank?
   end
 
   def avatar_url=(url)
@@ -239,7 +262,19 @@ class User < ActiveRecord::Base
     :birth_month,
     :brief,
     :motto,
-    :url
+    :url,
+    :avatar_url_grayscale,
+    :avatar_url_blur_1,
+    :avatar_url_blur_2,
+    :avatar_url_blur_3,
+    :avatar_url_blur_4,
+    :avatar_url_blur_5,
+    :avatar_url_blur_6,
+    :avatar_url_blur_7,
+    :cover_photo_url_grayscale,
+    :cover_photo_url_blur_1,
+    :cover_photo_url_blur_2,
+    :cover_photo_url_blur_3
   ]
 
   IDENTITY_ATTRS = [
