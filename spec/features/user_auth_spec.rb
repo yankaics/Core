@@ -5,8 +5,7 @@ feature "User Auth", :type => :feature, :retry => 3 do
     ENV['FB_APP_ADDITIONAL_SCOPES'] = 'user_friends,user_birthday'
     ActiveJob::Base.queue_adapter = :inline
 
-    stub_request(:get, "https://graph.facebook.com/me?access_token=mock_token&fields=id,email,name,picture.height(500).width(500),cover,gender,link,devices,friends.limit(50000),birthday,age_range&locale=zh-TW")
-      .to_return(:status => 200, :body => (<<-eod
+    fb_user_data_1 = <<-EOF
 {
   "id": "87654321",
   "name": "FB User",
@@ -52,8 +51,66 @@ feature "User Auth", :type => :feature, :retry => 3 do
     "min": 21
   }
 }
-eod
-      ), :headers => {})
+    EOF
+
+    fb_user_data_2 = <<-EOF
+{
+  "id": "87654321",
+  "name": "FB User",
+  "picture": {
+    "data": {
+      "height": 720,
+      "is_silhouette": false,
+      "url": "https://picture.com/picture",
+      "width": 720
+    }
+  },
+  "cover": {
+    "id": "12345678",
+    "offset_y": 0,
+    "source": "https://picture.com/picture"
+  },
+  "gender": "male",
+  "link": "https://www.facebook.com/app_scoped_user_id/87654321/",
+  "devices": [
+    {
+      "os": "Android"
+    },
+    {
+      "hardware": "iPad",
+      "os": "iOS"
+    }
+  ],
+  "friends": {
+    "data": [
+      {
+        "name": "Facebook User2",
+        "id": "12345678"
+      },
+      {
+        "name": "Facebook User3",
+        "id": "87655678"
+      }
+    ],
+    "paging": {
+      "next": "..."
+    },
+    "summary": {
+      "total_count": 52
+    }
+  },
+  "birthday": "05/02/1994",
+  "age_range": {
+    "min": 21
+  }
+}
+    EOF
+
+    stub_request(:get, "https://graph.facebook.com/me?access_token=mock_token&fields=id,email,name,picture.height(500).width(500),cover,gender,link,devices,friends.limit(50000),birthday,age_range&locale=zh-TW")
+      .to_return(:status => 200, :body => lambda { |_request| [fb_user_data_1, fb_user_data_2].sample })
+
+    stub_request(:get, "https://picture.com/picture")
+      .to_return(:status => 200, :body => lambda { |_request| File.new(Rails.root + 'spec/fixtures/files/image.png') })
   end
 
   scenario "new User signs in with Facebook" do
@@ -68,7 +125,9 @@ eod
     expect(user).to be_confirmed
     expect(user.name).to eq('FB User')
     expect(user.gender).to eq('male')
-    expect(user.avatar_url).to eq('https://picture.com/picture')
+    expect(user.avatar_url).not_to be_blank
+    expect(user.avatar_url_grayscale).not_to be_blank
+    expect(user.avatar_url(:grayscale)).not_to be_blank
     expect(user.birth_month).to eq(5)
     expect(user.birth_day).to eq(2)
     expect(user.birth_year).to eq(1994)
@@ -124,7 +183,6 @@ eod
     expect(user).to be_confirmed
     expect(user.name).to eq('FB User')
     expect(user.gender).to eq('male')
-    expect(user.avatar_url).to eq('https://picture.com/picture')
     expect(user.birth_month).to eq(5)
     expect(user.birth_day).to eq(2)
     expect(user.birth_year).to eq(1994)
