@@ -46,14 +46,37 @@ class User < ActiveRecord::Base
            :gender=, :birth_year=, :birth_month=, :birth_day=, :birth_date=,
            :url,  :brief,  :motto,  :fb_friends,  :fb_devices,
            :url=, :brief=, :motto=, :fb_friends=, :fb_devices=,
-           :unconfirmed_organization_code, :unconfirmed_department_code, :unconfirmed_started_year,
+           :unconfirmed_organization_code,  :unconfirmed_department_code,  :unconfirmed_started_year,
            :unconfirmed_organization_code=, :unconfirmed_department_code=, :unconfirmed_started_year=,
-           :unconfirmed_organization, :unconfirmed_department,
+           :unconfirmed_organization,  :unconfirmed_department,
+           :unconfirmed_organization=, :unconfirmed_department=,
            :unconfirmed_organization_name, :unconfirmed_organization_short_name,
            :unconfirmed_department_name, :unconfirmed_department_short_name,
+           :avatar_crop_x,  :avatar_crop_y,  :avatar_crop_w,  :avatar_crop_h,
+           :avatar_crop_x=, :avatar_crop_y=, :avatar_crop_w=, :avatar_crop_h=,
            to: :data, prefix: false, allow_nil: true
   accepts_nested_attributes_for :emails, :unconfirmed_emails,
                                 allow_destroy: true
+
+  has_attached_file :avatar,
+                    processors: [:avatar_cropper],
+                    styles: { medium: '512x512>#', thumb: '256x256>#', grayscale: '512x512>#', blur_1: '256x256#', blur_2: '256x256#', blur_3: '256x256#', blur_4: '256x256#', blur_5: '256x256#', blur_6: '256x256#', blur_7: '256x256#' },
+                    convert_options: { grayscale: '-colorspace Gray', blur_1: '-blur 0x2', blur_2: '-blur 0x4', blur_3: '-blur 0x8', blur_4: '-blur 0x16', blur_5: '-blur 0x32', blur_6: '-blur 0x64', blur_7: '-blur 0x128' },
+                    url: '/system/users/avatars/:style/:hash.:extension',
+                    hash_data: ':class/:attachment/:id/:style',
+                    hash_secret: ENV['SECRET_KEY_BASE'],
+                    preserve_files: true
+  validates_attachment_content_type :avatar, content_type: %r{\Aimage\/.*\Z}
+  has_attached_file :cover_photo,
+                    styles: { large: '2048x2048>', medium: '1024x1024>', thumb: '256x256>', blur_1: '1024x1024', blur_2: '1024x1024', blur_3: '1024x1024' },
+                    convert_options: { blur_1: '-blur 0x8', blur_2: '-blur 0x32', blur_3: '-blur 0x64' },
+                    url: '/system/users/cover_photos/:style/:hash.:extension',
+                    hash_data: ':class/:attachment/:id/:style',
+                    hash_secret: ENV['SECRET_KEY_BASE'],
+                    preserve_files: true
+  validates_attachment_content_type :cover_photo, content_type: %r{\Aimage\/.*\Z}
+  attr_accessor :crop_avatar
+  before_update :reprocess_avatar_if_cropping
 
   validates :name, presence: true, on: :update
   validates_associated :data, :emails, :unconfirmed_emails
@@ -114,12 +137,52 @@ class User < ActiveRecord::Base
     self.uuid = "%08x-%04x-%04x-%04x-%04x%08x" % ary
   end
 
-  def avatar_url
+  def avatar_url(style = :medium)
+    return avatar.url(style) if avatar.present?
     external_avatar_url
   end
 
-  def cover_photo_url
+  def cover_photo_url(style = :large)
+    return cover_photo.url(style) if cover_photo.present?
     external_cover_photo_url
+  end
+
+  def download_external_avatar!
+    self.avatar_url = external_avatar_url
+    self.save!
+  end
+
+  def download_external_cover_photo!
+    self.cover_photo_url = external_cover_photo_url
+    self.save!
+  end
+
+  def avatar_url=(url)
+    self.avatar = open(url)
+  rescue OpenURI::HTTPError
+    return false
+  end
+
+  def cover_photo_url=(url)
+    self.cover_photo = open(url)
+  rescue OpenURI::HTTPError
+    return false
+  end
+
+  def avatar_cropping?
+    crop_avatar && avatar_crop_data?
+  end
+
+  def avatar_crop_data?
+    !avatar_crop_x.blank? &&
+    !avatar_crop_y.blank? &&
+    !avatar_crop_w.blank? &&
+    !avatar_crop_h.blank?
+  end
+
+  def reprocess_avatar_if_cropping
+    return unless avatar_cropping?
+    avatar.reprocess!
   end
 
   def fb_linked?

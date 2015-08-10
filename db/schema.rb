@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150809085552) do
+ActiveRecord::Schema.define(version: 20150809185652) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace"
@@ -193,6 +193,7 @@ ActiveRecord::Schema.define(version: 20150809085552) do
     t.date     "core_rtd_refreshed_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "direct_data_access",       default: false, null: false
     t.boolean  "allow_direct_data_access", default: false, null: false
   end
 
@@ -270,6 +271,10 @@ ActiveRecord::Schema.define(version: 20150809085552) do
     t.string   "unconfirmed_organization_code"
     t.string   "unconfirmed_department_code"
     t.string   "unconfirmed_started_year"
+    t.integer  "avatar_crop_x"
+    t.integer  "avatar_crop_y"
+    t.integer  "avatar_crop_w"
+    t.integer  "avatar_crop_h"
   end
 
   add_index "user_data", ["user_id"], name: "index_user_data_on_user_id"
@@ -345,6 +350,14 @@ ActiveRecord::Schema.define(version: 20150809085552) do
     t.datetime "updated_at"
     t.string   "uuid",                                  null: false
     t.string   "fbemail"
+    t.string   "avatar_file_name"
+    t.string   "avatar_content_type"
+    t.integer  "avatar_file_size"
+    t.datetime "avatar_updated_at"
+    t.string   "cover_photo_file_name"
+    t.string   "cover_photo_content_type"
+    t.integer  "cover_photo_file_size"
+    t.datetime "cover_photo_updated_at"
   end
 
   add_index "users", ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
