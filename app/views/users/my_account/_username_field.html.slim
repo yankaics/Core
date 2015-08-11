@@ -1,0 +1,6 @@
+- field_name = :username
+
+= simple_form_for @user, wrapper: :horizontal_inline_edit_form, url: my_account_path, html: { id: "user_#{field_name}_form" } do |f|
+  = f.input field_name, placeholder: '設定使用者名稱'
+
+= render partial: 'field_ajax', locals: { field_name: field_name }

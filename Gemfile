@@ -84,6 +84,9 @@ gem 'active_admin_import', '2.1.2'
 gem 'simple_form', '~> 3.1.0'
 gem 'kaminari'
 
+# Decorators
+gem 'draper', '~> 1.3'
+
 # Serializers
 gem 'active_model_serializers', '~> 0.8.0'
 

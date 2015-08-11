@@ -16,6 +16,7 @@ RSpec.describe User, :type => :model do
   it { should respond_to(:organization, :organization_code, :department, :department_code) }
 
   it { should validate_presence_of(:name).on(:update) }
+  it { should validate_uniqueness_of(:username) }
 
   context "with emails" do
     subject { create(:user) }

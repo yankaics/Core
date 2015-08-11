@@ -1,0 +1,69 @@
+- if Settings.enable_user_unconfirmed_identity
+  - field_name = :unconfirmed_identity
+
+  = simple_form_for @user, url: my_account_path, html: { id: "user_#{field_name}_form"} do |f|
+    .h4 自訂身份
+    p
+      = user.unconfirmed_identity_description
+      | &nbsp;(
+      a(href="#user_#{field_name}_form_fields" data-toggle="collapse") 編輯
+      | )
+
+    .collapse(id="user_#{field_name}_form_fields")
+      .form-group
+        = f.label '學校'
+        = f.input_field :unconfirmed_organization_code, as: :select, collection: Organization.all_for_select
+      .form-group
+        = f.label '系別'
+        = f.input_field :unconfirmed_department_code
+      .form-group
+        = f.label '入學年度'
+        = f.input_field :unconfirmed_started_year
+      = f.submit '更新', class: 'btn btn--theme btn--flat'
+
+  = render partial: 'field_ajax', locals: { field_name: field_name }
+
+  javascript:
+    $(document).ready(function () {
+      $('#user_unconfirmed_organization_code').select2();
+
+      $('#user_unconfirmed_department_code').select2({
+        query: function (query) {
+          var data = {
+            results: [
+              { id: 0, text: "請先選擇學校", disabled: true }
+            ]
+          };
+          query.callback(data);
+        }
+      });
+
+      yearSelections = [];
+      currentYear = (new Date()).getFullYear();
+
+      for (var i = 0; i < 50; i++) {
+        yearSelections.push({ id: (currentYear - i), text: ((currentYear - i) + ' 年') });
+      }
+
+      $('#user_unconfirmed_started_year').select2({ data: { results: yearSelections } });
+
+      $('#user_unconfirmed_organization_code').on('change', function (e) {
+        var orgCode = (e.val || e.value || $('#user_unconfirmed_organization_code').val());
+
+        $.ajax({
+          method: 'GET',
+          url: "/api/v1/organizations/" + orgCode + ".json",
+          dataType: 'json',
+        }).done(function(data, textStatus, xhr) {
+          var deps = data.departments;
+          var selections = deps.map(function (obj) {
+            return { id: obj.code, text: obj.name };
+          });
+          var selectData = { results: selections };
+
+          $('#user_unconfirmed_department_code').select2({ data: selectData });
+        });
+      });
+
+      $('#user_unconfirmed_organization_code').change();
+    });
