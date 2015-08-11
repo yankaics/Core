@@ -79,10 +79,11 @@ class User < ActiveRecord::Base
   before_update :reprocess_avatar_if_cropping
 
   validates :name, presence: true, on: :update
+  validates :username, username: true, uniqueness: true, allow_nil: true
   validates_associated :data, :emails, :unconfirmed_emails
 
   before_create :generate_uuid, :build_data
-  before_validation :generate_uuid, :ensure_user_has_valid_primary_identity
+  before_validation :generate_uuid, :ensure_user_has_valid_primary_identity, :nilify_blanks
   after_touch :validate_after_touch
   after_save :clear_association_cache
   before_update :download_external_avatar_if_needed, :download_external_cover_photo_if_needed
@@ -99,6 +100,10 @@ class User < ActiveRecord::Base
   def initialize(*args, &block)
     super
     @skip_confirmation_notification = true
+  end
+
+  def nilify_blanks
+    self.username = nil if username.blank?
   end
 
   def organization_codes
