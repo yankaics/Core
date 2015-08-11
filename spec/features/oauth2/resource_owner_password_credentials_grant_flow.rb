@@ -279,14 +279,14 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
             "data": {
               "height": 720,
               "is_silhouette": false,
-              "url": "",
+              "url": "https://picture.com/picture",
               "width": 720
             }
           },
           "cover": {
             "id": "0",
             "offset_y": 0,
-            "source": ""
+            "source": "https://picture.com/picture"
           },
           "devices": [],
           "friends": {
@@ -298,6 +298,8 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
         }
       eos
     )
+    stub_request(:get, "https://picture.com/picture")
+      .to_return(:status => 200, :body => lambda { |_request| File.new(Rails.root + 'spec/fixtures/files/image.png') })
 
     # Resource Owner Facebook Access Token Grant, POST to the endpoint to get a token
     page.driver.post(<<-URL.squish.delete(' ')

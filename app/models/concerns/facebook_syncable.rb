@@ -44,10 +44,10 @@ module FacebookSyncable
       end
     end
 
-    download_external_avatar! if avatar.blank? &&
-                                 !avatar_local
-    download_external_cover_photo! if cover_photo.blank? &&
-                                      !cover_photo_local
+    download_external_avatar! if !avatar_local &&
+                                 external_avatar_url.present?
+    download_external_cover_photo! if !cover_photo_local &&
+                                      external_cover_photo_url.present?
 
     self.save!
   end
