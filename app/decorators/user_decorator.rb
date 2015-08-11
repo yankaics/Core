@@ -6,12 +6,13 @@ class UserDecorator < Draper::Decorator
   def identity_description
     if primary_identity.blank?
       if Settings.enable_user_unconfirmed_identity && unconfirmed_organization
-        "(未驗證) #{unconfirmed_organization_short_name} #{unconfirmed_department_short_name}"
+        return "(未驗證) #{unconfirmed_organization_short_name} #{unconfirmed_department_short_name}"
       else
         return '未知'
       end
+    else
+      return "#{organization_name} #{department_name} #{UserIdentity.human_enum_value(:identity, identity)}"
     end
-    "#{organization_name} #{department_name} #{UserIdentity.human_enum_value(:identity, identity)}"
   end
 
   def unconfirmed_identity_description
@@ -22,11 +23,12 @@ class UserDecorator < Draper::Decorator
   def identity_short_description
     if primary_identity.blank?
       if Settings.enable_user_unconfirmed_identity && unconfirmed_organization
-        "(未驗證) #{unconfirmed_organization_short_name} #{unconfirmed_department_short_name}"
+        return "(未驗證) #{unconfirmed_organization_short_name} #{unconfirmed_department_short_name}"
       else
         return '未知'
       end
+    else
+      return "#{organization_short_name} #{department_short_name} #{UserIdentity.human_enum_value(:identity, identity)}"
     end
-    "#{organization_short_name} #{department_short_name} #{UserIdentity.human_enum_value(:identity, identity)}"
   end
 end
