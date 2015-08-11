@@ -52,6 +52,8 @@ class User < ActiveRecord::Base
            :unconfirmed_organization=, :unconfirmed_department=,
            :unconfirmed_organization_name, :unconfirmed_organization_short_name,
            :unconfirmed_department_name, :unconfirmed_department_short_name,
+           :avatar_local,  :cover_photo_local,
+           :avatar_local=, :cover_photo_local=,
            :avatar_crop_x,  :avatar_crop_y,  :avatar_crop_w,  :avatar_crop_h,
            :avatar_crop_x=, :avatar_crop_y=, :avatar_crop_w=, :avatar_crop_h=,
            to: :data, prefix: false, allow_nil: true
