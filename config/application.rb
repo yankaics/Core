@@ -48,9 +48,9 @@ module Core
       allow do
         origins '*'
 
-        resource '/api/*',
-          headers: :any,
-          methods: [:get, :post, :delete, :put, :options, :head]
+        resource '/api/*', headers: :any,
+                           expose: %w(ETag Status Date Content-Encoding Content-Length Cache-Control Connection Server Link X-Request-Id X-RateLimit-Limit X-RateLimit-Remaining X-RateLimit-Reset X-OAuth-Scopes X-Accepted-OAuth-Scopes X-Poll-Interval X-Items-Count X-Pages-Count),
+                           methods: [:get, :post, :delete, :put, :options, :head]
       end
     end
 
