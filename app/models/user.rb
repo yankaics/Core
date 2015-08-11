@@ -30,7 +30,7 @@ class User < ActiveRecord::Base
   has_many :access_grants, class_name: 'Doorkeeper::AccessGrant', foreign_key: :resource_owner_id
   has_many :access_tokens, class_name: 'Doorkeeper::AccessToken', foreign_key: :resource_owner_id
 
-  delegate :organization, :organization_code,
+  delegate :organization, :organization_code, :started_at,
            :department, :department_code, :uid, :identity,
            to: :primary_identity, prefix: false, allow_nil: true
   delegate :name, :short_name,
@@ -120,6 +120,10 @@ class User < ActiveRecord::Base
 
   def possible_department_code
     department_code || unconfirmed_department_code
+  end
+
+  def possible_started_year
+    (started_at.try(:year) && started_at.try(:year).to_s) || unconfirmed_started_year
   end
 
   def verified?
@@ -295,7 +299,8 @@ class User < ActiveRecord::Base
     :department,
     :department_code,
     :possible_organization_code,
-    :possible_department_code
+    :possible_department_code,
+    :possible_started_year
   ]
 
   CORE_ATTRS = [
