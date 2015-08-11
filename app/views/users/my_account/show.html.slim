@@ -1,2 +1,25 @@
-= @user.email
-= @user.name
+.container
+  .row.user-head.valign-wrapper
+    .col-md-3.col-xs-3.avatar.valign-bottom
+      .thumbnail= image_tag current_user.avatar_url
+    .col-md-9.col-xs-9.name.valign-bottom
+      .h2.name= user.name
+      .h3.identity.hidden-xs= user.identity_description
+      .h4.identity.visible-xs-block= user.identity_short_description
+  .card.clearfix
+    .col-md-6.col-sm-12
+      .h3 帳號資料
+      .form-horizontal
+        = render partial: 'email_field'
+        = render partial: 'username_field'
+      .h3 個人基本資料
+      .form-horizontal
+        = render partial: 'gender_field'
+    .col-md-6.col-sm-12
+      .h3 身份
+      = render partial: 'unconfirmed_identity_field'
+
+javascript:
+  $(document).ready(function() {
+     $('select.form-control').material_select();
+   });

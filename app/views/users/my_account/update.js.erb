@@ -1,0 +1,7 @@
+<% if @user_param %>
+  $('#user_<%= @user_param %>_form').replaceWith('<%= j(render partial: "#{@user_param}_field") %>');
+
+  <% if @user.previous_changes.present? && @user_param == 'email' && @saved %>
+    flash.success('驗證信已送出！');
+  <% end %>
+<% end %>

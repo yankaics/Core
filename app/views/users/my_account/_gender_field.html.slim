@@ -1,0 +1,6 @@
+- field_name = :gender
+
+= simple_form_for @user, wrapper: :horizontal_inline_edit_form, url: my_account_path, html: { id: "user_#{field_name}_form" } do |f|
+  = f.input field_name, as: :select, collection: [['未指定', 'unspecified'], ['男性', 'male'], ['女性', 'female'], ['其他', 'other']], prompt: 'none'
+
+= render partial: 'field_ajax', locals: { field_name: field_name }

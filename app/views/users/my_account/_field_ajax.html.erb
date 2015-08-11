@@ -1,0 +1,30 @@
+<script type="text/javascript">
+  $(document).ready(function () {
+    var $form = $('#user_<%= field_name %>_form');
+    var $field = $('#user_<%= field_name %>');
+
+    var submit = function () {
+      var formURL = $form.attr('action') + '.js';
+      var postData = $form.serializeArray();
+
+      $.ajax({
+        method: 'POST',
+        url: formURL,
+        data: postData,
+        dataType: 'script'
+      }).done(function(data, textStatus, xhr) {
+      });
+    };
+
+    $field.on('change', function (e) {
+      submit();
+    });
+
+    $form.on('submit', function (e) {
+      e.preventDefault();
+      submit();
+    });
+
+    $('select.form-control').material_select();
+  });
+</script>
