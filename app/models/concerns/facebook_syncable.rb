@@ -46,9 +46,6 @@ module FacebookSyncable
 
     self.save!
 
-    download_external_avatar! if !avatar_local &&
-                                 external_avatar_url.present?
-    download_external_cover_photo! if !cover_photo_local &&
-                                      external_cover_photo_url.present?
+    UserExternalImageDownloadJob.perform_later(self)
   end
 end
