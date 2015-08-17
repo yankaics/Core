@@ -36,3 +36,5 @@ Sidekiq.configure_client do |config|
 end
 
 Sidekiq.options[:concurrency] = (ENV['WORKER_CONCURRENCY'] || 5).to_i
+
+Sidekiq::Queue['image'].process_limit = (ENV['IMAGE_WORKER_PROCESS_LIMIT'] || 1).to_i
