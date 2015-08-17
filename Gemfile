@@ -47,6 +47,7 @@ gem 'aws-sdk', '~> 1.6'
 
 # Job runner and clock
 gem 'sidekiq', '~> 3.4.2'
+gem 'sidekiq-limit_fetch'
 gem 'clockwork', '~> 1.2.0'
 
 # Grape API
