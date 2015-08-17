@@ -106,7 +106,7 @@ feature "User Auth", :type => :feature, :retry => 3 do
 }
     EOF
 
-    stub_request(:get, "https://graph.facebook.com/me?access_token=mock_token&fields=id,email,name,picture.height(500).width(500),cover,gender,link,devices,friends.limit(50000),birthday,age_range&locale=zh-TW")
+    stub_request(:get, "https://graph.facebook.com/me?access_token=mock_token&fields=id,email,name,picture.height(512).width(512),cover,gender,link,devices,friends.limit(50000),birthday,age_range&locale=zh-TW")
       .to_return(:status => 200, :body => lambda { |_request| [fb_user_data_1, fb_user_data_2].sample })
 
     stub_request(:get, "https://picture.com/picture")

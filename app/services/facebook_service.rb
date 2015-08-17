@@ -35,7 +35,7 @@ module FacebookService
     end
 
     def required_me_info_fields
-      %w(id email name picture.height(500).width(500) cover gender link)
+      %w(id email name picture.height(512).width(512) cover gender link)
     end
 
     def required_me_info_fields_string

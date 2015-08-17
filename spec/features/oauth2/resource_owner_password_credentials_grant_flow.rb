@@ -269,7 +269,7 @@ RSpec.shared_examples "Resource Owner Password Credentials Grant Flow" do
         }
       eos
     )
-    stub_request(:get, "https://graph.facebook.com/me?access_token=#{fbtoken}&fields=id,email,name,picture.height(500).width(500),cover,gender,link,devices&locale=#{I18n.locale}")
+    stub_request(:get, "https://graph.facebook.com/me?access_token=#{fbtoken}&fields=id,email,name,picture.height(512).width(512),cover,gender,link,devices&locale=#{I18n.locale}")
       .to_return(body: <<-eos
         {
           "id": "1234567890",
