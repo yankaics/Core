@@ -4,7 +4,7 @@ class Users::MyAccountController < ApplicationController
 
   def show
     @user = current_user.clone
-    @body_background_image = current_user.cover_photo_url(:blur_3)
+    @body_background_image = current_user.cover_photo_url(:blur_2x)
   end
 
   def update
