@@ -34,3 +34,5 @@ end
 Sidekiq.configure_client do |config|
   config.redis = ConnectionPool.new(&redis_conn)
 end
+
+Sidekiq.options[:concurrency] = (ENV['WORKER_CONCURRENCY'] || 5).to_i
