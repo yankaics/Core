@@ -1,1 +1,0 @@
-:concurrency: <%= ENV['WORKER_CONCURRENCY'] || 25 %>
