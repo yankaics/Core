@@ -151,12 +151,12 @@ class User < ActiveRecord::Base
 
   def avatar_url(style = :medium)
     return avatar.url(style) if avatar.present?
-    external_avatar_url
+    external_avatar_url || "#{ENV['APP_URL']}/assets/defaults/users/avatar.jpg"
   end
 
   def cover_photo_url(style = :large)
     return cover_photo.url(style) if cover_photo.present?
-    external_cover_photo_url
+    external_cover_photo_url || "#{ENV['APP_URL']}/assets/defaults/users/cover_photo.jpg"
   end
 
   %w(grayscale blur blur_2x).each do |avatar_style|
