@@ -159,13 +159,13 @@ class User < ActiveRecord::Base
     external_cover_photo_url || "#{ENV['APP_URL']}/assets/defaults/users/cover_photo.jpg"
   end
 
-  %w(grayscale blur blur_2x).each do |avatar_style|
+  %w(thumb grayscale blur blur_2x).each do |avatar_style|
     define_method "avatar_#{avatar_style}_url" do
       avatar_url(avatar_style)
     end
   end
 
-  %w(grayscale blur blur_2x).each do |cover_photo_style|
+  %w(thumb grayscale blur blur_2x).each do |cover_photo_style|
     define_method "cover_photo_#{cover_photo_style}_url" do
       cover_photo_url(cover_photo_style)
     end
@@ -253,7 +253,9 @@ class User < ActiveRecord::Base
     :username,
     :name,
     :avatar_url,
-    :cover_photo_url
+    :avatar_thumb_url,
+    :cover_photo_url,
+    :cover_photo_thumb_url
   ]
 
   EMAIL_ATTRS = [
