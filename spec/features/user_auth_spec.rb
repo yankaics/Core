@@ -126,7 +126,7 @@ feature "User Auth", :type => :feature, :retry => 3 do
     expect(user.name).to eq('FB User')
     expect(user.gender).to eq('male')
     expect(user.avatar_url).not_to be_blank
-    expect(user.avatar_url_grayscale).not_to be_blank
+    expect(user.avatar_grayscale_url).not_to be_blank
     expect(user.avatar_url(:grayscale)).not_to be_blank
     expect(user.birth_month).to eq(5)
     expect(user.birth_day).to eq(2)
