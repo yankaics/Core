@@ -160,13 +160,13 @@ class User < ActiveRecord::Base
   end
 
   %w(grayscale blur blur_2x).each do |avatar_style|
-    define_method "avatar_url_#{avatar_style}" do
+    define_method "avatar_#{avatar_style}_url" do
       avatar_url(avatar_style)
     end
   end
 
   %w(grayscale blur blur_2x).each do |cover_photo_style|
-    define_method "cover_photo_url_#{cover_photo_style}" do
+    define_method "cover_photo_#{cover_photo_style}_url" do
       cover_photo_url(cover_photo_style)
     end
   end
@@ -280,12 +280,12 @@ class User < ActiveRecord::Base
     :brief,
     :motto,
     :url,
-    :avatar_url_grayscale,
-    :avatar_url_blur,
-    :avatar_url_blur_2x,
-    :cover_photo_url_grayscale,
-    :cover_photo_url_blur,
-    :cover_photo_url_blur_2x
+    :avatar_grayscale_url,
+    :avatar_blur_url,
+    :avatar_blur_2x_url,
+    :cover_photo_grayscale_url,
+    :cover_photo_blur_url,
+    :cover_photo_blur_2x_url
   ]
 
   IDENTITY_ATTRS = [
