@@ -29,6 +29,7 @@ class User < ActiveRecord::Base
   has_many :oauth_applications, class_name: 'Doorkeeper::Application', as: :owner
   has_many :access_grants, class_name: 'Doorkeeper::AccessGrant', foreign_key: :resource_owner_id
   has_many :access_tokens, class_name: 'Doorkeeper::AccessToken', foreign_key: :resource_owner_id
+  has_many :devices, class_name: :UserDevice
 
   delegate :organization, :organization_code, :started_at,
            :department, :department_code, :uid, :identity,
@@ -80,6 +81,7 @@ class User < ActiveRecord::Base
   attr_accessor :crop_avatar
   before_update :reprocess_avatar_if_cropping
 
+  validates :uuid, uniqueness: true
   validates :name, presence: true, on: :update
   validates :username, username: true, uniqueness: true, allow_nil: true
   validates_associated :data, :emails, :unconfirmed_emails

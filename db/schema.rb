@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150811125209) do
+ActiveRecord::Schema.define(version: 20150825114028) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace"
@@ -280,6 +280,20 @@ ActiveRecord::Schema.define(version: 20150811125209) do
   end
 
   add_index "user_data", ["user_id"], name: "index_user_data_on_user_id"
+
+  create_table "user_devices", force: :cascade do |t|
+    t.integer  "user_id"
+    t.string   "uuid"
+    t.integer  "type",       limit: 1
+    t.string   "name"
+    t.text     "device_id"
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+  end
+
+  add_index "user_devices", ["type"], name: "index_user_devices_on_type"
+  add_index "user_devices", ["user_id"], name: "index_user_devices_on_user_id"
+  add_index "user_devices", ["uuid"], name: "index_user_devices_on_uuid"
 
   create_table "user_emails", force: :cascade do |t|
     t.integer  "user_id",              null: false
