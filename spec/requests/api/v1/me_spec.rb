@@ -144,4 +144,89 @@ describe "Me API" do
       end
     end
   end
+
+  describe "/devices" do
+    before do
+      @token = create(:oauth_access_token, scopes: 'public account write')
+      @user = @token.resource_owner
+      @device = create(:user_device, user: @user)
+    end
+
+    context "GET" do
+      it "returns data of the user's devices" do
+        get "/api/v1/me/devices.json?access_token=#{@token.token}"
+        expect(response).to be_success
+        json = JSON.parse(response.body)
+        expect(json[0]).not_to be_blank
+      end
+    end
+
+    context "POST" do
+      it "creates the user's new devices" do
+        post "/api/v1/me/devices.json?access_token=#{@token.token}",
+             user_device: {
+               type: 'android',
+               name: 'HTC',
+               device_id: '1234'
+             }
+        expect(response).to be_success
+        expect(response.code).to eq('201')
+        json = JSON.parse(response.body)
+        expect(json['name']).to eq('HTC')
+        expect(json['device_id']).to eq('1234')
+      end
+    end
+  end
+
+  describe "/devices/{uuid}" do
+    before do
+      @token = create(:oauth_access_token, scopes: 'public account write')
+      @user = @token.resource_owner
+      @device = create(:user_device, user: @user)
+    end
+
+    context "PUT" do
+      it "creates the user's new device" do
+        put "/api/v1/me/devices/u-u-i-d.json?access_token=#{@token.token}",
+            user_device: {
+              type: 'android',
+              name: 'HTC',
+              device_id: '1234'
+            }
+        expect(response).to be_success
+        expect(response.code).to eq('201')
+        json = JSON.parse(response.body)
+        expect(json['name']).to eq('HTC')
+        expect(json['uuid']).to eq('u-u-i-d')
+        expect(json['device_id']).to eq('1234')
+      end
+
+      it "replaces data of the user's existing device" do
+        put "/api/v1/me/devices/#{@device.uuid}.json?access_token=#{@token.token}",
+            user_device: {
+              type: 'ios',
+              name: 'My iPhone 7',
+              device_id: '1234'
+            }
+        expect(response).to be_success
+        expect(response.code).to eq('200')
+        json = JSON.parse(response.body)
+        expect(json['uuid']).not_to be_blank
+        expect(json['name']).to eq('My iPhone 7')
+        expect(json['device_id']).to eq('1234')
+      end
+    end
+
+    context "DELETE" do
+      it "delete the user's device" do
+        delete "/api/v1/me/devices/#{@device.uuid}.json?access_token=#{@token.token}"
+        expect(response).to be_success
+        expect(response.code).to eq('200')
+        json = JSON.parse(response.body)
+        expect(json['uuid']).not_to be_blank
+
+        expect(UserDevice.find_by(uuid: @device.uuid)).to be_blank
+      end
+    end
+  end
 end

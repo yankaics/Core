@@ -105,8 +105,12 @@ class API::V1::Me < API::V1
         #{APIGuard.access_token_required_note(scope: 'identity')}
       NOTE
     }
+    params do
+      optional :fields, desc: APIHelper::Fieldsettable.fields_param_desc(example: 'email,confirmed_at,created_at')
+    end
     get :emails, rabl: 'user_email' do
       guard! scopes: ['identity']
+      fieldset_for :user_email, default: true
       @user_email = current_user.emails
     end
 
@@ -116,9 +120,107 @@ class API::V1::Me < API::V1
         #{APIGuard.access_token_required_note(scope: 'identity')}
       NOTE
     }
+    params do
+      optional :fields, desc: APIHelper::Fieldsettable.fields_param_desc
+    end
     get :identities, rabl: 'user_identity' do
       guard! scopes: ['identity']
+      fieldset_for :user_identity, default: true
       @user_identity = current_user.identities
+    end
+
+    desc "Get devices of the current user", {
+      http_codes: APIGuard.access_token_error_codes,
+      notes: <<-NOTE
+        #{APIGuard.access_token_required_note(scope: 'account')}
+      NOTE
+    }
+    params do
+      optional :fields, desc: APIHelper::Fieldsettable.fields_param_desc(example: 'type,name,device_id')
+    end
+    get :devices, rabl: 'user_device' do
+      guard! scopes: ['account']
+      fieldset_for :user_device, default: true
+      @user_devices = current_user.devices
+    end
+
+    desc "Add a device for the current user", {
+      http_codes: APIGuard.access_token_error_codes,
+      notes: <<-NOTE
+        #{APIGuard.access_token_required_note(scope: 'write')}
+      NOTE
+    }
+    params do
+      optional :'user_device[type]', desc: "Device type, 'ios' or 'android'"
+      optional :'user_device[name]', desc: "Device name"
+      optional :'user_device[device_id]', desc: "Device ID"
+    end
+    post :devices, rabl: 'user_device' do
+      guard! scopes: ['write']
+      ac_params = ActionController::Parameters.new(params)
+
+      @user_device = current_user.devices.build(ac_params.require(:user_device).permit(:type, :name, :device_id))
+
+      if @user_device.save
+        status 201
+      else
+        error!({ error: 400, description: "#{@user_device.errors.full_messages.join(', ')}" }, 400)
+      end
+    end
+
+    desc "Add or replace a device for the current user", {
+      http_codes: APIGuard.access_token_error_codes,
+      notes: <<-NOTE
+        #{APIGuard.access_token_required_note(scope: 'write')}
+      NOTE
+    }
+    params do
+      requires :uuid, desc: "Device uuid"
+      optional :'user_device[type]', desc: "Device type, 'ios' or 'android'"
+      optional :'user_device[name]', desc: "Device name"
+      optional :'user_device[device_id]', desc: "Device ID"
+    end
+    put :'devices/:uuid', rabl: 'user_device' do
+      guard! scopes: ['write']
+      ac_params = ActionController::Parameters.new(params)
+
+      @user_device = current_user.devices.find_by(uuid: ac_params[:uuid]) ||
+                     current_user.devices.build(ac_params.require(:user_device).permit(:type, :name, :device_id))
+      @user_device.assign_attributes(ac_params.require(:user_device).permit(:type, :name, :device_id))
+      @user_device.uuid = ac_params[:uuid]
+
+      is_new = !@user_device.persisted?
+      has_saved = @user_device.save
+
+      if is_new && has_saved
+        status 201
+      elsif has_saved
+        status 200
+      else
+        error!({ error: 400, description: "#{@user_device.errors.full_messages.join(', ')}" }, 400)
+      end
+    end
+
+    desc "Remove a device from the current user", {
+      http_codes: APIGuard.access_token_error_codes,
+      notes: <<-NOTE
+        #{APIGuard.access_token_required_note(scope: 'write')}
+      NOTE
+    }
+    params do
+      requires :uuid, desc: "Device uuid"
+    end
+    delete :'devices/:uuid', rabl: 'user_device' do
+      guard! scopes: ['write']
+      ac_params = ActionController::Parameters.new(params)
+
+      @user_device = current_user.devices.find_by(uuid: ac_params[:uuid])
+
+      if @user_device && @user_device.destroy
+        status 200
+      else
+        error!({ error: 400 }, 400)
+      end
     end
   end
 end
