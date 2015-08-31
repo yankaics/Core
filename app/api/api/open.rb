@@ -90,8 +90,8 @@ class API::Open < API
       when 'POST'
         # this is only for user scoped resources,
         # the access token permission is verified on the above 'guard' section
-        error! 403, 403 unless @data_api_request.scoped_under_user
-        error! 403, 403 unless @data_api.owner_writable
+        error!({ error: 403 }, 403) unless @data_api_request.scoped_under_user
+        error!({ error: 403 }, 403) unless @data_api.owner_writable
 
         # expect the data exists
         error!({ error: 'no_data_provided', description: "The #{@data_api.name} parameter is expected to exist and be a object." }, 400) if params[@data_api.name].blank? || !params[@data_api.name].is_a?(Hash)
@@ -112,11 +112,11 @@ class API::Open < API
       when 'PATCH'
         # this is only for user scoped resources,
         # the access token permission is verified on the above 'guard' section
-        error! 403, 403 unless @data_api_request.scoped_under_user
-        error! 403, 403 unless @data_api.owner_writable
+        error!({ error: 403 }, 403) unless @data_api_request.scoped_under_user
+        error!({ error: 403 }, 403) unless @data_api.owner_writable
 
-        error! 404, 404 if @data_api_request.specified_resource.blank? ||
-                           !@data_api_request.specified_resource.try(:persisted?)
+        error!({ error: 404 }, 404) if @data_api_request.specified_resource.blank? ||
+                                       !@data_api_request.specified_resource.try(:persisted?)
 
         # expect the data exists
         error!({ error: 'no_data_provided', description: "The #{@data_api.name} parameter is expected to exist and be a object." }, 400) if params[@data_api.name].blank? || !params[@data_api.name].is_a?(Hash)
@@ -138,10 +138,10 @@ class API::Open < API
       when 'PUT'
         # this is only for user scoped resources,
         # the access token permission is verified on the above 'guard' section
-        error! 403, 403 unless @data_api_request.scoped_under_user
-        error! 403, 403 unless @data_api.owner_writable
+        error!({ error: 403 }, 403) unless @data_api_request.scoped_under_user
+        error!({ error: 403 }, 403) unless @data_api.owner_writable
 
-        error! 400, 400 if @data_api_request.specified_resource_id.blank?
+        error!({ error: 400 }, 400) if @data_api_request.specified_resource_id.blank?
 
         # expect the data exists
         error!({ error: 'no_data_provided', description: "The #{@data_api.name} parameter is expected to exist and be a object." }, 400) if params[@data_api.name].blank? || !params[@data_api.name].is_a?(Hash)
@@ -170,8 +170,8 @@ class API::Open < API
       when 'DELETE'
         # this is only for user scoped resources,
         # the access token permission is verified on the above 'guard' section
-        error! 403, 403 unless @data_api_request.scoped_under_user
-        error! 403, 403 unless @data_api.owner_writable
+        error!({ error: 403 }, 403) unless @data_api_request.scoped_under_user
+        error!({ error: 403 }, 403) unless @data_api.owner_writable
 
         # deleting scoped resource collection
         if @data_api_request.specified_resource_id.blank?
@@ -198,7 +198,7 @@ class API::Open < API
                 @resource.each(&:destroy!)
               end
             rescue
-              error! 400, 400
+              error!({ error: 400 }, 400)
             end
 
             status 200
@@ -212,13 +212,13 @@ class API::Open < API
               render rabl: 'data_api'
               return
             else
-              error! 400, 400
+              error!({ error: 400 }, 400)
             end
           end
         end
       end
     end
 
-    error! 404, 404
+    error!({ error: 404 }, 404)
   end
 end

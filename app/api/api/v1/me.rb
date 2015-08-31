@@ -1,5 +1,8 @@
 class API::V1::Me < API::V1
-  # rescue_from :all
+  rescue_from ActionController::ParameterMissing do |e|
+    error!({ error: e.to_s }, 400)
+  end
+
   guard_all!
 
   resource :me, desc: "Operations about the current user" do
@@ -127,6 +130,167 @@ class API::V1::Me < API::V1
       guard! scopes: ['identity']
       fieldset_for :user_identity, default: true
       @user_identity = current_user.identities
+    end
+
+    desc "Read notifications of the current user", {
+      http_codes: APIGuard.access_token_error_codes,
+      notes: <<-NOTE
+        #{APIGuard.access_token_required_note(scope: 'notifications')}
+      NOTE
+    }
+    params do
+      optional :per_page, desc: APIHelper::Paginatable.per_page_param_desc, type: :integer
+      optional :page, desc: APIHelper::Paginatable.page_param_desc, type: :integer
+      optional :sort, desc: APIHelper::Sortable.sort_param_desc
+      optional :fields, desc: APIHelper::Fieldsettable.fields_param_desc(example: 'type,name,device_id')
+    end
+    get :notifications, rabl: 'notification' do
+      guard! scopes: ['notifications']
+      fieldset_for :notification, default: true
+
+      @notifications = current_user.notifications
+
+      sortable default_order: { created_at: :desc }
+      pagination @notifications.size
+
+      @notifications = @notifications.order(sortable_sort).page(pagination_page).per(pagination_per_page)
+    end
+
+    desc "Mark all notifications as checked for the current user", {
+      http_codes: APIGuard.access_token_error_codes,
+      notes: <<-NOTE
+        #{APIGuard.access_token_required_note(scope: 'notifications')}
+      NOTE
+    }
+    params do
+      optional :fields, desc: APIHelper::Fieldsettable.fields_param_desc(example: 'type,name,device_id')
+    end
+    patch :notifications, rabl: 'notification' do
+      guard! scopes: ['notifications']
+      fieldset_for :notification, default: true
+
+      @notifications = current_user.check_notifications!
+
+      sortable default_order: { created_at: :desc }
+      pagination @notifications.size
+
+      @notifications = @notifications.order(sortable_sort).page(pagination_page).per(pagination_per_page)
+    end
+
+    desc "Mark a notification as clicked for the current user", {
+      http_codes: APIGuard.access_token_error_codes,
+      notes: <<-NOTE
+        #{APIGuard.access_token_required_note(scope: 'notifications')}
+      NOTE
+    }
+    params do
+      requires :uuid, desc: "Notification uuid"
+      optional :fields, desc: APIHelper::Fieldsettable.fields_param_desc(example: 'type,name,device_id')
+    end
+    patch 'notifications/:uuid', rabl: 'notification' do
+      guard! scopes: ['notifications']
+      fieldset_for :notification, default: true
+
+      ac_params = ActionController::Parameters.new(params)
+
+      @notification = current_user.notifications.find_by(uuid: ac_params[:uuid])
+
+      @notification.click!
+    end
+
+    desc "Send a notification to the current user", {
+      http_codes: APIGuard.access_token_error_codes,
+      notes: <<-NOTE
+        #{APIGuard.access_token_required_note(scope: 'notifications:send')}
+      NOTE
+    }
+    params do
+      optional :'notification[subject]', desc: "Notification subject"
+      optional :'notification[message]', desc: "Notification main message"
+      optional :'notification[url]', desc: "Notification link URL"
+      optional :'notification[payload]', desc: "Notification payload"
+      optional :'notification[push]', desc: "Send push notifications or not? (for permitted apps only)"
+      optional :'notification[email]', desc: "Send email notifications or not? (for permitted apps only)"
+      optional :'notification[sms]', desc: "Send SMS notifications or not? (for permitted apps only)"
+      optional :'notification[fb]', desc: "Send Facebook notifications or not? (for permitted apps only)"
+    end
+    post :notifications, rabl: 'notification' do
+      guard! scopes: ['notifications:send']
+      ac_params = ActionController::Parameters.new(params)
+
+      @notification = current_user.notifications.build(ac_params.require(:notification).permit(:subject, :message, :url, :payload, :push, :email, :sms, :fb))
+
+      if !current_application.try(:core_app?)
+        @notification.push = false
+      end
+
+      if !current_application.try(:core_app?)
+        @notification.email = false
+      end
+
+      if !current_application.try(:core_app?)
+        @notification.sms = false
+      end
+
+      if !current_application.try(:core_app?)
+        @notification.fb = false
+      end
+
+      if @notification.save
+        status 201
+      else
+        error!({ error: 400, description: "#{@notification.errors.full_messages.join(', ')}" }, 400)
+      end
+    end
+
+    desc "Send a notification to the current user", {
+      http_codes: APIGuard.access_token_error_codes,
+      notes: <<-NOTE
+        #{APIGuard.access_token_required_note(scope: 'notifications:send')}
+      NOTE
+    }
+    params do
+      requires :uuid, desc: "Notification uuid"
+      optional :'notification[subject]', desc: "Notification subject"
+      optional :'notification[message]', desc: "Notification main message"
+      optional :'notification[url]', desc: "Notification link URL"
+      optional :'notification[payload]', desc: "Notification payload"
+      optional :'notification[push]', desc: "Send push notifications or not? (for permitted apps only)"
+      optional :'notification[email]', desc: "Send email notifications or not? (for permitted apps only)"
+      optional :'notification[sms]', desc: "Send SMS notifications or not? (for permitted apps only)"
+      optional :'notification[fb]', desc: "Send Facebook notifications or not? (for permitted apps only)"
+    end
+    put :'notifications/:uuid', rabl: 'notification' do
+      guard! scopes: ['notifications:send']
+      ac_params = ActionController::Parameters.new(params)
+
+      @notification = current_user.notifications.find_by(uuid: ac_params[:uuid])
+      return if @notification.present?
+
+      @notification = current_user.notifications.build(ac_params.require(:notification).permit(:uuid, :subject, :message, :url, :payload, :push, :email, :sms, :fb))
+      @notification.uuid = ac_params[:uuid]
+
+      if !current_application.try(:core_app?)
+        @notification.push = false
+      end
+
+      if !current_application.try(:core_app?)
+        @notification.email = false
+      end
+
+      if !current_application.try(:core_app?)
+        @notification.sms = false
+      end
+
+      if !current_application.try(:core_app?)
+        @notification.fb = false
+      end
+
+      if @notification.save
+        status 201
+      else
+        error!({ error: 400, description: "#{@notification.errors.full_messages.join(', ')}" }, 400)
+      end
     end
 
     desc "Get devices of the current user", {

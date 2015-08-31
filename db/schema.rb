@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150825114028) do
+ActiveRecord::Schema.define(version: 20150830074242) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace"
@@ -140,6 +140,41 @@ ActiveRecord::Schema.define(version: 20150825114028) do
   add_index "friendly_id_slugs", ["slug", "sluggable_type"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type"
   add_index "friendly_id_slugs", ["sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_id"
   add_index "friendly_id_slugs", ["sluggable_type"], name: "index_friendly_id_slugs_on_sluggable_type"
+
+  create_table "notifications", force: :cascade do |t|
+    t.string   "uuid",                           null: false
+    t.integer  "user_id"
+    t.integer  "application_id"
+    t.string   "subject"
+    t.text     "message"
+    t.string   "url"
+    t.text     "payload"
+    t.datetime "checked_at"
+    t.datetime "clicked_at"
+    t.boolean  "push",           default: false, null: false
+    t.datetime "pushed_at"
+    t.boolean  "email",          default: false, null: false
+    t.datetime "emailed_at"
+    t.boolean  "sms",            default: false, null: false
+    t.datetime "sms_sent_at"
+    t.boolean  "fb",             default: false, null: false
+    t.datetime "fb_sent_at"
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+  end
+
+  add_index "notifications", ["checked_at"], name: "index_notifications_on_checked_at"
+  add_index "notifications", ["clicked_at"], name: "index_notifications_on_clicked_at"
+  add_index "notifications", ["email"], name: "index_notifications_on_email"
+  add_index "notifications", ["emailed_at"], name: "index_notifications_on_emailed_at"
+  add_index "notifications", ["fb"], name: "index_notifications_on_fb"
+  add_index "notifications", ["fb_sent_at"], name: "index_notifications_on_fb_sent_at"
+  add_index "notifications", ["push"], name: "index_notifications_on_push"
+  add_index "notifications", ["pushed_at"], name: "index_notifications_on_pushed_at"
+  add_index "notifications", ["sms"], name: "index_notifications_on_sms"
+  add_index "notifications", ["sms_sent_at"], name: "index_notifications_on_sms_sent_at"
+  add_index "notifications", ["user_id"], name: "index_notifications_on_user_id"
+  add_index "notifications", ["uuid"], name: "index_notifications_on_uuid", unique: true
 
   create_table "oauth_access_grants", force: :cascade do |t|
     t.integer  "resource_owner_id", null: false
