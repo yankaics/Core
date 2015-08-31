@@ -9,6 +9,8 @@ RSpec.describe User, :type => :model do
   it { should have_many(:organizations) }
   it { should have_many(:departments) }
 
+  it { should have_many(:notifications) }
+
   it { should have_many(:access_grants) }
   it { should have_many(:access_tokens) }
   it { should have_many(:oauth_applications) }
@@ -104,6 +106,31 @@ RSpec.describe User, :type => :model do
 
       expect(@user_with_no_identity.verified?).to be(false)
       expect(@user_with_identity.verified?).to be(true)
+    end
+  end
+
+  describe "#check_notifications!" do
+    subject(:user) { create(:user) }
+
+    it "mark unchecked notifications as checked" do
+      user.notifications.create(message: 'hi')
+      user.notifications.create(message: 'hi')
+      user.notifications.create(message: 'hi')
+      expect(user.notifications.unchecked.size).to be 3
+
+      check_notifications = user.check_notifications!
+      expect(user.notifications.unchecked.size).to be 0
+      expect(check_notifications.count).to be 3
+
+      user.notifications.create(message: 'hi')
+      user.notifications.create(message: 'hi')
+      user.notifications.create(message: 'hi')
+      expect(user.notifications.unchecked.size).to be 3
+
+      user.check_notifications!
+      expect(user.notifications.unchecked.size).to be 0
+
+      expect(user.notifications.first.checked_at).not_to eq(user.notifications.last.checked_at)
     end
   end
 end

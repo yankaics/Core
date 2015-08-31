@@ -1,0 +1,24 @@
+
+- field_name = :unconfirmed_identity
+
+= simple_form_for @user, url: my_account_path, html: { id: "user_#{field_name}_form"} do |f|
+
+  - if user.identities
+    ul.collection
+      - user.identities.each do |identity|
+        li.collection-item
+
+          span.title= identity.description
+          p
+            - if identity.department
+              = identity.department_name
+              br
+            - if identity.started_at
+              = identity.started_at.year
+              br
+
+          .secondary-content
+            => link_to '刪除', my_account_email_path(email), method: :delete, data: { confirm: 'Are you sure?' }
+  - else
+
+= render partial: 'field_ajax', locals: { field_name: field_name }

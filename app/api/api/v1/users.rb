@@ -99,7 +99,7 @@ class API::V1::Users < API::V1
       @user = User.find_by(id: params[:id])
 
       if @user.blank?
-        error! 404, 404
+        error!({ error: 404 }, 404)
       end
     end
 
@@ -121,7 +121,7 @@ class API::V1::Users < API::V1
       if current_application.blank? ||
          !current_application.allow_direct_data_access ||
          current_user.present?
-        error! 403, 403
+        error!({ error: 403 }, 403)
       end
 
       permitted_attrs = []
@@ -145,7 +145,7 @@ class API::V1::Users < API::V1
       @user = User.find_by(id: params[:id])
 
       if @user.blank?
-        error! 404, 404
+        error!({ error: 404 }, 404)
       end
 
       ac_params = ActionController::Parameters.new(params)
@@ -170,7 +170,7 @@ class API::V1::Users < API::V1
       begin
         @user.update!(user_params)
       rescue StandardError => e
-        error! e.to_s, 400
+        error!({ error: e.to_s }, 400)
       end
 
       @user

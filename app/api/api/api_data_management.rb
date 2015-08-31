@@ -27,7 +27,7 @@ class API::APIDataManagement < API
       @includable_fields = @data_api.includable_fields
 
       # verify the request
-      error!(401, 401) if params[:key] != @data_api.management_api_key
+      error!({ error: 401 }, 401) if params[:key] != @data_api.management_api_key
 
       # process request
       case @request_method
@@ -73,7 +73,7 @@ class API::APIDataManagement < API
 
       # PATCH requests, update resource
       when 'PATCH'
-        error! 400, 400 if @data_api_request.specified_resource_id.blank?
+        error!({ error: 400 }, 400) if @data_api_request.specified_resource_id.blank?
 
         error!({ error: 'no_data_provided', description: "The #{@data_api.name} parameter is expected to exist and be a object." }, 400) if params[@data_api.name].blank? || !params[@data_api.name].is_a?(Hash)
         attrs = params[@data_api.name].slice(*@data_api.writable_fields).to_h
@@ -90,7 +90,7 @@ class API::APIDataManagement < API
 
       # PUT requests, create or replace resource
       when 'PUT'
-        error! 400, 400 if @data_api_request.specified_resource_id.blank?
+        error!({ error: 400 }, 400) if @data_api_request.specified_resource_id.blank?
 
         error!({ error: 'no_data_provided', description: "The #{@data_api.name} parameter is expected to exist and be a object." }, 400) if params[@data_api.name].blank? || !params[@data_api.name].is_a?(Hash)
         permitted_fields = @data_api.writable_fields(primary_key: false)
@@ -127,7 +127,7 @@ class API::APIDataManagement < API
             status 204
             return
           else
-            error! 400, 400
+            error!({ error: 400 }, 400)
           end
 
         # deleting specified resources
@@ -141,7 +141,7 @@ class API::APIDataManagement < API
                 @resource.each(&:destroy!)
               end
             rescue
-              error! 400, 400
+              error!({ error: 400 }, 400)
             end
 
             status 200
@@ -156,13 +156,13 @@ class API::APIDataManagement < API
               render rabl: 'data_api'
               return
             else
-              error! 400, 400
+              error!({ error: 400 }, 400)
             end
           end
         end
       end
     end
 
-    error! 404, 404
+    error!({ error: 404 }, 404)
   end
 end

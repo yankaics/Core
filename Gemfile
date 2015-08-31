@@ -51,7 +51,7 @@ gem 'sidekiq-limit_fetch'
 gem 'clockwork', '~> 1.2.0'
 
 # Grape API
-gem 'grape', '~> 0.11.0'
+gem 'grape', '~> 0.13.0'
 gem 'grape-rabl'
 gem 'grape-entity'
 gem 'grape-swagger'

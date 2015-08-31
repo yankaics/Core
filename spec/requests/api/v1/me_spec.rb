@@ -145,6 +145,335 @@ describe "Me API" do
     end
   end
 
+  describe "/notifications" do
+    before do
+      @token = create(:oauth_access_token, scopes: 'public notifications notifications:send')
+      @user = @token.resource_owner
+      @core_token = create(:oauth_access_token, :core, scopes: 'public notifications notifications:send', resource_owner_id: @user.id)
+      @insufficient_scope_token = create(:oauth_access_token, scopes: 'public', resource_owner_id: @user.id)
+    end
+
+    context "GET" do
+      it "returns the current user's notifications" do
+        get "/api/v1/me/notifications.json?access_token=#{@token.token}"
+        expect(response).to be_success
+      end
+
+      context "insufficient scope" do
+        it "fails" do
+          get "/api/v1/me/notifications.json?access_token=#{@insufficient_scope_token.token}"
+          expect(response).not_to be_success
+        end
+      end
+    end
+
+    context "PATCH" do
+      it "Mark all notifications as checked for the current user" do
+        @user.notifications.create(message: 'hi')
+        @user.notifications.create(message: 'hi')
+        @user.notifications.create(message: 'hi')
+        patch "/api/v1/me/notifications.json?access_token=#{@token.token}"
+        expect(response).to be_success
+        json = JSON.parse(response.body)
+        expect(json.count).to be 3
+        notification = Notification.last
+        expect(notification.checked_at).not_to be_blank
+
+        patch "/api/v1/me/notifications.json?access_token=#{@token.token}"
+        expect(response).to be_success
+        json = JSON.parse(response.body)
+        expect(json.count).to be 0
+      end
+
+      context "insufficient scope" do
+        it "fails" do
+          patch "/api/v1/me/notifications.json?access_token=#{@insufficient_scope_token.token}"
+          expect(response).not_to be_success
+        end
+      end
+    end
+
+    context "POST" do
+      it "send a notification to the current user" do
+        post "/api/v1/me/notifications.json?access_token=#{@token.token}",
+             notification: {
+               subject: 'Hello',
+               message: 'Hola hola!',
+               url: 'https://colorgy.io',
+               payload: '{}',
+               push: 'true',
+               email: 'true',
+               sms: 'true',
+               fb: 'true'
+             }
+        expect(response).to be_success
+        expect(response.code).to eq('201')
+        json = JSON.parse(response.body)
+        expect(json['message']).to eq('Hola hola!')
+        notification = Notification.last
+        expect(notification.user).to eq(@user)
+        expect(notification.message).to eq('Hola hola!')
+
+        # These are unpermitted to be set to true
+        expect(notification.push).to be false
+        expect(notification.email).to be false
+        expect(notification.sms).to be false
+        expect(notification.fb).to be false
+      end
+
+      context "insufficient scope" do
+        it "fails" do
+          post "/api/v1/me/notifications.json?access_token=#{@insufficient_scope_token.token}",
+               notification: {
+                 subject: 'Hello',
+                 message: 'Hola hola!',
+                 url: 'https://colorgy.io',
+                 payload: '{}',
+                 push: 'true',
+                 email: 'true',
+                 sms: 'true',
+                 fb: 'true'
+               }
+          expect(response).not_to be_success
+        end
+      end
+
+      context "push notification permitted" do
+        it "successes" do
+          post "/api/v1/me/notifications.json?access_token=#{@core_token.token}",
+               notification: {
+                 subject: 'Hello',
+                 message: 'Hola hola!',
+                 url: 'https://colorgy.io',
+                 payload: '{}',
+                 push: 'true',
+                 email: 'true',
+                 sms: 'true',
+                 fb: 'true'
+               }
+          notification = Notification.last
+          expect(notification.push).to be true
+        end
+      end
+
+      context "email notification permitted" do
+        it "successes" do
+          post "/api/v1/me/notifications.json?access_token=#{@core_token.token}",
+               notification: {
+                 subject: 'Hello',
+                 message: 'Hola hola!',
+                 url: 'https://colorgy.io',
+                 payload: '{}',
+                 push: 'true',
+                 email: 'true',
+                 sms: 'true',
+                 fb: 'true'
+               }
+          notification = Notification.last
+          expect(notification.email).to be true
+        end
+      end
+
+      context "sms notification permitted" do
+        it "successes" do
+          post "/api/v1/me/notifications.json?access_token=#{@core_token.token}",
+               notification: {
+                 subject: 'Hello',
+                 message: 'Hola hola!',
+                 url: 'https://colorgy.io',
+                 payload: '{}',
+                 push: 'true',
+                 email: 'true',
+                 sms: 'true',
+                 fb: 'true'
+               }
+          notification = Notification.last
+          expect(notification.sms).to be true
+        end
+      end
+
+      context "fb notification permitted" do
+        it "successes" do
+          post "/api/v1/me/notifications.json?access_token=#{@core_token.token}",
+               notification: {
+                 subject: 'Hello',
+                 message: 'Hola hola!',
+                 url: 'https://colorgy.io',
+                 payload: '{}',
+                 push: 'true',
+                 email: 'true',
+                 sms: 'true',
+                 fb: 'true'
+               }
+          notification = Notification.last
+          expect(notification.fb).to be true
+        end
+      end
+    end
+  end
+
+  describe "/notifications/{uuid}" do
+    before do
+      @token = create(:oauth_access_token, scopes: 'public notifications notifications:send')
+      @user = @token.resource_owner
+      @core_token = create(:oauth_access_token, :core, scopes: 'public notifications notifications:send', resource_owner_id: @user.id)
+      @insufficient_scope_token = create(:oauth_access_token, scopes: 'public', resource_owner_id: @user.id)
+    end
+
+    describe "PUT" do
+      it "send a notification to the current user" do
+        put "/api/v1/me/notifications/#{'u-u-i-d'}.json?access_token=#{@token.token}",
+            notification: {
+              subject: 'Hello',
+              message: 'Hola hola!',
+              url: 'https://colorgy.io',
+              payload: '{}',
+              push: 'true',
+              email: 'true',
+              sms: 'true',
+              fb: 'true'
+            }
+        expect(response).to be_success
+        expect(response.code).to eq('201')
+        json = JSON.parse(response.body)
+        expect(json['message']).to eq('Hola hola!')
+
+        notification = Notification.last
+
+        # These are unpermitted to be set to true
+        expect(notification.push).to be false
+        expect(notification.email).to be false
+        expect(notification.sms).to be false
+        expect(notification.fb).to be false
+
+        put "/api/v1/me/notifications/#{'u-u-i-d'}.json?access_token=#{@token.token}",
+            notification: {
+              subject: 'Hello',
+              message: 'Yo!',
+              url: 'https://colorgy.io',
+              payload: '{}',
+              push: 'true',
+              email: 'true',
+              sms: 'true',
+              fb: 'true'
+            }
+        expect(response).to be_success
+        expect(response.code).to eq('200')
+        json = JSON.parse(response.body)
+        expect(json['message']).to eq('Hola hola!')
+      end
+
+      context "insufficient scope" do
+        it "fails" do
+          put "/api/v1/me/notifications/#{'u-u-i-d'}.json?access_token=#{@insufficient_scope_token.token}",
+               notification: {
+                 subject: 'Hello',
+                 message: 'Hola hola!',
+                 url: 'https://colorgy.io',
+                 payload: '{}',
+                 push: 'true',
+                 email: 'true',
+                 sms: 'true',
+                 fb: 'true'
+               }
+          expect(response).not_to be_success
+        end
+      end
+
+      context "push notification permitted" do
+        it "successes" do
+          put "/api/v1/me/notifications/#{'u-u-i-d'}.json?access_token=#{@core_token.token}",
+               notification: {
+                 subject: 'Hello',
+                 message: 'Hola hola!',
+                 url: 'https://colorgy.io',
+                 payload: '{}',
+                 push: 'true',
+                 email: 'true',
+                 sms: 'true',
+                 fb: 'true'
+               }
+          notification = Notification.last
+          expect(notification.push).to be true
+        end
+      end
+
+      context "email notification permitted" do
+        it "successes" do
+          put "/api/v1/me/notifications/#{'u-u-i-d'}.json?access_token=#{@core_token.token}",
+               notification: {
+                 subject: 'Hello',
+                 message: 'Hola hola!',
+                 url: 'https://colorgy.io',
+                 payload: '{}',
+                 push: 'true',
+                 email: 'true',
+                 sms: 'true',
+                 fb: 'true'
+               }
+          notification = Notification.last
+          expect(notification.email).to be true
+        end
+      end
+
+      context "sms notification permitted" do
+        it "successes" do
+          put "/api/v1/me/notifications/#{'u-u-i-d'}.json?access_token=#{@core_token.token}",
+               notification: {
+                 subject: 'Hello',
+                 message: 'Hola hola!',
+                 url: 'https://colorgy.io',
+                 payload: '{}',
+                 push: 'true',
+                 email: 'true',
+                 sms: 'true',
+                 fb: 'true'
+               }
+          notification = Notification.last
+          expect(notification.sms).to be true
+        end
+      end
+
+      context "fb notification permitted" do
+        it "successes" do
+          put "/api/v1/me/notifications/#{'u-u-i-d'}.json?access_token=#{@core_token.token}",
+               notification: {
+                 subject: 'Hello',
+                 message: 'Hola hola!',
+                 url: 'https://colorgy.io',
+                 payload: '{}',
+                 push: 'true',
+                 email: 'true',
+                 sms: 'true',
+                 fb: 'true'
+               }
+          notification = Notification.last
+          expect(notification.fb).to be true
+        end
+      end
+    end
+
+    context "PATCH" do
+      it "Mark an notification as clicked for the current user" do
+        notification = @user.notifications.create(message: 'hi')
+        patch "/api/v1/me/notifications/#{notification.uuid}.json?access_token=#{@token.token}"
+        expect(response).to be_success
+        json = JSON.parse(response.body)
+        expect(json['uuid']).to eq(notification.uuid)
+        notification.reload
+        expect(notification.clicked_at).not_to be_blank
+      end
+
+      context "insufficient scope" do
+        it "fails" do
+          notification = @user.notifications.create(message: 'hi')
+          patch "/api/v1/me/notifications/#{notification.uuid}.json?access_token=#{@insufficient_scope_token.token}"
+          expect(response).not_to be_success
+        end
+      end
+    end
+  end
+
   describe "/devices" do
     before do
       @token = create(:oauth_access_token, scopes: 'public account write')
@@ -173,7 +502,7 @@ describe "Me API" do
         expect(response.code).to eq('201')
         json = JSON.parse(response.body)
         expect(json['name']).to eq('HTC')
-        expect(json['device_id']).to eq('1234')
+        expect(UserDevice.last.device_id).to eq('1234')
       end
     end
   end
@@ -198,7 +527,7 @@ describe "Me API" do
         json = JSON.parse(response.body)
         expect(json['name']).to eq('HTC')
         expect(json['uuid']).to eq('u-u-i-d')
-        expect(json['device_id']).to eq('1234')
+        expect(UserDevice.last.device_id).to eq('1234')
       end
 
       it "replaces data of the user's existing device" do
@@ -213,7 +542,7 @@ describe "Me API" do
         json = JSON.parse(response.body)
         expect(json['uuid']).not_to be_blank
         expect(json['name']).to eq('My iPhone 7')
-        expect(json['device_id']).to eq('1234')
+        expect(UserDevice.last.device_id).to eq('1234')
       end
     end
 

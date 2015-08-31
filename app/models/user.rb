@@ -26,6 +26,7 @@ class User < ActiveRecord::Base
            through: :identities,
            primary_key: :code, foreign_key: :department_code
   belongs_to :primary_identity, class_name: :UserIdentity
+  has_many :notifications
   has_many :oauth_applications, class_name: 'Doorkeeper::Application', as: :owner
   has_many :access_grants, class_name: 'Doorkeeper::AccessGrant', foreign_key: :resource_owner_id
   has_many :access_tokens, class_name: 'Doorkeeper::AccessToken', foreign_key: :resource_owner_id
@@ -231,6 +232,13 @@ class User < ActiveRecord::Base
     reload
     valid?
     save! if changed?
+  end
+
+  def check_notifications!
+    proceed_notifications = notifications.unchecked
+    proceed_notifications_uuids = proceed_notifications.map(&:uuid)
+    proceed_notifications.update_all(checked_at: Time.now)
+    return notifications.where(uuid: proceed_notifications_uuids)
   end
 
   private
