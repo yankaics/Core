@@ -48,6 +48,9 @@
     .mini-nav.z-index-navbar-fixed.hidden-xs
       .container
         ul.mini-nav-nav.mini-nav-nav--right
+          li= link_to 'Books', 'https://books.colorgy.io'
+          li= link_to 'Table', 'https://table.colorgy.io'
+          li= link_to 'Bus', 'https://bus.colorgy.io'
           - if current_user
             li
               a.dropdown-toggle(href="#" data-toggle="dropdown")
