@@ -312,6 +312,9 @@ class User < ActiveRecord::Base
     :organization_code,
     :department,
     :department_code,
+    :unconfirmed_organization_code,
+    :unconfirmed_department_code,
+    :unconfirmed_started_year,
     :possible_organization_code,
     :possible_department_code,
     :possible_started_year
@@ -332,6 +335,9 @@ class User < ActiveRecord::Base
     :birth_month,
     :brief,
     :motto,
-    :url
+    :url,
+    :unconfirmed_organization_code,
+    :unconfirmed_department_code,
+    :unconfirmed_started_year
   ]
 end
