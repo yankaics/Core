@@ -87,7 +87,7 @@ background-color: #f6f6f6;
                     <br/>
                     或是直接前往此連結：
                     <br/>
-                    <a href="<%= user_emails_confirmation_url(confirmation_token: @email.confirmation_token) %>"><%= user_emails_confirmation_url(confirmation_token: @email.confirmation_token) %></a>
+                    <%= user_emails_confirmation_url(confirmation_token: @email.confirmation_token) %>
                   </td>
                 </tr>
                 <tr style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
