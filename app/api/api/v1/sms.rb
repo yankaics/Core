@@ -1,5 +1,5 @@
 class API::V1::SMS < API::V1
-  rescue_from ActionController::ParameterMissing, Nexmo::Error do |e|
+  rescue_from ActionController::ParameterMissing do |e|
     error!({ error: 'sms_error', messages: e.to_s }, 400)
   end
 
@@ -32,15 +32,21 @@ class API::V1::SMS < API::V1
       @sms = {
         to: SMSService.mobile_number(params[:sms][:to]),
         text: params[:sms][:text],
-        test: !!params[:sms][:test]
       }
+
+      @sms[:test] = true if params[:sms][:test]
 
       if !@sms[:test]
         current_application.sms_quota -= 1
         current_application.save!
-        SMSService.send_message(to: @sms[:to], text: @sms[:text])
+        result = SMSService.send_message(to: @sms[:to], text: @sms[:text])
 
-        status 201
+        if result[:error].present?
+          @sms[:error] = result[:error]
+          status 400
+        else
+          status 201
+        end
       else
         status 200
       end
