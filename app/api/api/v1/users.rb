@@ -5,7 +5,7 @@ class API::V1::Users < API::V1
     desc "Get data of users", {
       http_codes: APIGuard.access_token_error_codes,
       notes:  <<-NOTE
-        Accessiable fields will change while using access token with different permissions
+        Accessiable fields will change while using access token with different permissions.
       NOTE
     }
     params do
