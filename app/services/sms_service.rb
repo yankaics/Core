@@ -15,7 +15,7 @@ module SMSService
   def self.send_message(to: '', text: '')
     case ENV['SMS_DELIVERY_METHOD']
     when 'nexmo'
-      self.sender.send_message(from: ENV['APP_NAME'], to: mobile_number(to), text: text)
+      self.sender.send_message(from: ENV['APP_NAME'], to: mobile_number(to), text: text, type: 'unicode')
     when 'text'
       Rails.logger.info("SMS: Message to #{mobile_number(to)}: #{text}")
     end
