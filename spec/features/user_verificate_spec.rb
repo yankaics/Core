@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-feature "User Verificate", :type => :feature, :retry => 3 do
+feature "User Verification", :type => :feature, :retry => 3 do
   before :each do
     @ntust = create(:ntust_organization)
     @nthu = create(:nthu_organization)
