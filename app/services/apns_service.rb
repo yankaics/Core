@@ -55,7 +55,7 @@ module ApnsService
         unless File.exist?(APNS.pem)
     else
       begin
-        object = aws_service.buckets.find(ENV['AWS_APNS_BUCKET_NAME']).objects.find(ENV['APNS_PEM_NAME'])
+        object = aws_service.bucket(ENV['S3_BUCKET']).objects.find(ENV['APNS_PEM_NAME'])
         File.write(APNS.pem, object.content)
       rescue Exception => e
       end
@@ -68,7 +68,7 @@ module ApnsService
   end
 
   def self.aws_service
-    @@service ||= S3::Service.new(access_key_id: ENV['AWS_ACCESS_KEY_ID'],
-                                  secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'])
+    @@service ||= S3::Service.new(access_key_id: ENV['S3_ACCESS_KEY_ID'],
+                                  secret_access_key: ENV['S3_SECRET_ACCESS_KEY'])
   end
 end
