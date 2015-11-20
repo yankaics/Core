@@ -43,22 +43,22 @@ module ApnsService
       packaged_notifications = map_devices_proc.call(notification)
     end
 
-    APNS.send_notifications(packaged_notifications)
+    APNS.send_notifications(packaged_notifications) if Rails.env.production?
 
     unload_pem() if Rails.env.production?
   end
 
   def self.load_pem
-    if Rails.env.developement?
-      # developement env, check if the pem file exists
-      Rails.logger.error("Please replace APNS_PEM_PATH in .env with correct filepath") \
-        unless File.exist?(APNS.pem)
-    else
+    if Rails.env.production?
       begin
         object = aws_service.bucket(ENV['S3_BUCKET']).objects.find(ENV['APNS_PEM_NAME'])
         File.write(APNS.pem, object.content)
       rescue Exception => e
       end
+    else
+      # developement env, check if the pem file exists
+      Rails.logger.error("Please replace APNS_PEM_PATH in .env with correct filepath") \
+        unless File.exist?(APNS.pem)
     end
 
   end
