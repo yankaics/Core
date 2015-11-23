@@ -91,7 +91,6 @@ GEM
       thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
     addressable (2.3.8)
-    apns (1.0.0)
     arbre (1.0.3)
       activesupport (>= 3.0.0)
     arel (6.0.3)
@@ -179,6 +178,8 @@ GEM
       execjs
     coffee-script-source (1.9.1.1)
     columnize (0.9.0)
+    commander (4.3.5)
+      highline (~> 1.7.2)
     compass (1.0.3)
       chunky_png (~> 1.2)
       compass-core (~> 1.0.2)
@@ -281,12 +282,16 @@ GEM
       actionpack (>= 3.2, < 5)
       activesupport (>= 3.2, < 5)
     hashie (3.4.2)
+    highline (1.7.8)
     hike (1.2.3)
     hirb (0.7.3)
     hirb-unicode (0.0.5)
       hirb (~> 0.5)
       unicode-display_width (~> 0.1.1)
     hitimes (1.2.2)
+    houston (2.2.3)
+      commander (~> 4.1)
+      json
     http-cookie (1.0.2)
       domain_name (~> 0.5)
     httparty (0.13.3)
@@ -623,7 +628,6 @@ DEPENDENCIES
   activeadmin!
   activerecord-import (~> 0.7.0)
   api_helper!
-  apns
   awesome_print
   aws-sdk (~> 1.6)
   babosa
@@ -658,6 +662,7 @@ DEPENDENCIES
   grape-swagger
   hirb
   hirb-unicode
+  houston
   httparty (~> 0.13.1)
   jbuilder (~> 2.0)
   jquery-rails

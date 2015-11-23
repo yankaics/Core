@@ -21,13 +21,17 @@
 module ApnsService
   def self.send_notification notification
     load_pem() if Rails.env.production?
-    return unless File.exist?(APNS.pem)
+    return unless File.exist?(apns_pem_path)
 
     packaged_notifications = []
     map_devices_proc = Proc.new do |noti|
       noti.user.devices.map do |dev|
         if dev.type == 'ios'
-          APNS::Notification.new(dev.device_id, alert: "#{noti.subject}: #{noti.message}", sound: 'default', other: { subject: noti.subject ,payload: noti.payload })
+          Houston::Notification.new(
+            device: dev.device_id,
+            alert: "#{noti.subject}: #{noti.message}",
+            custom_data: { subject: noti.subject ,payload: noti.payload }
+          )
         elsif dev.type == 'android'
           nil
         end
@@ -43,7 +47,8 @@ module ApnsService
       packaged_notifications = map_devices_proc.call(notification)
     end
 
-    APNS.send_notifications(packaged_notifications) if Rails.env.production?
+    packaged_notifications.reject!(&:nil?)
+    packaged_notifications.each{|noti| APN.push(noti) } if Rails.env.production?
 
     unload_pem() if Rails.env.production?
   end
@@ -52,23 +57,29 @@ module ApnsService
     if Rails.env.production?
       begin
         object = aws_service.bucket(ENV['S3_BUCKET']).objects.find(ENV['APNS_PEM_NAME'])
-        File.write(APNS.pem, object.content)
+        # File.write(apns_pem_path, object.content)
+        APN.certificate = object.content
       rescue Exception => e
       end
     else
       # developement env, check if the pem file exists
       Rails.logger.error("Please replace APNS_PEM_PATH in .env with correct filepath") \
-        unless File.exist?(APNS.pem)
+        unless File.exist?(apns_pem_path)
     end
 
   end
 
   def self.unload_pem
-    File.delete(APNS.pem)
+    File.delete(apns_pem_path) if File.exist?(apns_pem_path)
   end
 
   def self.aws_service
     @@service ||= S3::Service.new(access_key_id: ENV['S3_ACCESS_KEY_ID'],
                                   secret_access_key: ENV['S3_SECRET_ACCESS_KEY'])
   end
+
+  def self.apns_pem_path
+    Rails.root.join('tmp', ENV['APNS_PEM_NAME'])
+  end
+
 end
