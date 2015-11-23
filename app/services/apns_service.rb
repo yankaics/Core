@@ -29,8 +29,7 @@ module ApnsService
         if dev.type == 'ios'
           Houston::Notification.new(
             device: dev.device_id,
-            alert: "#{noti.subject}: #{noti.message}",
-            custom_data: { subject: noti.subject ,payload: noti.payload }
+            alert: "#{noti.subject}: #{noti.message}"
           )
         elsif dev.type == 'android'
           nil
