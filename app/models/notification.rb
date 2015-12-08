@@ -8,7 +8,7 @@ class Notification < ActiveRecord::Base
   validates :uuid, :user, presence: true
 
   before_validation :init_uuid
-  after_create :send_out!
+  after_create :send_mobile_notification_if_needed
 
   def init_uuid
     return if self.uuid.present?
@@ -20,10 +20,7 @@ class Notification < ActiveRecord::Base
     return self
   end
 
-  def send_out!
-    UserNotificationSendJob.perform_later(self)
-    # ignore push cases currently :p
-    # update(push: true, pushed_at: Time.now)
+  def send_mobile_notification_if_needed
+    UserNotificationMobilePushJob.perform_later(self) if push
   end
-
 end

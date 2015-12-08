@@ -1,6 +1,10 @@
 require "rails_helper"
 
 describe "Me API" do
+  before do
+    ActiveJob::Base.queue_adapter = :inline
+  end
+
   context "requested with no token" do
     it "returns error" do
       get '/api/v1/me.json'
@@ -253,6 +257,7 @@ describe "Me API" do
                }
           notification = Notification.last
           expect(notification.push).to be true
+          expect(notification.pushed_at).not_to be_blank
         end
       end
 
