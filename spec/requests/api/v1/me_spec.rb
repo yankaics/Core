@@ -244,7 +244,7 @@ describe "Me API" do
 
       context "push notification permitted" do
         it "successes" do
-          post "/api/v1/me/notifications.json?access_token=#{@core_token.token}",
+          post "/api/v1/me/notifications.json?access_token=#{create(:oauth_access_token, scopes: 'public notifications notifications:send', resource_owner_id: @user.id, application: create(:oauth_application, permit_push_notifications: true)).token}",
                notification: {
                  subject: 'Hello',
                  message: 'Hola hola!',
@@ -263,7 +263,7 @@ describe "Me API" do
 
       context "email notification permitted" do
         it "successes" do
-          post "/api/v1/me/notifications.json?access_token=#{@core_token.token}",
+          post "/api/v1/me/notifications.json?access_token=#{create(:oauth_access_token, scopes: 'public notifications notifications:send', resource_owner_id: @user.id, application: create(:oauth_application, permit_email_notifications: true)).token}",
                notification: {
                  subject: 'Hello',
                  message: 'Hola hola!',
@@ -281,7 +281,7 @@ describe "Me API" do
 
       context "sms notification permitted" do
         it "successes" do
-          post "/api/v1/me/notifications.json?access_token=#{@core_token.token}",
+          post "/api/v1/me/notifications.json?access_token=#{create(:oauth_access_token, scopes: 'public notifications notifications:send', resource_owner_id: @user.id, application: create(:oauth_application, permit_sms_notifications: true)).token}",
                notification: {
                  subject: 'Hello',
                  message: 'Hola hola!',
@@ -299,7 +299,7 @@ describe "Me API" do
 
       context "fb notification permitted" do
         it "successes" do
-          post "/api/v1/me/notifications.json?access_token=#{@core_token.token}",
+          post "/api/v1/me/notifications.json?access_token=#{create(:oauth_access_token, scopes: 'public notifications notifications:send', resource_owner_id: @user.id, application: create(:oauth_application, permit_fb_notifications: true)).token}",
                notification: {
                  subject: 'Hello',
                  message: 'Hola hola!',
@@ -387,7 +387,7 @@ describe "Me API" do
 
       context "push notification permitted" do
         it "successes" do
-          put "/api/v1/me/notifications/#{'u-u-i-d'}.json?access_token=#{@core_token.token}",
+          put "/api/v1/me/notifications/#{'u-u-i-d'}.json?access_token=#{create(:oauth_access_token, scopes: 'public notifications notifications:send', resource_owner_id: @user.id, application: create(:oauth_application, permit_push_notifications: true)).token}",
                notification: {
                  subject: 'Hello',
                  message: 'Hola hola!',
@@ -405,7 +405,7 @@ describe "Me API" do
 
       context "email notification permitted" do
         it "successes" do
-          put "/api/v1/me/notifications/#{'u-u-i-d'}.json?access_token=#{@core_token.token}",
+          put "/api/v1/me/notifications/#{'u-u-i-d'}.json?access_token=#{create(:oauth_access_token, scopes: 'public notifications notifications:send', resource_owner_id: @user.id, application: create(:oauth_application, permit_email_notifications: true)).token}",
                notification: {
                  subject: 'Hello',
                  message: 'Hola hola!',
@@ -423,7 +423,7 @@ describe "Me API" do
 
       context "sms notification permitted" do
         it "successes" do
-          put "/api/v1/me/notifications/#{'u-u-i-d'}.json?access_token=#{@core_token.token}",
+          put "/api/v1/me/notifications/#{'u-u-i-d'}.json?access_token=#{create(:oauth_access_token, scopes: 'public notifications notifications:send', resource_owner_id: @user.id, application: create(:oauth_application, permit_sms_notifications: true)).token}",
                notification: {
                  subject: 'Hello',
                  message: 'Hola hola!',
@@ -441,7 +441,7 @@ describe "Me API" do
 
       context "fb notification permitted" do
         it "successes" do
-          put "/api/v1/me/notifications/#{'u-u-i-d'}.json?access_token=#{@core_token.token}",
+          put "/api/v1/me/notifications/#{'u-u-i-d'}.json?access_token=#{create(:oauth_access_token, scopes: 'public notifications notifications:send', resource_owner_id: @user.id, application: create(:oauth_application, permit_fb_notifications: true)).token}",
                notification: {
                  subject: 'Hello',
                  message: 'Hola hola!',
