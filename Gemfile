@@ -118,7 +118,7 @@ gem 'mailgunner', '~> 2.2.0'
 gem 'nexmo'
 gem 'twilio-ruby', '~> 4.2.1'
 gem 'letter_opener'
-gem 'houston'
+gem 'grocer'
 
 # Logger
 gem 'remote_syslog_logger'

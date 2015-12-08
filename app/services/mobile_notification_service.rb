@@ -19,10 +19,8 @@
 # :content_available
 
 module MobileNotificationService
-
   # Send a raw notification to a device
   def self.send(type, device_id, subject, message, url: nil, badge: nil, sound_type: nil, payload: {})
-    load_apns_pem if !APN.certificate && Rails.env.production?
     payload['subject'] = subject
     payload['message'] = message
     payload['url'] = url
@@ -31,35 +29,36 @@ module MobileNotificationService
 
     case type
     when 'ios'
-      apn_notification = Houston::Notification.new(
-        device: device_id,
-        alert: "#{noti.subject}: #{noti.message}",
-        custom_data: payload
+      apns_notification = Grocer::Notification.new(
+        device_token:      device_id.gsub(/[\<\>]/, ''),
+        alert:             "#{subject}: #{message}",
+        custom:            payload
       )
-      apn_notification.badge = badge if badge
-      apn_notification.sound = "#{sound_type}.aiff" if sound_type
 
-      APN.push(apn_notification)
+      apns_notification.badge = badge if badge
+      apns_notification.sound = "#{sound_type}.aiff" if sound_type
+
+      apns_pusher.push(apns_notification)
     when 'android'
       # TODO
     end
   end
 
-  # Send mobile notifications fore a notification
+  # Send mobile notifications for a notification
   def self.send_notification(notification)
-    load_apns_pem if !APN.certificate && Rails.env.production?
-
     notification.user.devices.each do |device|
-      send(device.type, device.device_id, notification.subject, notification.message, url: notification.url)  # TODO: deal with badge and sound
+      send(device.type, device.device_id, notification.subject, notification.message, url: notification.url, payload: notification.payload)  # TODO: deal with badge and sound
     end
   end
 
-  def self.load_apns_pem
+  def self.apns_certificate_pem_file
+    certificate_pem_file = StringIO.new('')
+
     case ENV['APNS_PEM_STORAGE']
     when 'local'
       begin
         certificate_pem_file = File.open(ENV['APNS_PEM_PATH'])
-        APN.certificate = certificate_pem_file.read
+
       rescue Exception => e
         Rails.logger.error("ApnsService error: #{e}")
       end
@@ -67,11 +66,33 @@ module MobileNotificationService
     when 's3'
       begin
         certificate_pem_object = aws_service.bucket(ENV['S3_BUCKET']).objects.find(ENV['APNS_PEM_PATH'])
-        APN.certificate = certificate_pem_object.content
+        certificate_text = certificate_pem_object.content
+        certificate_pem_file = StringIO.new(certificate_text)
+
       rescue Exception => e
         Rails.logger.error("ApnsService error: #{e}")
       end
     end
+
+    return certificate_pem_file
+  end
+
+  def self.apns_pusher
+    @@apns_pusher ||= Grocer.pusher(
+      certificate: apns_certificate_pem_file,
+      gateway:     ENV['APNS_HOST'],
+      port:        ENV['APNS_PORT'],
+      retries:     3
+    )
+  end
+
+  def self.apns_feedback
+    @@apns_feedback ||= Grocer.feedback(
+      certificate: apns_certificate_pem_file,
+      gateway:     ENV['APNS_HOST'],
+      port:        ENV['APNS_PORT'],
+      retries:     3
+    )
   end
 
   def self.aws_service
