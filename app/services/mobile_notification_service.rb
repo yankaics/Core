@@ -21,6 +21,7 @@
 module MobileNotificationService
   # Send a raw notification to a device
   def self.send(type, device_id, subject, message, url: nil, badge: nil, sound_type: nil, payload: {})
+    payload = {} if payload.nil?
     payload['subject'] = subject
     payload['message'] = message
     payload['url'] = url
@@ -39,8 +40,21 @@ module MobileNotificationService
       apns_notification.sound = "#{sound_type}.aiff" if sound_type
 
       apns_pusher.push(apns_notification)
+
     when 'android'
-      # TODO
+      gcm_data = payload
+
+      results = HTTParty.post(
+        'https://gcm-http.googleapis.com/gcm/send',
+        verify: false,
+        headers: { 'Authorization' => "key=#{ENV['GCM_API_KEY']}", 'Content-Type' => 'application/json' },
+        body: { data: gcm_data, to: device_id }.to_json
+      )
+
+      raise StandardError.new(results) if !results.is_a?(Hash) ||
+                                          results['failure'] > 0
+
+      results
     end
   end
 

@@ -52,6 +52,10 @@ ActiveAdmin.register Doorkeeper::Application do
       f.input :allow_direct_data_access
       f.input :blocked
       # f.input :scopes
+      f.input :permit_push_notifications
+      f.input :permit_email_notifications
+      f.input :permit_sms_notifications
+      f.input :permit_fb_notifications
       f.input :sms_quota
     end
     f.actions

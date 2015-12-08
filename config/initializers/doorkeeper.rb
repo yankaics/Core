@@ -227,6 +227,10 @@ module OAuthApplication
       app.name = 'API Explorer'
       app.description = 'API Explorer'
       app.redirect_uri = 'urn:ietf:wg:oauth:2.0:oob'
+      app.permit_push_notifications = true
+      app.permit_email_notifications = true
+      app.permit_sms_notifications = true
+      app.permit_fb_notifications = true
     end
   end
 

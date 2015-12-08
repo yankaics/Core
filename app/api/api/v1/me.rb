@@ -220,19 +220,21 @@ class API::V1::Me < API::V1
 
       @notification = current_user.notifications.build(ac_params.require(:notification).permit(:subject, :message, :url, :payload, :push, :email, :sms, :fb))
 
-      if !current_application.try(:core_app?)
+      @notification.application = current_application
+
+      if !current_application.try(:permit_push_notifications?)
         @notification.push = false
       end
 
-      if !current_application.try(:core_app?)
+      if !current_application.try(:permit_email_notifications?)
         @notification.email = false
       end
 
-      if !current_application.try(:core_app?)
+      if !current_application.try(:permit_sms_notifications?)
         @notification.sms = false
       end
 
-      if !current_application.try(:core_app?)
+      if !current_application.try(:permit_fb_notifications?)
         @notification.fb = false
       end
 
@@ -270,19 +272,21 @@ class API::V1::Me < API::V1
       @notification = current_user.notifications.build(ac_params.require(:notification).permit(:uuid, :subject, :message, :url, :payload, :push, :email, :sms, :fb))
       @notification.uuid = ac_params[:uuid]
 
-      if !current_application.try(:core_app?)
+      @notification.application = current_application
+
+      if !current_application.try(:permit_push_notifications?)
         @notification.push = false
       end
 
-      if !current_application.try(:core_app?)
+      if !current_application.try(:permit_email_notifications?)
         @notification.email = false
       end
 
-      if !current_application.try(:core_app?)
+      if !current_application.try(:permit_sms_notifications?)
         @notification.sms = false
       end
 
-      if !current_application.try(:core_app?)
+      if !current_application.try(:permit_fb_notifications?)
         @notification.fb = false
       end
 
