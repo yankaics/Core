@@ -10,7 +10,7 @@ ActiveAdmin.register Organization do
     end
   end
 
-  permit_params :code, :name, :short_name,
+  permit_params :code, :name, :short_name, :enabled,
                 email_patterns_attributes: [
                   :_destroy,
                   :id,
@@ -38,6 +38,7 @@ ActiveAdmin.register Organization do
   filter :code_cont
   filter :name
   filter :short_name
+  filter :enabled
   filter :created_at
   filter :updated_at
 
@@ -46,6 +47,7 @@ ActiveAdmin.register Organization do
     column(:code) { |organization| link_to organization.code, admin_organization_path(organization) }
     column(:short_name) { |organization| link_to organization.short_name, admin_organization_path(organization) }
     column(:name) { |organization| link_to organization.name, admin_organization_path(organization) }
+    column(:enabled)
     id_column
     actions
   end
@@ -76,6 +78,7 @@ ActiveAdmin.register Organization do
       row(:code)
       row(:name)
       row(:short_name)
+      row(:enabled)
     end
 
     panel 'Email 辨識模型' do
@@ -108,6 +111,7 @@ ActiveAdmin.register Organization do
       f.input :code
       f.input :name
       f.input :short_name
+      f.input :enabled
     end
 
     # f.inputs "資料集" do
