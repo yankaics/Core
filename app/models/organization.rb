@@ -3,6 +3,8 @@ class Organization < ActiveRecord::Base
   extend FriendlyId
   friendly_id :code
 
+  scope :enabled, -> { where(enabled: true)  }
+
   has_many :departments, primary_key: :code, foreign_key: :organization_code, dependent: :delete_all
   has_many :email_patterns, primary_key: :code, foreign_key: :organization_code, dependent: :delete_all
   has_many :user_identities, primary_key: :code, foreign_key: :organization_code

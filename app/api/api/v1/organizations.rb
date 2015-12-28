@@ -26,7 +26,7 @@ class API::V1::Organizations < API::V1
       scoped_resource = scoped_resource.preload(:departments) if fieldset(:organization, :departments)
       scoped_resource = scoped_resource.includes(:departments) if inclusion(:organization, :departments)
 
-      @organization = scoped_resource.all
+      @organization = scoped_resource.enabled
     end
 
     desc "Get data of an organization", {
