@@ -215,6 +215,10 @@ class DataAPI < ActiveRecord::Base
 
   def initialize_management_api_key
     return if management_api_key.present?
+    generate_management_api_key
+  end
+
+  def generate_management_api_key
     self.management_api_key = SecureRandom.urlsafe_base64(64).gsub(/[^a-zA-Z0-9]/, '0')
   end
 
