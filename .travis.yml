@@ -9,3 +9,5 @@ before_install:
 install:
   - travis_retry bin/setup
 script: bin/test
+services:
+  - redis-server
