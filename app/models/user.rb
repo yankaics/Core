@@ -79,7 +79,8 @@ class User < ActiveRecord::Base
                     hash_secret: ENV['SECRET_KEY_BASE'],
                     preserve_files: true
   validates_attachment_content_type :cover_photo, content_type: %r{\Aimage\/.*\Z}
-  attr_accessor :crop_avatar
+  attr_accessor :avatar_crop_pending
+  before_update :reset_crop_options_if_avatar_changed
   before_update :reprocess_avatar_if_cropping
 
   validates :uuid, uniqueness: true
@@ -216,10 +217,10 @@ class User < ActiveRecord::Base
     !avatar_crop_h.blank?
   end
 
-  # Will the avatar be cropped on save (crop_avatar set to true and all
+  # Will the avatar be cropped on save (avatar_crop_pending set to true and all
   # the required crop data exists)?
   def avatar_cropping?
-    crop_avatar && avatar_crop_data?
+    avatar_crop_pending && avatar_crop_data?
   end
 
   # Is this user linked to Facebook?
@@ -257,6 +258,14 @@ class User < ActiveRecord::Base
     avatar.reprocess!
   end
 
+  def reset_crop_options_if_avatar_changed
+    return unless avatar_updated_at_changed? && !avatar_cropping?
+    avatar_crop_x = nil
+    avatar_crop_y = nil
+    avatar_crop_w = nil
+    avatar_crop_h = nil
+  end
+
   PUBLIC_ATTRS = [
     :id,
     :uuid,
@@ -265,7 +274,13 @@ class User < ActiveRecord::Base
     :avatar_url,
     :avatar_thumb_url,
     :cover_photo_url,
-    :cover_photo_thumb_url
+    :cover_photo_thumb_url,
+    :avatar_grayscale_url,
+    :avatar_blur_url,
+    :avatar_blur_2x_url,
+    :cover_photo_grayscale_url,
+    :cover_photo_blur_url,
+    :cover_photo_blur_2x_url
   ]
 
   EMAIL_ATTRS = [
@@ -291,13 +306,7 @@ class User < ActiveRecord::Base
     :birth_month,
     :brief,
     :motto,
-    :url,
-    :avatar_grayscale_url,
-    :avatar_blur_url,
-    :avatar_blur_2x_url,
-    :cover_photo_grayscale_url,
-    :cover_photo_blur_url,
-    :cover_photo_blur_2x_url
+    :url
   ]
 
   IDENTITY_ATTRS = [
@@ -326,7 +335,22 @@ class User < ActiveRecord::Base
     :fb_devices
   ]
 
+  PERMIT_EDIT_ATTRS = [
+    :avatar,
+    :avatar_crop_x,
+    :avatar_crop_y,
+    :avatar_crop_w,
+    :avatar_crop_h,
+    :cover_photo
+  ]
+
   EDITABLE_ATTRS = [
+    :avatar,
+    :avatar_crop_x,
+    :avatar_crop_y,
+    :avatar_crop_w,
+    :avatar_crop_h,
+    :cover_photo,
     :username,
     :name,
     :gender,

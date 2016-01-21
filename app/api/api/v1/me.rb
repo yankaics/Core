@@ -52,7 +52,7 @@ class API::V1::Me < API::V1
     patch rabl: 'user' do
       guard!(scopes: ['write'])
 
-      permitted_attrs = []
+      permitted_attrs = User::PERMIT_EDIT_ATTRS
       permitted_attrs += User::PUBLIC_ATTRS if scopes.include? :public
       permitted_attrs += User::EMAIL_ATTRS if scopes.include? :email
       permitted_attrs += User::ACCOUNT_ATTRS if scopes.include? :account
@@ -76,6 +76,8 @@ class API::V1::Me < API::V1
 
       ac_params = ActionController::Parameters.new(params)
       user_params = ac_params.require(:user).permit(*permitted_attrs)
+
+      @user.avatar_crop_pending = true if (user_params[:avatar].present? && user_params[:avatar_crop_x].present?)
 
       # translate enums
       if user_params[:gender].present?
