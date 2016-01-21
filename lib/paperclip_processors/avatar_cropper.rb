@@ -12,7 +12,7 @@ module Paperclip
     def crop_command
       target = @attachment.instance
       return nil unless target.avatar_cropping?
-      target.crop_avatar = false
+      target.avatar_crop_pending = false
       " -crop '#{target.avatar_crop_w.to_i}x#{target.avatar_crop_h.to_i}+#{target.avatar_crop_x.to_i}+#{target.avatar_crop_y.to_i}' "
     end
   end
