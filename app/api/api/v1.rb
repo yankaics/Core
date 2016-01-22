@@ -14,5 +14,6 @@ class API::V1 < API
   mount Users
   mount Organizations
   mount Utilities
+  mount Notifications
   mount SMS
 end
