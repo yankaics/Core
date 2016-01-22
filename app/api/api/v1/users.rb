@@ -5,7 +5,6 @@ class API::V1::Users < API::V1
     desc "Get data of users", {
       http_codes: APIGuard.access_token_error_codes,
       notes:  <<-NOTE
-        Accessiable fields will change while using access token with different permissions.
       NOTE
     }
     params do
@@ -62,7 +61,6 @@ class API::V1::Users < API::V1
     desc "Get data of a user", {
       http_codes: APIGuard.access_token_error_codes,
       notes:  <<-NOTE
-        Accessiable fields will change while using access token with different permissions.
       NOTE
     }
     params do
@@ -106,7 +104,6 @@ class API::V1::Users < API::V1
     desc "Update data for a user", {
       http_codes: APIGuard.access_token_error_codes,
       notes:  <<-NOTE
-        Accessiable fields will change while using access tokens with different permissions.
       NOTE
     }
     params do
@@ -174,6 +171,65 @@ class API::V1::Users < API::V1
       end
 
       @user
+    end
+
+    desc "Send notifications to users", {
+      http_codes: APIGuard.access_token_error_codes,
+      notes:  <<-NOTE
+        This API is accessible only with app tokens, with apps that have direct data access.
+      NOTE
+    }
+    params do
+      requires :id, desc: "User ID."
+      optional :'notification[subject]', desc: "Notification subject"
+      optional :'notification[message]', desc: "Notification main message"
+      optional :'notification[url]', desc: "Notification link URL"
+      optional :'notification[payload]', desc: "Notification payload"
+      optional :'notification[push]', desc: "Send push notifications or not? (for permitted apps only)"
+      optional :'notification[email]', desc: "Send email notifications or not? (for permitted apps only)"
+      optional :'notification[sms]', desc: "Send SMS notifications or not? (for permitted apps only)"
+      optional :'notification[fb]', desc: "Send Facebook notifications or not? (for permitted apps only)"
+    end
+    post :':id/notifications', rabl: 'notification' do
+      # Only permitted applications can use this API
+      # (using their applications access token)
+      if current_application.blank? ||
+         !current_application.allow_direct_data_access ||
+         current_user.present?
+        error!({ error: 403 }, 403)
+      end
+
+      params.id = params.id && params.id.to_s
+      ac_params = ActionController::Parameters.new(params)
+
+      if multiget?(param: :id)
+        @users = multiget(User, find_by: :id, param: :id, max: 1000)
+        @notifications = @users.map do |user|
+          notification = user.notifications.build(ac_params.require(:notification).permit(:subject, :message, :url, :payload, :push, :email, :sms, :fb))
+
+          notification.application = current_application
+
+          if notification.save
+            status 201
+          else
+            error!({ error: 400, description: "#{@notification.errors.full_messages.join(', ')}" }, 400)
+          end
+
+          notification
+        end
+
+      else
+        @user = multiget(User, find_by: :id, param: :id, max: 1)
+        @notification = @user.notifications.build(ac_params.require(:notification).permit(:subject, :message, :url, :payload, :push, :email, :sms, :fb))
+
+        @notification.application = current_application
+
+        if @notification.save
+          status 201
+        else
+          error!({ error: 400, description: "#{@notification.errors.full_messages.join(', ')}" }, 400)
+        end
+      end
     end
   end
 end

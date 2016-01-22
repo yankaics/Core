@@ -63,7 +63,7 @@ ActiveAdmin.register Doorkeeper::Application do
 
   controller do
     def oauth_application_params
-      params.require(:doorkeeper_application).permit(:name, :description, :app_url, :redirect_uri, :scopes, :blocked, :allow_direct_data_access, :sms_quota, :owner_id, :owner_type, :owner, :secret)
+      params.require(:doorkeeper_application).permit(:name, :description, :app_url, :redirect_uri, :scopes, :blocked, :allow_direct_data_access, :sms_quota, :owner_id, :owner_type, :owner, :secret, :permit_push_notifications, :permit_email_notifications, :permit_sms_notifications, :permit_fb_notifications)
     end
 
     def update
