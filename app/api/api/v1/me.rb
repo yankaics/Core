@@ -119,6 +119,68 @@ class API::V1::Me < API::V1
       @user_email = current_user.emails
     end
 
+    desc "Add a new email for the current user", {
+      http_codes: APIGuard.access_token_error_codes,
+      notes:  <<-NOTE
+        #{APIGuard.access_token_required_note(scope: 'identity, write')}
+      NOTE
+    }
+    params do
+      optional :'user_email[email]'
+    end
+    post :emails, rabl: 'user_email' do
+      guard! scopes: ['identity', 'write']
+      ac_params = ActionController::Parameters.new(params)
+
+      @user_email = current_user.emails.build(ac_params.require(:user_email).permit(:email, :department_code, :started_at))
+
+      ActiveRecord::Base.transaction do
+        if @user_email.save
+          if @user_email.email == current_user.email || @user_email.can_skip_confirmation?
+            @user_email.confirm!
+          else
+            @user_email.send_confirmation_instructions
+          end
+        else
+          error!({ error: 400, description: "bad_email" }, 400)
+        end
+      end
+    end
+
+    desc "Resend confirmation instructions for a new email for the current user", {
+      http_codes: APIGuard.access_token_error_codes,
+      notes:  <<-NOTE
+        #{APIGuard.access_token_required_note(scope: 'identity, write')}
+      NOTE
+    }
+    params do
+      requires :id, desc: 'The id or email of the email'
+    end
+    patch :'emails/:id', rabl: 'user_email' do
+      guard! scopes: ['identity', 'write']
+
+      @user_email = current_user.unconfirmed_emails.find_by(email: params[:id]) ||
+                    current_user.unconfirmed_emails.find(params[:id])
+      @user_email.resend_confirmation_instructions
+    end
+
+    desc "Delete a email for the current user", {
+      http_codes: APIGuard.access_token_error_codes,
+      notes:  <<-NOTE
+        #{APIGuard.access_token_required_note(scope: 'identity, write')}
+      NOTE
+    }
+    params do
+      requires :id, desc: 'The id or email of the email'
+    end
+    delete :'emails/:id', rabl: 'user_email' do
+      guard! scopes: ['identity', 'write']
+
+      @user_email = current_user.all_emails.find_by(email: params[:id]) ||
+                    current_user.all_emails.find(params[:id])
+      @user_email.destroy
+    end
+
     desc "Get identities of the current user", {
       http_codes: APIGuard.access_token_error_codes,
       notes:  <<-NOTE
