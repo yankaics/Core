@@ -130,19 +130,30 @@ class API::V1::Me < API::V1
     end
     post :emails, rabl: 'user_email' do
       guard! scopes: ['identity', 'write']
-      ac_params = ActionController::Parameters.new(params)
 
-      @user_email = current_user.emails.build(ac_params.require(:user_email).permit(:email, :department_code, :started_at))
+      @user_email = current_user.unconfirmed_emails.find_by(email: (params.user_email && params.user_email.email))
 
-      ActiveRecord::Base.transaction do
-        if @user_email.save
-          if @user_email.email == current_user.email || @user_email.can_skip_confirmation?
-            @user_email.confirm!
+      if @user_email
+        # Resend confirmation instructions
+        @user_email.resend_confirmation_instructions
+        status 200
+      else
+        # Create a new one
+        ac_params = ActionController::Parameters.new(params)
+
+        @user_email = current_user.emails.build(ac_params.require(:user_email).permit(:email, :department_code, :started_at))
+
+        ActiveRecord::Base.transaction do
+          if @user_email.save
+            status 201
+            if @user_email.email == current_user.email || @user_email.can_skip_confirmation?
+              @user_email.confirm!
+            else
+              @user_email.send_confirmation_instructions
+            end
           else
-            @user_email.send_confirmation_instructions
+            error!({ error: 400, description: "bad_email" }, 400)
           end
-        else
-          error!({ error: 400, description: "bad_email" }, 400)
         end
       end
     end
