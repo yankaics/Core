@@ -176,4 +176,23 @@ class API::V1::Users < API::V1
       @user
     end
   end
+
+  helpers do
+    def sign_up_params
+       ActionController::Parameters.new(params).require(:user).permit(:name, :email, :password, :password_confirmation)
+    end
+  end
+
+  post 'sign_up' do
+    user = User.new(sign_up_params)
+
+    begin
+      user.save!
+    rescue Exception => e
+      # 校驗失敗: 密碼確認 不符合確認值, 登入密碼 過短（最短是 8 個字）
+      # 慣用電子郵件信箱 不能是空白字元
+      error!({error: 400, description: "#{e}"}, 400)
+    end
+  end
+
 end
