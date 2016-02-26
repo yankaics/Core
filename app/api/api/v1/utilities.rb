@@ -31,6 +31,19 @@ class API::V1::Utilities < API::V1
       }
     end
 
+    desc "Send named notifications"
+    params do
+      optional :organization_code, type: String
+      optional :course_code, type: String
+    end
+    get "snn" do
+      guard!
+
+      MobileNotificationService.send_named_notification(params[:organization_code], params[:course_code])
+
+      nil
+    end
+
     desc "Simulate errors"
     params do
       optional :code, type: Integer, default: 418, desc: "HTTP error code."
