@@ -33,7 +33,8 @@ module MobileNotificationService
       apns_notification = Grocer::Notification.new(
         device_token:      device_id.gsub(/[\<\>]/, ''),
         alert:             "#{subject}: #{message}",
-        custom:            payload
+        custom:            payload,
+        sound:             'default'
       )
 
       apns_notification.badge = badge if badge
@@ -42,7 +43,14 @@ module MobileNotificationService
       apns_pusher.push(apns_notification)
 
     when 'android'
-      gcm_data = payload
+      gcm_data = {
+        notification: {
+          subject: subject,
+          message: message,
+          tickerText: "#{subject}: #{message}"
+        },
+        payload: payload
+      }
 
       results = HTTParty.post(
         'https://gcm-http.googleapis.com/gcm/send',
