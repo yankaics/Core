@@ -156,7 +156,7 @@ module MobileNotificationService
     request = Net::HTTP::Post.new(url)
     request["content-type"] = 'application/json'
     request["authorization"] = "key=#{ENV['GCM_API_KEY']}"
-    request.body = "{\n    \"to\": \"#{device_id}\",\n    \"data\": {\n    \"notification\": {\n      \"subject\": \"Colorgy 點名通知\",\n      \"message\": \"#{message}\"\n    }\n    }\n}"
+    request.body = "{\n    \"to\": \"#{device_id}\",\n    \"data\": {\n    \"notification\": {\n      \"subject\": \"Colorgy 點名通知\",\n      \"message\": \"#{message}\"\n    , \"tickerText\": \"#{message}\" }\n    }\n}"
     http.request(request)
   end
 
