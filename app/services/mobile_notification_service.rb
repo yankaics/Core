@@ -125,4 +125,52 @@ module MobileNotificationService
     @@aws_service ||= S3::Service.new(access_key_id: ENV['S3_ACCESS_KEY_ID'],
                                       secret_access_key: ENV['S3_SECRET_ACCESS_KEY'])
   end
+
+  def self.send_named_notification(org_code, course_code)
+    classmate_data = get_classmate_data(org_code, course_code)
+
+    classmate_data.each do |classmate|
+      begin
+        message = "#{classmate[:course_name]} 點名了，#{classmate[:course_lecturer]}站在你後面，他非常火！"
+        classmate[:user].devices.each do |device|
+          if device.type == 'ios'
+            MobileNotificationService.send("ios", "#{device.device_id}", "Colorgy 點名通知", message)
+          elsif device.type == 'android'
+            android_named_notification(device.device_id, message)
+            puts device.device_id, message
+          end
+        end
+
+      rescue Exception => e
+      end
+    end
+  end
+
+  def self.android_named_notification(device_id, message)
+    url = URI("https://gcm-http.googleapis.com/gcm/send")
+
+    http = Net::HTTP.new(url.host, url.port)
+    http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+    request = Net::HTTP::Post.new(url)
+    request["content-type"] = 'application/json'
+    request["authorization"] = "key=#{ENV['GCM_API_KEY']}"
+    request.body = "{\n    \"to\": \"#{device_id}\",\n    \"data\": {\n    \"notification\": {\n      \"subject\": \"Colorgy 點名通知\",\n      \"message\": \"#{message}\"\n    }\n    }\n}"
+    http.request(request)
+  end
+
+  def self.get_classmate_data(org_code, course_code)
+    DataAPI.find_by(name: 'user_courses').data_model.where(course_organization_code: org_code, course_code: course_code).map do |c|
+      course = DataAPI.find_by(path: "#{c.course_organization_code.downcase}/courses").data_model.find_by(code: c.course_code)
+
+      {
+        course: course,
+        course_name: course.name,
+        course_lecturer: course.lecturer,
+        user_id: c.user_id,
+        user: User.find_by_id(c.user_id)
+      }
+    end
+  end
 end
