@@ -88,8 +88,8 @@ class SSOController < ApplicationController
 
       @access_token = Doorkeeper::AccessToken.by_token(params[:access_token])
       if @access_token &&
-         OAuth::AccessTokenValidationService.validate(@access_token) == :valid &&
-         @access_token.application && @access_token.application.core_app?
+         OAuth::AccessTokenValidationService.validate(@access_token) == :valid# &&
+         # @access_token.application && @access_token.application.core_app?
         @user = User.find_by(id: @access_token.resource_owner_id)
 
         if @user
