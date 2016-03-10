@@ -12,13 +12,13 @@ feature "SSO New Session", :type => :feature do
   end
 
   scenario "user login via sso_new_session" do
-    # this functionality will not work for user apps
-    visit("#{@sso_new_session_url}?access_token=#{@user_app_access_token.token}")
-    visit(my_account_path)
-    expect(page).not_to have_content(@user.name)
-    # On background: sign-on status token (sst) cookie is expected to be blank
-    sst_string = page.driver.request.cookies['_sst']
-    expect(sst_string).to be_blank
+    # # this functionality will not work for user apps
+    # visit("#{@sso_new_session_url}?access_token=#{@user_app_access_token.token}")
+    # visit(my_account_path)
+    # expect(page).not_to have_content(@user.name)
+    # # On background: sign-on status token (sst) cookie is expected to be blank
+    # sst_string = page.driver.request.cookies['_sst']
+    # expect(sst_string).to be_blank
 
     # this functionality will work for core apps
     visit("#{@sso_new_session_url}?access_token=#{@core_app_access_token.token}")
