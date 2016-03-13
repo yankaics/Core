@@ -65,7 +65,7 @@ class User < ActiveRecord::Base
   has_attached_file :avatar,
                     processors: [:avatar_cropper],
                     styles: { medium: '512x512#', thumb: '256x256>#', grayscale: '512x512>#', blur: '256x256#', blur_2x: '256x256#' },
-                    convert_options: { grayscale: '-colorspace Gray', blur: '-blur 0x4', blur_2x: '-blur 0x16' },
+                    convert_options: { grayscale: '-colorspace Gray', blur: '-blur 0x4', blur_2x: '-blur 0x8' },
                     url: '/system/users/avatars/:style/:hash.:extension',
                     hash_data: ':class/:attachment/:id/:style',
                     hash_secret: ENV['SECRET_KEY_BASE'],
