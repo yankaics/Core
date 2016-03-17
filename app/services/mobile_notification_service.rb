@@ -70,7 +70,7 @@ module MobileNotificationService
   def self.send_notification(notification)
     notification.user.devices.each do |device|
       begin
-        send(device.type, device.device_id, notification.subject, notification.message, url: notification.url, payload: notification.payload)  # TODO: deal with badge and sound
+        send(device.type, device.device_id, notification.subject, notification.message, url: notification.url, payload: (notification.payload.blank? ? nil : JSON.parse(notification.payload)))  # TODO: deal with badge and sound
       rescue Exception => e
 
       end
