@@ -41,7 +41,7 @@ module MobileNotificationService
       apns_notification.sound = "#{sound_type}.aiff" if sound_type
 
       apns_pusher.push(apns_notification)
-      apns_dev_pusher.push(apns_notification) if apns_dev_pusher
+      # apns_dev_pusher.push(apns_notification) if apns_dev_pusher
 
     when 'android'
       gcm_data = {
