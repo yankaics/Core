@@ -166,21 +166,33 @@ module MobileNotificationService
   def self.send_roll_call_notification(org_code, course_code)
     classmate_data = get_classmate_data(org_code, course_code)
 
-    classmate_data.each do |classmate|
-      begin
-        message = "#{classmate[:course_name]} 點名了，#{classmate[:course_lecturer]}站在你後面，他非常火！"
-        classmate[:user].devices.each do |device|
-          if device.type == 'ios'
-            MobileNotificationService.send("ios", "#{device.device_id}", "Colorgy 點名通知", message)
-          elsif device.type == 'android'
-            android_roll_call_notification(device.device_id, message)
-            puts device.device_id, message
-          end
-        end
+    period_datas =
+      DataAPI.find_by(name: "#{org_code.downcase}_period_data").data_model
+        .select(:code, :time, :order)
+        .map{|period| period.time.split('-').map{|time_str| Time.strptime("#{time_str} +08:00", '%H:%M %Z') }
+      }
 
-      rescue Exception => e
-      end
-    end
+    period_datas.each do |period_data|
+      if time_within?(period_data[0], period_data[1], Time.now)
+        classmate_data.each do |classmate|
+          begin
+            message = "#{classmate[:course_name]} 點名了，#{classmate[:course_lecturer]}站在你後面，他非常火！"
+            classmate[:user].devices.each do |device|
+              if device.type == 'ios'
+                MobileNotificationService.send("ios", "#{device.device_id}", "Colorgy 點名通知", message)
+              elsif device.type == 'android'
+                android_roll_call_notification(device.device_id, message)
+                puts device.device_id, message
+              end
+            end
+
+          rescue Exception => e;
+          end;
+        end # each class_mate data
+
+        break
+      end # if time_within
+    end # end each period_data
   end
 
   def self.android_roll_call_notification(device_id, message)
@@ -210,4 +222,9 @@ module MobileNotificationService
       }
     end
   end
+
+  def self.time_within? start_time, end_time, compare_time
+    (compare_time.utc.strftime( "%H%M%S%N" ) <= end_time.utc.strftime( "%H%M%S%N" )) && (start_time.utc.strftime( "%H%M%S%N" ) <= compare_time.utc.strftime( "%H%M%S%N" ) )
+  end
+
 end
