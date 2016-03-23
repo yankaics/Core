@@ -16,4 +16,5 @@ class API::V1 < API
   mount Utilities
   mount Notifications
   mount SMS
+  mount RollCallNotificationAPI
 end

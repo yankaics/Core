@@ -11,15 +11,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151228064057) do
+ActiveRecord::Schema.define(version: 20160323120457) do
 
   create_table "active_admin_comments", force: :cascade do |t|
-    t.string   "namespace"
+    t.string   "namespace",     limit: 255
     t.text     "body"
-    t.string   "resource_id",   null: false
-    t.string   "resource_type", null: false
+    t.string   "resource_id",   limit: 255, null: false
+    t.string   "resource_type", limit: 255, null: false
     t.integer  "author_id"
-    t.string   "author_type"
+    t.string   "author_type",   limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -29,19 +29,19 @@ ActiveRecord::Schema.define(version: 20151228064057) do
   add_index "active_admin_comments", ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id"
 
   create_table "admins", force: :cascade do |t|
-    t.string   "username",                 default: "", null: false
-    t.string   "email",                    default: "", null: false
-    t.string   "encrypted_password",       default: "", null: false
+    t.string   "username",                 limit: 255, default: "", null: false
+    t.string   "email",                    limit: 255, default: "", null: false
+    t.string   "encrypted_password",       limit: 255, default: "", null: false
     t.datetime "remember_created_at"
-    t.integer  "sign_in_count",            default: 0,  null: false
+    t.integer  "sign_in_count",                        default: 0,  null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
-    t.string   "current_sign_in_ip"
-    t.string   "last_sign_in_ip"
-    t.integer  "failed_attempts",          default: 0,  null: false
-    t.string   "unlock_token"
+    t.string   "current_sign_in_ip",       limit: 255
+    t.string   "last_sign_in_ip",          limit: 255
+    t.integer  "failed_attempts",                      default: 0,  null: false
+    t.string   "unlock_token",             limit: 255
     t.datetime "locked_at"
-    t.string   "scoped_organization_code"
+    t.string   "scoped_organization_code", limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -94,45 +94,40 @@ ActiveRecord::Schema.define(version: 20151228064057) do
   add_index "data_apis", ["public"], name: "index_data_apis_on_public"
 
   create_table "departments", force: :cascade do |t|
-    t.string   "organization_code",           null: false
-    t.string   "code",                        null: false
-    t.string   "name",                        null: false
-    t.string   "short_name",                  null: false
-    t.string   "parent_code"
+    t.string   "organization_code", limit: 255, null: false
+    t.string   "code",              limit: 255, null: false
+    t.string   "name",              limit: 255, null: false
+    t.string   "short_name",        limit: 255, null: false
+    t.string   "parent_code",       limit: 255
     t.string   "group",             limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "departments", ["code"], name: "index_departments_on_code"
   add_index "departments", ["organization_code"], name: "index_departments_on_organization_code"
-  add_index "departments", ["parent_code"], name: "index_departments_on_parent_code"
 
   create_table "email_patterns", force: :cascade do |t|
-    t.integer  "priority",                                   limit: 3, default: 100,   null: false
-    t.string   "organization_code",                                                    null: false
-    t.integer  "corresponded_identity",                      limit: 1,                 null: false
-    t.string   "email_regexp",                                                         null: false
+    t.integer  "priority",                                               default: 100,   null: false
+    t.string   "organization_code",                          limit: 255,                 null: false
+    t.integer  "corresponded_identity",                      limit: 2,                   null: false
+    t.string   "email_regexp",                               limit: 255,                 null: false
     t.text     "uid_postparser"
     t.text     "department_code_postparser"
     t.text     "started_at_postparser"
     t.text     "identity_detail_postparser"
-    t.boolean  "permit_changing_department_in_group",                  default: false, null: false
-    t.boolean  "permit_changing_department_in_organization",           default: false, null: false
+    t.boolean  "permit_changing_department_in_group",                    default: false, null: false
+    t.boolean  "permit_changing_department_in_organization",             default: false, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "skip_confirmation",                                    default: false, null: false
-    t.boolean  "permit_changing_started_at",                           default: false, null: false
+    t.boolean  "skip_confirmation",                                      default: false, null: false
+    t.boolean  "permit_changing_started_at",                             default: false, null: false
   end
 
-  add_index "email_patterns", ["organization_code"], name: "index_email_patterns_on_organization_code"
-  add_index "email_patterns", ["priority"], name: "index_email_patterns_on_priority"
-
   create_table "friendly_id_slugs", force: :cascade do |t|
-    t.string   "slug",                      null: false
-    t.integer  "sluggable_id",              null: false
+    t.string   "slug",           limit: 255, null: false
+    t.integer  "sluggable_id",               null: false
     t.string   "sluggable_type", limit: 50
-    t.string   "scope"
+    t.string   "scope",          limit: 255
     t.datetime "created_at"
   end
 
@@ -177,14 +172,14 @@ ActiveRecord::Schema.define(version: 20151228064057) do
   add_index "notifications", ["uuid"], name: "index_notifications_on_uuid", unique: true
 
   create_table "oauth_access_grants", force: :cascade do |t|
-    t.integer  "resource_owner_id", null: false
-    t.integer  "application_id",    null: false
-    t.string   "token",             null: false
-    t.integer  "expires_in",        null: false
-    t.text     "redirect_uri",      null: false
-    t.datetime "created_at",        null: false
+    t.integer  "resource_owner_id",             null: false
+    t.integer  "application_id",                null: false
+    t.string   "token",             limit: 255, null: false
+    t.integer  "expires_in",                    null: false
+    t.text     "redirect_uri",                  null: false
+    t.datetime "created_at",                    null: false
     t.datetime "revoked_at"
-    t.string   "scopes"
+    t.string   "scopes",            limit: 255
   end
 
   add_index "oauth_access_grants", ["token"], name: "index_oauth_access_grants_on_token", unique: true
@@ -192,12 +187,12 @@ ActiveRecord::Schema.define(version: 20151228064057) do
   create_table "oauth_access_tokens", force: :cascade do |t|
     t.integer  "resource_owner_id"
     t.integer  "application_id"
-    t.string   "token",             null: false
-    t.string   "refresh_token"
+    t.string   "token",             limit: 255, null: false
+    t.string   "refresh_token",     limit: 255
     t.integer  "expires_in"
     t.datetime "revoked_at"
-    t.datetime "created_at",        null: false
-    t.string   "scopes"
+    t.datetime "created_at",                    null: false
+    t.string   "scopes",            limit: 255
   end
 
   add_index "oauth_access_tokens", ["refresh_token"], name: "index_oauth_access_tokens_on_refresh_token", unique: true
@@ -205,49 +200,61 @@ ActiveRecord::Schema.define(version: 20151228064057) do
   add_index "oauth_access_tokens", ["token"], name: "index_oauth_access_tokens_on_token", unique: true
 
   create_table "oauth_applications", force: :cascade do |t|
-    t.string   "name",                                       null: false
+    t.string   "name",                       limit: 255,                 null: false
     t.text     "description"
-    t.string   "app_url"
-    t.integer  "owner_id",                                   null: false
-    t.string   "owner_type",                                 null: false
-    t.string   "uid",                                        null: false
-    t.string   "secret",                                     null: false
-    t.text     "redirect_uri",                               null: false
-    t.string   "scopes",                     default: "",    null: false
+    t.string   "app_url",                    limit: 255
+    t.integer  "owner_id",                                               null: false
+    t.string   "owner_type",                 limit: 255,                 null: false
+    t.string   "uid",                        limit: 255,                 null: false
+    t.string   "secret",                     limit: 255,                 null: false
+    t.text     "redirect_uri",                                           null: false
+    t.string   "scopes",                     limit: 255, default: "",    null: false
     t.text     "extensional_scopes"
     t.text     "data"
-    t.boolean  "blocked",                    default: false, null: false
-    t.integer  "sms_quota",                  default: 0,     null: false
-    t.integer  "rth",                        default: 0,     null: false
+    t.boolean  "blocked",                                default: false, null: false
+    t.integer  "sms_quota",                              default: 0,     null: false
+    t.integer  "rth",                                    default: 0,     null: false
     t.datetime "rth_refreshed_at"
-    t.integer  "rtd",                        default: 0,     null: false
+    t.integer  "rtd",                                    default: 0,     null: false
     t.date     "rtd_refreshed_at"
-    t.integer  "core_rth",                   default: 0,     null: false
+    t.integer  "core_rth",                               default: 0,     null: false
     t.datetime "core_rth_refreshed_at"
-    t.integer  "core_rtd",                   default: 0,     null: false
+    t.integer  "core_rtd",                               default: 0,     null: false
     t.date     "core_rtd_refreshed_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "allow_direct_data_access",   default: false, null: false
-    t.boolean  "permit_push_notifications",  default: false
-    t.boolean  "permit_email_notifications", default: false
-    t.boolean  "permit_sms_notifications",   default: false
-    t.boolean  "permit_fb_notifications",    default: false
+    t.boolean  "allow_direct_data_access",               default: false, null: false
+    t.boolean  "permit_push_notifications",              default: false
+    t.boolean  "permit_email_notifications",             default: false
+    t.boolean  "permit_sms_notifications",               default: false
+    t.boolean  "permit_fb_notifications",                default: false
   end
 
   add_index "oauth_applications", ["owner_id", "owner_type"], name: "index_oauth_applications_on_owner_id_and_owner_type"
   add_index "oauth_applications", ["uid"], name: "index_oauth_applications_on_uid", unique: true
 
   create_table "organizations", force: :cascade do |t|
-    t.string   "code"
-    t.string   "name"
-    t.string   "short_name"
-    t.boolean  "enabled",    default: true
+    t.string   "code",       limit: 255
+    t.string   "name",       limit: 255
+    t.string   "short_name", limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "enabled",                default: true, null: false
   end
 
   add_index "organizations", ["code"], name: "index_organizations_on_code", unique: true
+
+  create_table "roll_call_notifications", force: :cascade do |t|
+    t.integer  "user_id"
+    t.string   "organization_code"
+    t.string   "course_code"
+    t.datetime "created_at",        null: false
+    t.datetime "updated_at",        null: false
+  end
+
+  add_index "roll_call_notifications", ["course_code"], name: "index_roll_call_notifications_on_course_code"
+  add_index "roll_call_notifications", ["organization_code"], name: "index_roll_call_notifications_on_organization_code"
+  add_index "roll_call_notifications", ["user_id"], name: "index_roll_call_notifications_on_user_id"
 
   create_table "service_navigations", force: :cascade do |t|
     t.string   "name",                                            null: false
@@ -279,7 +286,7 @@ ActiveRecord::Schema.define(version: 20151228064057) do
   end
 
   create_table "settings", force: :cascade do |t|
-    t.string   "var",                   null: false
+    t.string   "var",        limit: 255, null: false
     t.text     "value"
     t.integer  "thing_id"
     t.string   "thing_type", limit: 30
@@ -290,19 +297,19 @@ ActiveRecord::Schema.define(version: 20151228064057) do
   add_index "settings", ["thing_type", "thing_id", "var"], name: "index_settings_on_thing_type_and_thing_id_and_var", unique: true
 
   create_table "user_data", force: :cascade do |t|
-    t.integer  "user_id",                                                 null: false
-    t.integer  "gender",                        limit: 1, default: 0,     null: false
+    t.integer  "user_id",                                                   null: false
+    t.integer  "gender",                        limit: 2,   default: 0,     null: false
     t.integer  "birth_year"
-    t.integer  "birth_month",                   limit: 1
-    t.integer  "birth_day",                     limit: 1
-    t.string   "url",                                     default: "",    null: false
-    t.text     "brief",                                   default: "",    null: false
-    t.text     "motto",                                   default: "",    null: false
-    t.string   "mobile"
-    t.string   "unconfirmed_mobile"
-    t.string   "mobile_confirmation_token"
+    t.integer  "birth_month",                   limit: 2
+    t.integer  "birth_day",                     limit: 2
+    t.string   "url",                           limit: 255, default: "",    null: false
+    t.text     "brief",                                     default: "",    null: false
+    t.text     "motto",                                     default: "",    null: false
+    t.string   "mobile",                        limit: 255
+    t.string   "unconfirmed_mobile",            limit: 255
+    t.string   "mobile_confirmation_token",     limit: 255
     t.datetime "mobile_confirmation_sent_at"
-    t.integer  "mobile_confirm_tries",                    default: 0,     null: false
+    t.integer  "mobile_confirm_tries",                      default: 0,     null: false
     t.text     "fb_devices"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -314,11 +321,9 @@ ActiveRecord::Schema.define(version: 20151228064057) do
     t.integer  "avatar_crop_y"
     t.integer  "avatar_crop_w"
     t.integer  "avatar_crop_h"
-    t.boolean  "avatar_local",                            default: false, null: false
-    t.boolean  "cover_photo_local",                       default: false, null: false
+    t.boolean  "avatar_local",                              default: false, null: false
+    t.boolean  "cover_photo_local",                         default: false, null: false
   end
-
-  add_index "user_data", ["user_id"], name: "index_user_data_on_user_id"
 
   create_table "user_devices", force: :cascade do |t|
     t.integer  "user_id"
@@ -335,9 +340,9 @@ ActiveRecord::Schema.define(version: 20151228064057) do
   add_index "user_devices", ["uuid"], name: "index_user_devices_on_uuid"
 
   create_table "user_emails", force: :cascade do |t|
-    t.integer  "user_id",              null: false
-    t.string   "email",                null: false
-    t.string   "confirmation_token"
+    t.integer  "user_id",                          null: false
+    t.string   "email",                limit: 255, null: false
+    t.string   "confirmation_token",   limit: 255
     t.datetime "confirmation_sent_at"
     t.datetime "confirmed_at"
     t.text     "options"
@@ -346,64 +351,55 @@ ActiveRecord::Schema.define(version: 20151228064057) do
   end
 
   add_index "user_emails", ["confirmation_token"], name: "index_user_emails_on_confirmation_token", unique: true
-  add_index "user_emails", ["confirmed_at"], name: "index_user_emails_on_confirmed_at"
-  add_index "user_emails", ["email"], name: "index_user_emails_on_email"
-  add_index "user_emails", ["user_id"], name: "index_user_emails_on_user_id"
 
   create_table "user_identities", force: :cascade do |t|
     t.integer  "email_pattern_id"
     t.integer  "user_id"
-    t.string   "email",                                                      null: false
-    t.string   "organization_code",                                          null: false
-    t.integer  "identity",                                   default: 0,     null: false
-    t.string   "uid",                                                        null: false
-    t.string   "original_department_code"
-    t.string   "department_code"
-    t.string   "identity_detail",                            default: "",    null: false
+    t.string   "email",                                      limit: 255,                 null: false
+    t.string   "organization_code",                          limit: 255,                 null: false
+    t.integer  "identity",                                               default: 0,     null: false
+    t.string   "uid",                                        limit: 255,                 null: false
+    t.string   "original_department_code",                   limit: 255
+    t.string   "department_code",                            limit: 255
+    t.string   "identity_detail",                            limit: 255, default: "",    null: false
     t.date     "started_at"
-    t.boolean  "permit_changing_department_in_group",        default: false, null: false
-    t.boolean  "permit_changing_department_in_organization", default: false, null: false
-    t.string   "name"
+    t.boolean  "permit_changing_department_in_group",                    default: false, null: false
+    t.boolean  "permit_changing_department_in_organization",             default: false, null: false
+    t.string   "name",                                       limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "skip_confirmation",                          default: false, null: false
-    t.boolean  "permit_changing_started_at",                 default: false, null: false
+    t.boolean  "skip_confirmation",                                      default: false, null: false
+    t.boolean  "permit_changing_started_at",                             default: false, null: false
   end
 
-  add_index "user_identities", ["email"], name: "index_user_identities_on_email"
-  add_index "user_identities", ["email_pattern_id"], name: "index_user_identities_on_email_pattern_id"
-  add_index "user_identities", ["organization_code"], name: "index_user_identities_on_organization_code"
-  add_index "user_identities", ["uid"], name: "index_user_identities_on_uid"
-  add_index "user_identities", ["user_id"], name: "index_user_identities_on_user_id"
-
   create_table "users", force: :cascade do |t|
-    t.string   "email",                    default: "", null: false
-    t.string   "encrypted_password",       default: "", null: false
-    t.string   "reset_password_token"
+    t.string   "email",                    limit: 255, default: "", null: false
+    t.string   "encrypted_password",       limit: 255, default: "", null: false
+    t.string   "reset_password_token",     limit: 255
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
-    t.integer  "sign_in_count",            default: 0,  null: false
+    t.integer  "sign_in_count",                        default: 0,  null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
-    t.string   "current_sign_in_ip"
-    t.string   "last_sign_in_ip"
-    t.string   "confirmation_token"
+    t.string   "current_sign_in_ip",       limit: 255
+    t.string   "last_sign_in_ip",          limit: 255
+    t.string   "confirmation_token",       limit: 255
     t.datetime "confirmed_at"
     t.datetime "confirmation_sent_at"
-    t.string   "unconfirmed_email"
-    t.integer  "failed_attempts",          default: 0,  null: false
-    t.string   "unlock_token"
+    t.string   "unconfirmed_email",        limit: 255
+    t.integer  "failed_attempts",                      default: 0,  null: false
+    t.string   "unlock_token",             limit: 255
     t.datetime "locked_at"
     t.integer  "primary_identity_id"
-    t.string   "name",                     default: "", null: false
-    t.string   "username"
-    t.string   "external_avatar_url"
-    t.string   "external_cover_photo_url"
-    t.string   "fbid"
-    t.text     "fbtoken"
+    t.string   "name",                     limit: 255, default: "", null: false
+    t.string   "username",                 limit: 255
+    t.string   "external_avatar_url",      limit: 255
+    t.string   "external_cover_photo_url", limit: 255
+    t.string   "fbid",                     limit: 255
+    t.text     "fbtoken",                  limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "uuid",                                  null: false
+    t.string   "uuid",                                              null: false
     t.string   "fbemail"
     t.string   "avatar_file_name"
     t.string   "avatar_content_type"

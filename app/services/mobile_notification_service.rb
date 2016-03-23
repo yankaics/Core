@@ -126,7 +126,7 @@ module MobileNotificationService
                                       secret_access_key: ENV['S3_SECRET_ACCESS_KEY'])
   end
 
-  def self.send_named_notification(org_code, course_code)
+  def self.send_roll_call_notification(org_code, course_code)
     classmate_data = get_classmate_data(org_code, course_code)
 
     classmate_data.each do |classmate|
@@ -136,7 +136,7 @@ module MobileNotificationService
           if device.type == 'ios'
             MobileNotificationService.send("ios", "#{device.device_id}", "Colorgy 點名通知", message)
           elsif device.type == 'android'
-            android_named_notification(device.device_id, message)
+            android_roll_call_notification(device.device_id, message)
             puts device.device_id, message
           end
         end
@@ -146,7 +146,7 @@ module MobileNotificationService
     end
   end
 
-  def self.android_named_notification(device_id, message)
+  def self.android_roll_call_notification(device_id, message)
     url = URI("https://gcm-http.googleapis.com/gcm/send")
 
     http = Net::HTTP.new(url.host, url.port)
