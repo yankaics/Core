@@ -41,6 +41,7 @@ module MobileNotificationService
       apns_notification.sound = "#{sound_type}.aiff" if sound_type
 
       apns_pusher.push(apns_notification)
+      apns_dev_pusher.push(apns_notification) if apns_dev_pusher
 
     when 'android'
       gcm_data = {
@@ -70,7 +71,7 @@ module MobileNotificationService
   def self.send_notification(notification)
     notification.user.devices.each do |device|
       begin
-        send(device.type, device.device_id, notification.subject, notification.message, url: notification.url, payload: notification.payload)  # TODO: deal with badge and sound
+        send(device.type, device.device_id, notification.subject, notification.message, url: notification.url, payload: (notification.payload.blank? ? nil : JSON.parse(notification.payload)))  # TODO: deal with badge and sound
       rescue Exception => e
 
       end
@@ -103,11 +104,47 @@ module MobileNotificationService
     return certificate_pem_file
   end
 
+  def self.apns_dev_certificate_pem_file
+    certificate_pem_file = StringIO.new('')
+
+    case ENV['APNS_PEM_STORAGE'] || ENV['APNS_DEV_PEM_STORAGE']
+    when 'local'
+      begin
+        certificate_pem_file = File.open(ENV['APNS_DEV_PEM_PATH'])
+
+      rescue Exception => e
+        Rails.logger.error("ApnsService error: #{e}")
+      end
+
+    when 's3'
+      begin
+        certificate_pem_object = aws_service.bucket(ENV['S3_BUCKET']).objects.find(ENV['APNS_DEV_PEM_PATH'])
+        certificate_text = certificate_pem_object.content
+        certificate_pem_file = StringIO.new(certificate_text)
+
+      rescue Exception => e
+        Rails.logger.error("ApnsService error: #{e}")
+      end
+    end
+
+    return certificate_pem_file
+  end
+
   def self.apns_pusher
     @@apns_pusher ||= Grocer.pusher(
       certificate: apns_certificate_pem_file,
       gateway:     ENV['APNS_HOST'],
       port:        ENV['APNS_PORT'],
+      retries:     3
+    )
+  end
+
+  def self.apns_dev_pusher
+    return nil if ENV['APNS_DEV_PEM_PATH'].blank?
+    @@apns_pusher ||= Grocer.pusher(
+      certificate: apns_dev_certificate_pem_file,
+      gateway:     ENV['APNS_DEV_HOST'] || ENV['APNS_HOST'],
+      port:        ENV['APNS_DEV_PORT'] || ENV['APNS_PORT'],
       retries:     3
     )
   end
