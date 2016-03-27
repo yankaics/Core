@@ -48,7 +48,8 @@ module MobileNotificationService
         notification: {
           subject: subject,
           message: message,
-          tickerText: "#{subject}: #{message}"
+          tickerText: "#{subject}: #{message}",
+          "smallIcon": "ic_logo"
         },
         payload: payload
       }
