@@ -71,6 +71,11 @@ Rails.application.routes.draw do
   get '/sso_redirect_iframe' => 'sso#get_sso_redirect_iframe'
   get '/sso_new_session' => 'sso#get_sso_new_session'
 
+  # user manual validation route
+  resources :user_manual_validations, only: [:index, :new, :create]
+  get 'user_manual_validation/thank_you' => 'user_manual_validations#thank_you_page', as: :thank_you_page
+  get 'user_manual_validation/sso_new_session' => 'user_manual_validations#sso_login'
+
   # Developers
   scope '/developers' do
     resources :applications, :controller => 'oauth/applications'
