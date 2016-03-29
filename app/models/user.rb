@@ -31,6 +31,7 @@ class User < ActiveRecord::Base
   has_many :access_grants, class_name: 'Doorkeeper::AccessGrant', foreign_key: :resource_owner_id
   has_many :access_tokens, class_name: 'Doorkeeper::AccessToken', foreign_key: :resource_owner_id
   has_many :devices, class_name: :UserDevice
+  has_one :user_manual_validation
 
   delegate :organization, :organization_code, :started_at,
            :department, :department_code, :uid, :identity,
