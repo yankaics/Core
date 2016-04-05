@@ -389,6 +389,7 @@ GEM
       pry (~> 0.10)
     pry-rails (0.3.4)
       pry (>= 0.9.10)
+    puma (3.2.0)
     rabl (0.11.6)
       activesupport (>= 2.3.14)
     rack (1.6.4)
@@ -677,6 +678,7 @@ DEPENDENCIES
   pg
   pry-byebug
   pry-rails
+  puma
   rack-cors
   rack-oauth2 (~> 1.1.1)
   railroady
