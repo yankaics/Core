@@ -38,6 +38,10 @@ task :environment do
 
   # For those using RVM, use this to load an RVM version@gemset.
   # invoke :'rvm:use[ruby-1.9.3-p125@default]'
+  queue %{
+    source /home/deploy/.rvm/scripts/rvm
+    rvm use 2.2.0
+  }
 end
 
 # Put any custom mkdir's in here for when `mina setup` is ran.
