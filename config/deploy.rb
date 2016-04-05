@@ -17,6 +17,8 @@ set :branch, 'deploy-core-via-mina-nginx-puma'
 set :app_path, lambda { "#{deploy_to}/#{current_path}" }
 set :forward_agent, true
 
+
+
 # For system-wide RVM install.
 #   set :rvm_path, '/usr/local/rvm/bin/rvm'
 
@@ -31,6 +33,11 @@ set :shared_paths, ['config/database.yml', 'config/secrets.yml', 'log']
 
 # This task is the environment that is loaded for most commands, such as
 # `mina deploy` or `mina rake`.
+
+task :env do
+   #
+end
+
 task :environment do
   # If you're using rbenv, use this to load the rbenv environment.
   # Be sure to commit your .ruby-version or .rbenv-version to your repository.
@@ -40,8 +47,11 @@ task :environment do
   # invoke :'rvm:use[ruby-1.9.3-p125@default]'
   queue %{
     source /home/deploy/.rvm/scripts/rvm
+    source /home/deploy/.bashrc
     rvm use 2.2.0
   }
+
+  # set :ssh_options, %{export #{File.open(".env").readlines.map(&:chomp).join(" ")}}
 end
 
 # Put any custom mkdir's in here for when `mina setup` is ran.
@@ -89,6 +99,47 @@ task :deploy => :environment do
       queue "mkdir -p #{deploy_to}/#{current_path}/tmp/"
       queue "touch #{deploy_to}/#{current_path}/tmp/restart.txt"
     end
+  end
+end
+
+
+###############
+
+desc "Deploys the current version to the server."
+task :deploy => :environment do
+  deploy do
+    # Put things that will set up an empty directory into a fully set-up
+    # instance of your project.
+    invoke :'git:clone'
+    invoke :'deploy:link_shared_paths'
+    invoke :'bundle:install'
+    invoke :'rails:db_migrate'
+    invoke :'rails:assets_precompile'
+    invoke :'deploy:cleanup'
+
+    to :launch do
+      invoke :'puma:restart'
+    end
+  end
+end
+
+namespace :puma do
+  desc "Start the application"
+  task :start do
+    queue 'echo "-----> Start Puma"'
+    queue "cd #{app_path} && RAILS_ENV=#{stage} && bin/puma.sh start", :pty => false
+  end
+
+  desc "Stop the application"
+  task :stop do
+    queue 'echo "-----> Stop Puma"'
+    queue "cd #{app_path} && RAILS_ENV=#{stage} && bin/puma.sh stop"
+  end
+
+  desc "Restart the application"
+  task :restart do
+    queue 'echo "-----> Restart Puma"'
+    queue "cd #{app_path} && RAILS_ENV=#{stage} && bin/puma.sh restart"
   end
 end
 
