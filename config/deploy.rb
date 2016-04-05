@@ -105,24 +105,6 @@ end
 
 ###############
 
-desc "Deploys the current version to the server."
-task :deploy => :environment do
-  deploy do
-    # Put things that will set up an empty directory into a fully set-up
-    # instance of your project.
-    invoke :'git:clone'
-    invoke :'deploy:link_shared_paths'
-    invoke :'bundle:install'
-    invoke :'rails:db_migrate'
-    invoke :'rails:assets_precompile'
-    invoke :'deploy:cleanup'
-
-    # to :launch do
-    #   invoke :'puma:restart'
-    # end
-  end
-end
-
 namespace :puma do
   desc "Start the application"
   task :start do
