@@ -8,3 +8,4 @@ Rails.application.config.assets.version = '1.0'
 # Rails.application.config.assets.precompile += %w( search.js )
 Rails.application.config.assets.precompile += %w( inbox.css )
 Rails.application.config.assets.precompile += %w( api_docs/explorer.js )
+Rails.application.config.assets.precompile += %w( user_manual_validation.css user_manual_validation.js )

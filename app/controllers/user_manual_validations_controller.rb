@@ -1,5 +1,5 @@
 class UserManualValidationsController < ApplicationController
-	before_action :authenticate_admin!, only: :index
+	before_action :authenticate_admin!, only: [:index, :update_user_org_code]
 	before_action :authenticate_user!, only: [:new, :create]
 
 	def index
@@ -8,6 +8,35 @@ class UserManualValidationsController < ApplicationController
 
 	def new
 		@user_manual_validation = current_user.build_user_manual_validation
+	end
+
+	def update_user_org_code
+		org = params[:org]
+		validation_id = params[:validation_id].to_i
+		user_id = params[:user_id].to_i
+		@user_manual_validation = UserManualValidation.find(validation_id)
+		@user = User.find(user_id)
+		@user.unconfirmed_organization_code = org
+
+    respond_to do |format|
+      if @user.save
+      	@user_manual_validation.update({ state: 'passed' })
+        format.json { render json:
+          {
+            state: 'success',
+            user: @user,
+            user_manual_validation: @user_manual_validation
+          }
+        }
+      else
+        format.json { render json:
+          {
+            state: 'error',
+            error: @user.errors.full_messages
+          }
+        }
+      end
+    end
 	end
 
 	def thank_you_page
