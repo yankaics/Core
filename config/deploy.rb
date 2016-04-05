@@ -112,25 +112,25 @@ end
 
 ###############
 
-namespace :puma do
-  desc "Start the application"
-  task :start do
-    queue 'echo "-----> Start Puma"'
-    queue "cd #{app_path} && RAILS_ENV='production' && bin/puma.sh start"
-  end
+# namespace :puma do
+#   desc "Start the application"
+#   task :start do
+#     queue 'echo "-----> Start Puma"'
+#     queue "cd #{app_path} && RAILS_ENV='production' && bin/puma.sh start"
+#   end
 
-  desc "Stop the application"
-  task :stop do
-    queue 'echo "-----> Stop Puma"'
-    queue "cd #{app_path} && RAILS_ENV='production' && bin/puma.sh stop"
-  end
+#   desc "Stop the application"
+#   task :stop do
+#     queue 'echo "-----> Stop Puma"'
+#     queue "cd #{app_path} && RAILS_ENV='production' && bin/puma.sh stop"
+#   end
 
-  # desc "Restart the application"
-  # task :restart do
-  #   queue 'echo "-----> Restart Puma"'
-  #   queue "cd #{app_path} && RAILS_ENV='production' && bin/puma.sh restart"
-  # end
-end
+#   # desc "Restart the application"
+#   # task :restart do
+#   #   queue 'echo "-----> Restart Puma"'
+#   #   queue "cd #{app_path} && RAILS_ENV='production' && bin/puma.sh restart"
+#   # end
+# end
 
 # For help in making your deploy script, see the Mina documentation:
 #
