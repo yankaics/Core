@@ -34,7 +34,11 @@ gem 'spring',        group: :development
 
 # Use unicorn as the app server
 # gem 'unicorn'
+
+# Use puma as the app server
 gem 'puma'
+# Use figaro to setup env
+gem "figaro"
 
 gem 'sinatra', :require => nil
 

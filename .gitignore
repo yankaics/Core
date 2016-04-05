@@ -27,3 +27,6 @@ erd.pdf
 erd.dot
 
 .powder
+
+# Ignore application configuration
+/config/application.yml
