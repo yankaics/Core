@@ -110,6 +110,11 @@ task :deploy => :environment do
   end
 end
 
+task :cat_server_log => :environment do
+  queue "tail -n 200 #{deploy_to}/current/log/production.log"
+end
+
+
 
 ###############
 
