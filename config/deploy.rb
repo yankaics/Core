@@ -136,11 +136,11 @@ namespace :puma do
     queue "cd #{deploy_to}/#{current_path} && RAILS_ENV=#{stage} && bin/puma.sh stop"
   end
 
-  desc "Restart the application"
-  task :restart do
-    queue 'echo "-----> Restart Puma"'
-    queue "cd #{deploy_to}/#{current_path} && RAILS_ENV=#{stage} && bin/puma.sh restart"
-  end
+  # desc "Restart the application"
+  # task :restart do
+  #   queue 'echo "-----> Restart Puma"'
+  #   queue "cd #{deploy_to}/#{current_path} && RAILS_ENV=#{stage} && bin/puma.sh restart"
+  # end
 end
 
 # For help in making your deploy script, see the Mina documentation:
