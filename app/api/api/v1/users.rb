@@ -244,6 +244,7 @@ class API::V1::Users < API::V1
 
     begin
       user.save!
+      {state: "success", message: "user successfully registered"}
     rescue Exception => e
       # 校驗失敗: 密碼確認 不符合確認值, 登入密碼 過短（最短是 8 個字）
       # 慣用電子郵件信箱 不能是空白字元
