@@ -38,6 +38,7 @@ gem 'spring',        group: :development
 # Use puma as the app server
 gem 'puma'
 gem 'mina-puma', :require => false
+gem 'mina-tail', require: false
 
 gem 'sinatra', :require => nil
 

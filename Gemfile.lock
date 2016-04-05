@@ -340,6 +340,8 @@ GEM
       rake
     mina-puma (0.2.0)
       mina
+    mina-tail (0.0.1)
+      mina (>= 0.2.1)
     mini_portile (0.6.2)
     minitest (5.8.0)
     multi_json (1.11.2)
@@ -669,6 +671,7 @@ DEPENDENCIES
   meta-tags (~> 2.0.0)
   meta_request
   mina-puma
+  mina-tail
   newrelic_rpm
   nexmo
   nprogress-rails (~> 0.1.6.5)

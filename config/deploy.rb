@@ -1,3 +1,4 @@
+require 'mina/tail'
 require 'mina/bundler'
 require 'mina/rails'
 require 'mina/git'
