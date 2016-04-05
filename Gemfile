@@ -37,8 +37,6 @@ gem 'spring',        group: :development
 
 # Use puma as the app server
 gem 'puma'
-# Use figaro to setup env
-gem "figaro"
 
 gem 'sinatra', :require => nil
 
