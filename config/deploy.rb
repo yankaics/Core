@@ -117,9 +117,9 @@ task :deploy => :environment do
     invoke :'rails:assets_precompile'
     invoke :'deploy:cleanup'
 
-    to :launch do
-      invoke :'puma:restart'
-    end
+    # to :launch do
+    #   invoke :'puma:restart'
+    # end
   end
 end
 
