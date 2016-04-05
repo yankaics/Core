@@ -109,7 +109,7 @@ namespace :puma do
   desc "Start the application"
   task :start do
     queue 'echo "-----> Start Puma"'
-    queue "cd #{app_path} && RAILS_ENV='production' && bin/puma.sh start", :pty => false
+    queue "cd #{app_path} && RAILS_ENV='production' && bin/puma.sh start"
   end
 
   desc "Stop the application"
