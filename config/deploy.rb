@@ -18,7 +18,6 @@ set :repository, 'git@github.com:colorgy/Core.git'
 set :branch, 'deploy-core-via-mina-nginx-puma'
 set :app_path, lambda { "#{deploy_to}/#{current_path}" }
 set :forward_agent, true
-set :puma_config,  -> { "#{deploy_to}/#{current_path}/config/puma.rb" }
 
 # For system-wide RVM install.
 #   set :rvm_path, '/usr/local/rvm/bin/rvm'
