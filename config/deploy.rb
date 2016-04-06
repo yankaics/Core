@@ -4,7 +4,7 @@ require 'mina/git'
 require 'mina/puma'
 require 'mina/tail'
 # require 'mina/rbenv'  # for rbenv support. (http://rbenv.org)
-# require 'mina/rvm'    # for rvm support. (http://rvm.io)
+require 'mina/rvm'    # for rvm support. (http://rvm.io)
 
 # Basic settings:
 #   domain       - The hostname to SSH to.
@@ -18,15 +18,14 @@ set :repository, 'git@github.com:colorgy/Core.git'
 set :branch, 'deploy-core-via-mina-nginx-puma'
 set :app_path, lambda { "#{deploy_to}/#{current_path}" }
 set :forward_agent, true
-
-
+set :puma_config,  -> { "#{deploy_to}/#{current_path}/config/puma.rb" }
 
 # For system-wide RVM install.
 #   set :rvm_path, '/usr/local/rvm/bin/rvm'
 
 # Manually create these paths in shared/ (eg: shared/config/database.yml) in your server.
 # They will be linked in the 'deploy:link_shared_paths' step.
-set :shared_paths, ['.env', 'config/database.yml', 'config/secrets.yml', 'log', 'tmp/pids', 'tmp/sockets']
+set :shared_paths, ['.env', 'config/database.yml', 'config/secrets.yml', 'log', 'tmp/pids', 'tmp/sockets', 'config/puma.rb']
 
 # Optional settings:
 #   set :user, 'foobar'    # Username in the server to SSH to.
@@ -36,10 +35,6 @@ set :shared_paths, ['.env', 'config/database.yml', 'config/secrets.yml', 'log', 
 # This task is the environment that is loaded for most commands, such as
 # `mina deploy` or `mina rake`.
 
-task :env do
-   #
-end
-
 task :environment do
   # If you're using rbenv, use this to load the rbenv environment.
   # Be sure to commit your .ruby-version or .rbenv-version to your repository.
@@ -47,11 +42,7 @@ task :environment do
 
   # For those using RVM, use this to load an RVM version@gemset.
   # invoke :'rvm:use[ruby-1.9.3-p125@default]'
-  queue %{
-    source /home/deploy/.rvm/scripts/rvm
-    source /home/deploy/.bashrc
-    rvm use 2.2.0
-  }
+  invoke :'rvm:use[ruby-2.2.0@default]'
 
   # set :ssh_options, %{export #{File.open(".env").readlines.map(&:chomp).join(" ")}}
 end
@@ -60,20 +51,41 @@ end
 # For Rails apps, we'll make some of the shared paths that are shared between
 # all releases.
 task :setup => :environment do
+  queue! %[mkdir -p "#{deploy_to}/#{shared_path}/tmp"]
+  queue! %[chmod g+rx,u+rwx "#{deploy_to}/#{shared_path}/tmp"]
+
   queue! %(mkdir -p "#{deploy_to}/#{shared_path}/tmp/sockets")
   queue! %(chmod g+rx,u+rwx "#{deploy_to}/#{shared_path}/tmp/sockets")
+
   queue! %(mkdir -p "#{deploy_to}/#{shared_path}/tmp/pids")
   queue! %(chmod g+rx,u+rwx "#{deploy_to}/#{shared_path}/tmp/pids")
 
   queue! %[mkdir -p "#{deploy_to}/#{shared_path}/log"]
   queue! %[chmod g+rx,u+rwx "#{deploy_to}/#{shared_path}/log"]
 
+  # tmp/sockets/puma.state
+  queue! %[touch "#{deploy_to}/#{shared_path}/tmp/sockets/puma.state"]
+  queue  %[echo "-----> Be sure to edit '#{shared_path}/tmp/sockets/puma.state'."]
+
+  # log/stdout
+  queue! %[touch "#{deploy_to}/#{shared_path}/tmp/log/stdout"]
+  queue  %[echo "-----> Be sure to edit '#{shared_path}/tmp/log/stdout'."]
+
+  # log/stderr
+  queue! %[touch "#{deploy_to}/#{shared_path}/tmp/log/stderr"]
+  queue  %[echo "-----> Be sure to edit '#{shared_path}/tmp/log/stderr'."]
+
   queue! %[mkdir -p "#{deploy_to}/#{shared_path}/config"]
   queue! %[chmod g+rx,u+rwx "#{deploy_to}/#{shared_path}/config"]
+
+  # puma.rb
+  queue! %[touch "#{deploy_to}/#{shared_path}/config/puma.rb"]
+  queue  %[echo "-----> Be sure to edit '#{shared_path}/config/puma.rb'."]
 
   queue! %[touch "#{deploy_to}/#{shared_path}/config/database.yml"]
   queue! %[touch "#{deploy_to}/#{shared_path}/config/secrets.yml"]
   queue  %[echo "-----> Be sure to edit '#{deploy_to}/#{shared_path}/config/database.yml' and 'secrets.yml'."]
+
 
   if repository
     repo_host = repository.split(%r{@|://}).last.split(%r{:|\/}).first
@@ -111,7 +123,7 @@ task :deploy => :environment do
 end
 
 task :cat_server_log => :environment do
-  queue "tail -n 200 #{deploy_to}/current/log/production.log"
+  queue "tail -f -n 200 #{deploy_to}/current/log/production.log"
 end
 
 
