@@ -292,7 +292,8 @@ class User < ActiveRecord::Base
     :sign_in_count,
     :created_at,
     :updated_at,
-    :last_sign_in_at
+    :last_sign_in_at,
+    :is_test_account
   ]
 
   FB_ATTRS = [
