@@ -1,4 +1,42 @@
-- @user_manual_validations.each do |user_manual_validation|
-	tr
-		td= user_manual_validation.user.name
-		td= image_tag user_manual_validation.validation_image.url
+= stylesheet_link_tag 'user_manual_validation', media: 'all', 'data-turbolinks-track' => true
+.container
+	table.table
+		thead
+			tr
+				th 使用者名稱
+				th 圖片
+				th 狀態
+				th 開通
+				th 提交時間
+
+		tbody
+		- @user_manual_validations.each do |user_manual_validation|
+			tr
+				td= user_manual_validation.user.name
+				td
+					a target="_blank" href="#{user_manual_validation.validation_image.url}" 開啟圖片
+				td= user_manual_validation.state
+				td
+					- if user_manual_validation.state == 'passed'
+						span= user_manual_validation.user.unconfirmed_organization_code
+					- else
+						select class="update-org-select" user-id="#{user_manual_validation.user_id}" validation-id="#{user_manual_validation.id}"
+						  - Organization.all_for_select.each do |org|
+						  	option value="#{org[1]}" = org[0]
+						button.update-org-btn user-id="#{user_manual_validation.user_id}" validation-id="#{user_manual_validation.id}" 更新
+				td= user_manual_validation.created_at
+
+javascript:
+	$(document).ready(function() {
+	  $('.update-org-select').select2();
+	});
+
+	$('.update-org-btn').click(function(){
+		var user_id = $(this).attr('user-id');
+		var validation_id = $(this).attr('validation-id');
+		var org = $('.update-org-select[validation-id="' + validation_id + '"]').val();
+		var reqURL = '/user_manual_validation/update_user_org_code' + '?user_id=' + user_id + '&org=' + org + '&validation_id=' + validation_id;
+		$.post(reqURL, function(response){
+			console.log(response);
+		})
+	})
