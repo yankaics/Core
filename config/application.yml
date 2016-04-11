@@ -1,0 +1,61 @@
+# Add configuration values here, as shown below.
+#
+# pusher_app_id: "2954"
+# pusher_key: 7381a978f7dd7f9a1117
+# pusher_secret: abdc3b896a0ffb85d373
+# stripe_api_key: sk_test_2J0l093xOyW72XUYJHE4Dv2r
+# stripe_publishable_key: pk_test_ro9jV5SNwGb1yYlQfzG17LHK
+#
+# production:
+#   stripe_api_key: sk_live_EeHnL644i6zo4Iyq4v1KdV9H
+#   stripe_publishable_key: pk_live_9lcthxpSIHbGwmdO941O1XVU
+
+production:
+  DATABASE_URL: "postgresql://colorgy:C4XpxRYdXGFpRbzTuRresN4JhFQkccMGt2K@colorgy.c4yccvz3zurh.ap-northeast-1.rds.amazonaws.com/core?pool=0"
+  APP_NAME: "Colorgy"
+  SECRET_KEY_BASE: "249b0336c76cf7f339422a1cf4a6d513c38453159e92dc82524f5ee42c2d0e23944ab970bcae49a331a0a40bb192863f9f0de59296a490d446751ca12c5bb5f8"
+  PEPPER: "ce8072b79c4c401139fe01f3e7e97d5cb54e3f58324f44fbfb21b4c748e58f2ea63c15bd359c6087e8561897a6d4fb9bd43fc5d4fb0063df348aa1dc504ba698"
+  MAILER_SENDER: "hello@colorgy.io"
+  MAILER_DELIVERY_METHOD: "mailgun"
+  MAILGUN_API_KEY: "key-5ad80c44e8ef73343b3ad47f98d77090"
+  MAILGUN_SMTP_LOGIN: "mg.colorgy.io"
+  SMS_DELIVERY_METHOD: "twilio"
+  NEXMO_KEY: "dd024bf7"
+  NEXMO_SECRET: "f96005c9"
+  FB_APP_ID: "752440461479659"
+  FB_APP_SECRET: "b18b8ad90da4fe8f1719e86eba91140f"
+  NEWRELIC_LICENSE_KEY: "db8c841dcded1b44ba0172aba1f56d399b2ce4dc"
+  REMOTE_LOGGER_HOST: "logs2.papertrailapp.com"
+  REMOTE_LOGGER_PORT: "38468"
+  SITE_SECRET: "78ffabaea2050a3d5e3b071a5501e2c184e1eae5a90abc844128e697c24081b1649006f017cccadcbb9582bcb24c66da5bc0ba9ae9a14271a0726555dcc23e83"
+  APP_URL: "https://colorgy.io"
+  INVITATION_CODE_KEY: "c458090ea980f652114823b2213ebf7abebe4d610054d7ada2fbdd661166be32b2ca068219d0000e3a7c80f315c1a1ada5c3bd18f85833c491d2e301d1340fb6"
+  NEWRELIC_APP_NAME: "Colorgy;Colorgy-Core"
+  APP_CONTACT_URL: "https://www.facebook.com/pages/Colorgy/1529686803975150"
+  API_DATABASE_URL: "postgresql://colorgy:C4XpxRYdXGFpRbzTuRresN4JhFQkccMGt2K@colorgy.c4yccvz3zurh.ap-northeast-1.rds.amazonaws.com/api"
+  LOGGER: "remote"
+  CORE_RSA_PRIVATE_KEY_1: "-----BEGIN RSA PRIVATE KEY-----\nMIICXgIBAAKBgQC6QlxeMW99W5azKyoITDCcdfMkPdmTp9br1rpsMwJE3oRtJ0KQ\nZIPGc85FEIMg7sxB5c/alvgtr1Uh2vAu/Lhv8eb1MwA5wenqY5EFILLpReDaUVDH\nWA/BeRYRmcyB6svBMfkP3/m1NtMixtqcyzYo4b3DXWnO8Zfi8n3eaGbWBQIDAQAB\nAoGBAIKxB6DsLR+XwWFMezz"
+  CORE_RSA_PRIVATE_KEY_2: "BQSa3uHiIkX+CuFJZJAvBqujp/Z+deZ5ZeQEpxuU9\nFdVo2Zevii4F2nQr359WwUsm9r4bXE3YXeqY0jiAWnJFi8Q0iomQCvex7u8TMNaO\nMon13pUgOH8rkR58lgN8MsKs1VVoiamPD/JLMfOvFe9QJCQNAkEA2z2Z55fPyNcX\nf7ukcAM5w/D7k5JrSiMxbSNo9eM1TuTFodSovJ7cCiQ9mwH4ZkN4ofTs/8xAaPwj\nlUAFVM5TWwJBA"
+  CORE_RSA_PRIVATE_KEY_3: "Nl9G9Ofk/BOdL+NrpWKjJ4EvvHTZ4i++tJYpfCobP16a4Rl2jEN\nwXoyHYZxWiYpt510fDKvbMqCci7DujCymh8CQQCFFEZoquEIs29jLJ5rE7orswqy\nkC0qCmTFL7pVjz5bjkhcrD5kiDVevpLalX6XbJs8C/UUbIIod+yNexgBW2CDAkEA\ni7LA3P3zmLfMZf4r1gJYsGd7/vk716pUkig+7oZA+9BWn4SM0lVzoXnvXRwSO9Ew\nEAN"
+  CORE_RSA_PRIVATE_KEY_4: "yg1wLFUkU7tTqE72lIQJAVwhr5E6D1SoNA+vWGtWQEi2S0GGV8jEjlX+oma2k\nG4zcBRSRxHccEsuK04maoPzxZUXFNysMXD2gWkUYc8aG2A==\n-----END RSA PRIVATE KEY-----\n"
+  GOOGLE_ANALYTICS_ID: "UA-60031864-5,UA-60031864-1"
+  SKIP_NEW_USER_IDENTITY_VERIFICATION: "false"
+  REDIS_URL: "redis://colorgy-redis.yxekba.0001.apne1.cache.amazonaws.com:6379"
+  FB_APP_ADDITIONAL_SCOPES: "user_birthday,user_friends"
+  workers: "2"
+  FILE_STORAGE: "s3"
+  S3_BUCKET: "colorgy-core"
+  S3_HOST_NAME: "s3-ap-northeast-1.amazonaws.com"
+  S3_ACCESS_KEY_ID: "AKIAIIDDRVTKA3NR7LCQ"
+  S3_SECRET_ACCESS_KEY: "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"
+  WORKER_CONCURRENCY: "4"
+  TWILIO_ACCOUNT_SID: "AC7a61b891aeb9fbe7a52193b03f27c354"
+  TWILIO_AUTH_TOKEN: "428ae3d3c537546b068f7951a8d0990d"
+  TWILIO_FROM_NUMBER: "+12568500808"
+  APNS_PEM_PATH: "apns-cert.pem"
+  APNS_HOST: "gateway.push.apple.com"
+  APNS_PORT: "2195"
+  APNS_PEM_STORAGE: "s3"
+  GCM_API_KEY: "AIzaSyBgx_10Advw2Se7h4YxkWP5s-mV31i3Zmc"
+  APNS_DEV_PEM_PATH: "apns-dev-cert.pem"
+
