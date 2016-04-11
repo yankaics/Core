@@ -51,8 +51,8 @@ gem 'httparty', '~> 0.13.1'
 gem 'aws-sdk', '~> 1.6'
 
 # Job runner and clock
-gem 'sidekiq', '~> 3.4.2'
-gem 'sidekiq-limit_fetch'
+gem 'sidekiq', '~> 4.1.1'
+gem 'sidekiq-limit_fetch', '~> 3.1.0'
 gem 'clockwork', '~> 1.2.0'
 
 # Grape API
