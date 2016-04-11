@@ -12,12 +12,16 @@
 			.fileUpload.user-validation-block-submit
 				span 上傳檔案
 				= form.file_field :validation_image, class:'hidden-file-upload-tag', id: 'file-upload-input'
-
+.loading-view
+	.loading-view-inner
+		h3.loading-view-text 檔案上傳中
+		.progress
+			.indeterminate
 
 javascript:
   $(function() {
 	   $("#file-upload-input").change(function(){
-	     var fileName = $(this).val();
+	     $('.loading-view').addClass('active');
 	     $('#new_user_manual_validation').submit();
 	   });
 	});

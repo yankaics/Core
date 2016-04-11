@@ -3,7 +3,8 @@ class UserManualValidationsController < ApplicationController
 	before_action :authenticate_user!, only: [:new, :create]
 
 	def index
-		@user_manual_validations = UserManualValidation.includes(:user).page(1).per(20)
+    @user_manual_validations = UserManualValidation.where.not(user_id: nil)
+		@user_manual_validations = @user_manual_validations.includes(:user).page(1).per(20)
 	end
 
 	def new
