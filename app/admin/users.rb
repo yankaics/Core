@@ -244,7 +244,7 @@ ActiveAdmin.register User do
       f.input :username if current_admin.root?
       f.input :fbid if current_admin.root?
       f.input :encrypted_password if current_admin.root?
-      f.input :reset_password_token if current_admin.root?
+      # f.input :reset_password_token if current_admin.root?
       f.input :reset_password_sent_at if current_admin.root?
       f.input :remember_created_at if current_admin.root?
       f.input :sign_in_count if current_admin.root?
