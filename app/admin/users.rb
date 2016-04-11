@@ -252,7 +252,7 @@ ActiveAdmin.register User do
       f.input :last_sign_in_at if current_admin.root?
       f.input :current_sign_in_ip if current_admin.root?
       f.input :last_sign_in_ip if current_admin.root?
-      f.input :confirmation_token if current_admin.root?
+      # f.input :confirmation_token if current_admin.root?
       f.input :confirmed_at if current_admin.root?
       f.input :confirmation_sent_at if current_admin.root?
       f.input :unconfirmed_email if current_admin.root?
