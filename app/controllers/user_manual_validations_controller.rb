@@ -71,8 +71,8 @@ class UserManualValidationsController < ApplicationController
         end
       end
 
-      redirect_to new_user_manual_validation_path
     end
+    redirect_to new_user_manual_validation_path
 
     render nothing: true unless performed?
 	end
