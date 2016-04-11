@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160329075118) do
+ActiveRecord::Schema.define(version: 20160410134650) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace"
@@ -436,6 +436,7 @@ ActiveRecord::Schema.define(version: 20160329075118) do
     t.string   "cover_photo_content_type"
     t.integer  "cover_photo_file_size"
     t.datetime "cover_photo_updated_at"
+    t.boolean  "is_test_account",                      default: false, null: false
   end
 
   add_index "users", ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
