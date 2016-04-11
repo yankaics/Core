@@ -167,7 +167,7 @@ Doorkeeper.configure do
       u = User.find_for_database_authentication(email: username)
       u = User.find_for_database_authentication(username: username) if u.blank?
 
-      if u.present?
+      if u.present? && u.confirmed?
         if u.access_locked?
           u.unlock_access! if u.locked_at < Time.now - User.unlock_in
         end
