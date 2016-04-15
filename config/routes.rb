@@ -75,6 +75,7 @@ Rails.application.routes.draw do
   resources :user_manual_validations, only: [:index, :new, :create]
   get 'user_manual_validation/thank_you' => 'user_manual_validations#thank_you_page', as: :thank_you_page
   get 'user_manual_validation/sso_new_session' => 'user_manual_validations#sso_login'
+  post 'user_manual_validation/update_user_org_code' => 'user_manual_validations#update_user_org_code'
 
   # Developers
   scope '/developers' do

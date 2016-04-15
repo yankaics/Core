@@ -1,13 +1,43 @@
 class UserManualValidationsController < ApplicationController
-	before_action :authenticate_admin!, only: :index
+	before_action :authenticate_admin!, only: [:index, :update_user_org_code]
 	before_action :authenticate_user!, only: [:new, :create]
 
 	def index
-		@user_manual_validations = UserManualValidation.includes(:user).page(1).per(20)
+    @user_manual_validations = UserManualValidation.where.not(user_id: nil)
+		@user_manual_validations = @user_manual_validations.includes(:user).page(1).per(20)
 	end
 
 	def new
 		@user_manual_validation = current_user.build_user_manual_validation
+	end
+
+	def update_user_org_code
+		org = params[:org]
+		validation_id = params[:validation_id].to_i
+		user_id = params[:user_id].to_i
+		@user_manual_validation = UserManualValidation.find(validation_id)
+		@user = User.find(user_id)
+		@user.unconfirmed_organization_code = org
+
+    respond_to do |format|
+      if @user.save
+      	@user_manual_validation.update({ state: 'passed' })
+        format.json { render json:
+          {
+            state: 'success',
+            user: @user,
+            user_manual_validation: @user_manual_validation
+          }
+        }
+      else
+        format.json { render json:
+          {
+            state: 'error',
+            error: @user.errors.full_messages
+          }
+        }
+      end
+    end
 	end
 
 	def thank_you_page
@@ -42,8 +72,8 @@ class UserManualValidationsController < ApplicationController
         end
       end
 
-      redirect_to new_user_manual_validation_path
     end
+    redirect_to new_user_manual_validation_path
 
     render nothing: true unless performed?
 	end
