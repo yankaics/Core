@@ -4,7 +4,7 @@ class UserManualValidationsController < ApplicationController
 
 	def index
     @user_manual_validations = UserManualValidation.where.not(user_id: nil)
-		@user_manual_validations = @user_manual_validations.includes(:user).page(1).per(20)
+		@user_manual_validations = @user_manual_validations.order("created_at DESC").includes(:user).page(1).per(20)
 	end
 
 	def new
