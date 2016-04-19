@@ -3,8 +3,8 @@ class UserManualValidationsController < ApplicationController
 	before_action :authenticate_user!, only: [:new, :create]
 
 	def index
-    @user_manual_validations = UserManualValidation.where.not(user_id: nil)
-		@user_manual_validations = @user_manual_validations.order("created_at DESC").includes(:user).page(1).per(20)
+    @user_manual_validations = UserManualValidation.where.not(user_id: nil).page(1).per(20)
+		@user_manual_validations = @user_manual_validations.order("created_at DESC").includes(:user)
 	end
 
 	def new
@@ -17,6 +17,10 @@ class UserManualValidationsController < ApplicationController
     if @user_manual_validation.destroy
       redirect_to user_manual_validations_path
     end
+  end
+
+  def update_user_test_account
+
   end
 
 	def update_user_org_code
