@@ -11,6 +11,14 @@ class UserManualValidationsController < ApplicationController
 		@user_manual_validation = current_user.build_user_manual_validation
 	end
 
+  def destroy
+    @user_manual_validation = UserManualValidation.find(params[:id])
+
+    if @user_manual_validation.destroy
+      redirect_to user_manual_validations_path
+    end
+  end
+
 	def update_user_org_code
 		org = params[:org]
 		validation_id = params[:validation_id].to_i

@@ -25,6 +25,8 @@
 						  	option value="#{org[1]}" = org[0]
 						button.update-org-btn user-id="#{user_manual_validation.user_id}" validation-id="#{user_manual_validation.id}" 更新
 				td= user_manual_validation.created_at
+				td
+					= button_to '刪除', user_manual_validation_path(user_manual_validation), :method => :delete
 
 javascript:
 	$(document).ready(function() {
