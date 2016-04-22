@@ -1,0 +1,162 @@
+<style type="text/css">
+	.email-wrapper{
+		background-color: #FFF;
+		border: 1px solid #EEE;
+		border-radius: 2px;
+		max-width: 800px;
+		margin: 0 auto;
+	}
+
+	.email-nav{
+		background-color: #FFF;
+		padding: 24px 48px;
+	}
+
+	.email-nav > img{
+		width: 200px;
+		height: auto;
+	}
+
+	.email-header{
+		padding: 24px 48px;
+		background-color: #F89680;
+	}
+
+	.email-header-title{
+		color: #FFF;
+	}
+
+	.email-body{
+		color: #666;
+		padding: 24px 48px;
+	}
+
+	.email-text{
+		font-size: 18px;
+	}
+
+  .bill-detail-card {
+    background-color: white;
+    border-bottom: 1px solid #EEEEEE;
+    padding: 10px;
+  }
+
+  .shop-name{
+  	display: block;
+    color: #959195;
+    padding: 12px 0;
+    border-bottom: 2px solid #B3B3B3;
+  }
+
+  .product-name {
+    margin-bottom: 8px;
+  }
+
+  .col{
+  	float: left;
+  }
+
+  .col.s8{
+		width: 66.66666666%;
+  }
+
+  .col.s10{
+		width: 83.33333333%;
+  }
+
+  .clear-both{
+  	clear: both;
+  }
+
+  .btn{
+		background-color: #00CFE4;
+		padding: 12px 32px;
+		color: #FFF;
+		display: inline-block;
+		text-decoration: none;
+  }
+
+  .text-align-center{
+  	text-align: center;
+  }
+
+  p{
+  	line-height: 30px;
+  }
+
+  .email-footer{
+  	border-bottom: 6px solid #F89680;
+  	background-color: #FAF7F5;
+  }
+
+  .email-footer-inner{
+  	padding: 24px 48px;
+  }
+
+  .footer-logo{
+  	float: left;
+  	padding: 8px 0;
+  }
+
+  .footer-logo > img{
+		width: 150px;
+		height: auto;
+	}
+
+  .footer-links{
+  	float: right;
+  }
+
+  .footer-link{
+  	display: inline-block;
+  	margin: 0 8px;
+  	padding: 8px 16px;
+  	text-decoration: none;
+  }
+
+	.footer-link.facebook{
+		background-color: #3b5998;
+		color: #FFF;
+		border-radius: 4px;
+	}
+
+	.cta-block{
+		padding: 32px 0;
+	}
+
+</style>
+<div class="email-wrapper">
+  <div class="email-nav">
+    <%= image_tag ('header_logo.png') %>
+  </div>
+  <div class="email-header">
+    <h1 class="email-header-title">票券訂單成功建立！</h1>
+  </div>
+
+  <div class="email-body">
+
+    <h2 class="email-title">親愛的 <%= @user.name %> 您好</h2>
+    <p class="email-text">
+      感謝您使用 Colorgy<br>
+      您的票券訂單已成功建立，請記得在<strong> <%= formatted_deadline(@event_ticket_bill) %></strong> 前付款
+    </p>
+    <%= render_bill_info(@event_ticket_bill) %>
+    <%= render partial: 'event_ticket_bill_detail', locals: { event_ticket_bill: @event_ticket_bill} %>
+    <p class="email-text text-align-center cta-block">
+      <%= link_to '查看明細', event_ticket_bill_url(@event_ticket_bill, host: "https://mall.colorgy.io"), class: 'btn', target: '_blank' %>
+    </p>
+    <p class="email-text">若您有任何訂單相關問題，請聯絡客服人員。<br>Colorgy敬上</p>
+
+  </div>
+  <div class="email-footer">
+    <div class="email-footer-inner">
+      <div class="footer-logo">
+        <%= image_tag ('header_logo.png') %>
+      </div>
+      <div class="footer-links">
+        <a class="footer-link facebook" href="https://www.facebook.com/ColorUCollege/">Facebook</a>
+      </div>
+      <div class="clear-both"></div>
+    </div>
+  </div>
+</div>
