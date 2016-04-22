@@ -3,7 +3,7 @@ class UserManualValidationsController < ApplicationController
 	before_action :authenticate_user!, only: [:new, :create]
 
 	def index
-    @user_manual_validations = UserManualValidation.where.not(user_id: nil).page(1).per(20)
+    @user_manual_validations = UserManualValidation.where.not(user_id: nil)
 		@user_manual_validations = @user_manual_validations.order("created_at DESC").includes(:user)
 	end
 
@@ -19,8 +19,31 @@ class UserManualValidationsController < ApplicationController
     end
   end
 
-  def update_user_test_account
+  def refuse_user
+    validation_id = params[:validation_id].to_i
+    user_id = params[:user_id].to_i
+    @user_manual_validation = UserManualValidation.find(validation_id)
+    @user = User.find(user_id)
+    @user_manual_validation.state = 'refused'
 
+    respond_to do |format|
+      if @user_manual_validation.save
+
+        format.json { render json:
+          {
+            state: 'success',
+            user_manual_validation: @user_manual_validation
+          }
+        }
+      else
+        format.json { render json:
+          {
+            state: 'error',
+            error: @user_manual_validation.errors.full_messages
+          }
+        }
+      end
+    end
   end
 
 	def update_user_org_code

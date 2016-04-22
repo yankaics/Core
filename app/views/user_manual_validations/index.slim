@@ -1,7 +1,5 @@
 = stylesheet_link_tag 'user_manual_validation', media: 'all', 'data-turbolinks-track' => true
 .container
-	div.paginate
-		= paginate @user_manual_validations
 	div
 		table.table
 			thead
@@ -11,6 +9,7 @@
 					th 狀態
 					th 開通
 					th 提交時間
+					th
 
 			tbody
 			- @user_manual_validations.each do |user_manual_validation|
@@ -22,21 +21,32 @@
 					td
 						- if user_manual_validation.state == 'passed'
 							span= user_manual_validation.user.unconfirmed_organization_code
-						- else
+						- elsif user_manual_validation.state == 'refused'
+							span= '已拒絕'
+						- elsif user_manual_validation.state == 'pending'
 							select class="update-org-select" user-id="#{user_manual_validation.user_id}" validation-id="#{user_manual_validation.id}"
 							  - Organization.all_for_select.each do |org|
 							  	option value="#{org[1]}" = org[0]
 							button.update-org-btn user-id="#{user_manual_validation.user_id}" validation-id="#{user_manual_validation.id}" 更新
+							button.refuse-btn user-id="#{user_manual_validation.user_id}" validation-id="#{user_manual_validation.id}" 拒絕
 					td= user_manual_validation.created_at
 					td
 						= button_to '刪除', user_manual_validation_path(user_manual_validation), :method => :delete
-	div.paginate
-		= paginate @user_manual_validations
 
 javascript:
 	$(document).ready(function() {
 	  $('.update-org-select').select2();
 	});
+
+	$('.refuse-btn').click(function(){
+		var user_id = $(this).attr('user-id');
+		var validation_id = $(this).attr('validation-id');
+		var reqURL = '/user_manual_validation/refuse_user' + '?user_id=' + user_id + '&validation_id=' + validation_id;
+		$.post(reqURL, function(response){
+			console.log(response);
+			$(this).parent('td').html('<span>refused</span>');
+		}.bind(this))
+	})
 
 	$('.update-org-btn').click(function(){
 		var user_id = $(this).attr('user-id');
@@ -44,6 +54,10 @@ javascript:
 		var org = $('.update-org-select[validation-id="' + validation_id + '"]').val();
 		var reqURL = '/user_manual_validation/update_user_org_code' + '?user_id=' + user_id + '&org=' + org + '&validation_id=' + validation_id;
 		$.post(reqURL, function(response){
-			console.log(response);
-		})
+			if(response.state == 'success'){
+				console.log(response);
+				var organization_code = response.user.organization_code;
+				$(this).parent('td').html('<span>' + organization_code + '</span>');
+			}
+		}.bind(this))
 	})
