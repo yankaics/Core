@@ -5,4 +5,5 @@ class UserMailer < Devise::Mailer
     opts[:subject] = "#{ENV['APP_NAME']} 帳號認證信"
     super
   end
+
 end
