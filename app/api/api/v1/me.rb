@@ -404,6 +404,8 @@ class API::V1::Me < API::V1
 
       @user_device = current_user.devices.build(ac_params.require(:user_device).permit(:type, :name, :device_id))
 
+      UserDevice.where(device_id: @user_device.device_id).destroy_all
+
       if @user_device.save
         status 201
       else
