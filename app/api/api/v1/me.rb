@@ -434,6 +434,8 @@ class API::V1::Me < API::V1
       @user_device.assign_attributes(ac_params.require(:user_device).permit(:type, :name, :device_id))
       @user_device.uuid = ac_params[:uuid]
 
+      UserDevice.where(device_id: @user_device.device_id).where.not(user_id: current_user.id).destroy_all
+
       is_new = !@user_device.persisted?
       has_saved = @user_device.save
 
