@@ -78,6 +78,9 @@ Rails.application.routes.draw do
   post 'user_manual_validation/update_user_org_code' => 'user_manual_validations#update_user_org_code'
   post 'user_manual_validation/refuse_user' => 'user_manual_validations#refuse_user'
 
+  post 'user_manual_validation/send_success_notification' => 'user_manual_validations#send_success_notification'
+  post 'user_manual_validation/send_error_notification' => 'user_manual_validations#send_error_notification'
+
   # Developers
   scope '/developers' do
     resources :applications, :controller => 'oauth/applications'

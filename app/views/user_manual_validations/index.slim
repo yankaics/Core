@@ -9,6 +9,7 @@
 					th 狀態
 					th 開通
 					th 提交時間
+					th 傳送推播
 					th
 
 			tbody
@@ -31,9 +32,27 @@
 							button.refuse-btn user-id="#{user_manual_validation.user_id}" validation-id="#{user_manual_validation.id}" 拒絕
 					td= user_manual_validation.created_at
 					td
+						button.send-notification.success user-id="#{user_manual_validation.user.id}" 傳送成功通知
+						button.send-notification.error user-id="#{user_manual_validation.user.id}" 傳送失敗通知
+					td
 						= button_to '刪除', user_manual_validation_path(user_manual_validation), :method => :delete
 
 javascript:
+	$('.send-notification').click(function(){
+		var user_id = $(this).attr('user-id');
+		if($(this).hasClass('success')){
+			var reqURL = 'user_manual_validation/send_success_notification?user_id=' + user_id;
+		}else if($(this).hasClass('error')){
+			var reqURL = 'user_manual_validation/send_error_notification?user_id=' + user_id;
+		}else{
+			return false;
+		}
+
+		$.post(reqURL, function(res){
+			console.log(res);
+		})
+	})
+
 	$(document).ready(function() {
 	  $('.update-org-select').select2();
 	});
