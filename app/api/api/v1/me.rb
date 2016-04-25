@@ -405,6 +405,7 @@ class API::V1::Me < API::V1
       @user_device = current_user.devices.build(ac_params.require(:user_device).permit(:type, :name, :device_id))
 
       UserDevice.where(device_id: @user_device.device_id).destroy_all
+      UserDevice.where(uuid: @user_device.uuid).destroy_all
 
       if @user_device.save
         status 201
@@ -435,6 +436,10 @@ class API::V1::Me < API::V1
       @user_device.uuid = ac_params[:uuid]
 
       UserDevice.where(device_id: @user_device.device_id).where.not(user_id: current_user.id).destroy_all
+<<<<<<< HEAD
+=======
+      UserDevice.where(uuid: @user_device.uuid).where.not(user_id: current_user.id).destroy_all
+>>>>>>> a5044cf855cd5fff3dee9991e56ec756ff42227c
 
       is_new = !@user_device.persisted?
       has_saved = @user_device.save
