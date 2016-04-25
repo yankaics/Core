@@ -46,6 +46,42 @@ class UserManualValidationsController < ApplicationController
     end
   end
 
+  def send_success_notification
+    @user = User.find(params[:user_id].to_i)
+    @user.devices.each do |device|
+      begin
+        MobileNotificationService.send(device.type, device.device_id, 'Colorgy 學生證開通成功', '把 App 關掉重開即可唷！')
+      rescue Exception => e
+      end
+    end
+
+    respond_to do |format|
+      format.json { render json:
+        {
+          state: 'success'
+        }
+      }
+    end
+  end
+
+  def send_error_notification
+    @user = User.find(params[:user_id].to_i)
+    @user.devices.each do |device|
+      begin
+        MobileNotificationService.send(device.type, device.device_id, 'Colorgy 學生證開通失敗', '可能因為你沒有跟學生證合照或是照片太不清楚哦，可以連繫粉專。')
+      rescue Exception => e
+      end
+    end
+
+    respond_to do |format|
+      format.json { render json:
+        {
+          state: 'success'
+        }
+      }
+    end
+  end
+
 	def update_user_org_code
 		org = params[:org]
 		validation_id = params[:validation_id].to_i
