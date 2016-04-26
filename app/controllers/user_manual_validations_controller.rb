@@ -90,6 +90,8 @@ class UserManualValidationsController < ApplicationController
 		@user = User.find(user_id)
 		@user.unconfirmed_organization_code = org
 
+    confirm_user!(@user, org)
+
     respond_to do |format|
       if @user.save
       	@user_manual_validation.update({ state: 'passed' })
@@ -154,4 +156,20 @@ class UserManualValidationsController < ApplicationController
 	def user_manual_validation_params
 		params.require(:user_manual_validation).permit(:user_id, :state, :validation_image)
 	end
+
+  def confirm_user! user, org
+    email = user.email
+    uid = email.match(/^[^@]+/)[0]
+    identity = UserIdentity.create!(
+      name: user.name,
+      email: email,
+      organization_code: org,
+      identity: 1,
+      uid: uid,
+      permit_changing_department_in_group: true,
+      permit_changing_department_in_organization: true
+    )
+    user_email = user.emails.create!(email: email)
+    user_email.confirm!
+  end
 end
