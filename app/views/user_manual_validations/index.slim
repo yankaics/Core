@@ -21,7 +21,7 @@
 					td= user_manual_validation.state
 					td
 						- if user_manual_validation.state == 'passed'
-							span= user_manual_validation.user.unconfirmed_organization_code
+							span= user_manual_validation.user.try(:organization_code)
 						- elsif user_manual_validation.state == 'refused'
 							span= '已拒絕'
 						- elsif user_manual_validation.state == 'pending'
