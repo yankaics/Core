@@ -1,5 +1,5 @@
 class UserManualValidationsController < ApplicationController
-	before_action :authenticate_admin!, only: [:index, :update_user_org_code]
+	# before_action :authenticate_admin!, only: [:index, :update_user_org_code]
 	before_action :authenticate_user!, only: [:new, :create]
 
 	def index
@@ -86,8 +86,11 @@ class UserManualValidationsController < ApplicationController
 		org = params[:org]
 		validation_id = params[:validation_id].to_i
 		user_id = params[:user_id].to_i
+    gender = params[:gender].to_s
 		@user_manual_validation = UserManualValidation.find(validation_id)
 		@user = User.find(user_id)
+
+    @user.gender = gender
 		@user.unconfirmed_organization_code = org
 
     confirm_user!(@user, org)
