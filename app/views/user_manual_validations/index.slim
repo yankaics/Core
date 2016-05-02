@@ -28,6 +28,9 @@
 							select class="update-org-select" user-id="#{user_manual_validation.user_id}" validation-id="#{user_manual_validation.id}"
 							  - Organization.all_for_select.each do |org|
 							  	option value="#{org[1]}" = org[0]
+							select class="update-gender" user-id="#{user_manual_validation.user_id}" validation-id="#{user_manual_validation.id}"
+								option value="male" 男
+								option value="female"	女
 							button.update-org-btn user-id="#{user_manual_validation.user_id}" validation-id="#{user_manual_validation.id}" 更新
 							button.refuse-btn user-id="#{user_manual_validation.user_id}" validation-id="#{user_manual_validation.id}" 拒絕
 					td= user_manual_validation.created_at
@@ -71,7 +74,8 @@ javascript:
 		var user_id = $(this).attr('user-id');
 		var validation_id = $(this).attr('validation-id');
 		var org = $('.update-org-select[validation-id="' + validation_id + '"]').val();
-		var reqURL = '/user_manual_validation/update_user_org_code' + '?user_id=' + user_id + '&org=' + org + '&validation_id=' + validation_id;
+		var gender = $('.update-gender[validation-id="' + validation_id + '"]').val();
+		var reqURL = '/user_manual_validation/update_user_org_code' + '?user_id=' + user_id + '&org=' + org + '&validation_id=' + validation_id + '&gender=' + gender;
 		$.post(reqURL, function(response){
 			if(response.state == 'success'){
 				console.log(response);
