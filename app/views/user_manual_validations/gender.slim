@@ -1,0 +1,40 @@
+= stylesheet_link_tag 'user_manual_validation', media: 'all', 'data-turbolinks-track' => true
+.container
+	div
+		table.table
+			thead
+				tr
+					th 使用者名稱
+					th 圖片
+					th 設定性別
+
+			tbody
+			- @users.each do |user|
+				tr
+					td= user.try(:name)
+					td
+						= image_tag user.avatar_url, style:'width: 80px; height: 80px;'
+					td
+						- if user.gender == 'male' || user.gender == 'female'
+							= user.gender
+						- else
+							select.gender-select user-id="#{user.id}"
+								option value="male" male
+								option value="female" female
+							button.gender-save-btn user-id="#{user.id}" 儲存
+
+
+javascript:
+	$('.gender-save-btn').click(function(){
+		var user_id = $(this).attr('user-id');
+		var gender = $('.gender-select[user-id="' + user_id + '"]').val();
+		var reqURL = '/user_manual_validation/update_user_gender' + '?user_id=' + user_id + '&gender=' + gender;
+		console.log(reqURL);
+		$.post(reqURL, function(response){
+			console.log(response);
+			if(response.state == 'success'){
+				var gender = response.user.gender;
+				$(this).parent('td').html('<span>' + gender + '</span>');
+			}
+		}.bind(this))
+	})

@@ -81,6 +81,9 @@ Rails.application.routes.draw do
   post 'user_manual_validation/send_success_notification' => 'user_manual_validations#send_success_notification'
   post 'user_manual_validation/send_error_notification' => 'user_manual_validations#send_error_notification'
 
+  get 'user_manual_validations/gender' => 'user_manual_validations#gender'
+  post 'user_manual_validation/update_user_gender' => 'user_manual_validations#update_user_gender'
+
   # Developers
   scope '/developers' do
     resources :applications, :controller => 'oauth/applications'

@@ -11,6 +11,39 @@ class UserManualValidationsController < ApplicationController
 		@user_manual_validation = current_user.build_user_manual_validation
 	end
 
+  def gender
+    @users = User.includes(:data).where(user_data: {gender: 0})
+  end
+
+  def update_user_gender
+    user_id = params[:user_id].to_i
+    gender = params[:gender].to_s
+    @user = User.find(user_id)
+    if @user.name.blank?
+      @user.name = '無名氏'
+    end
+    @user.gender = gender
+
+    respond_to do |format|
+      if @user.save
+        format.json { render json:
+          {
+            state: 'success',
+            user: @user,
+          }
+        }
+      else
+        format.json { render json:
+          {
+            state: 'error',
+            error: @user.errors.full_messages
+          }
+        }
+      end
+    end
+
+  end
+
   def destroy
     @user_manual_validation = UserManualValidation.find(params[:id])
 
