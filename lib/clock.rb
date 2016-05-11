@@ -5,7 +5,7 @@ require 'clockwork'
 
 module Clockwork
   configure do |config|
-    config[:logger] = Rails.logger
+    config[:logger] = Logger.new('/var/log/clockwork.log')
   end
 
   # every(3.hours, 'course.sync') { CourseSyncWorker.perform_async }
