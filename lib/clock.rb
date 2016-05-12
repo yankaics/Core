@@ -17,5 +17,5 @@ module Clockwork
 
   # every(10.minutes, 'bill.test_autopay.pay') { TestingBillWorker.perform_async }
 
-  every( 1.day , 'change_daily_question', :at => '12:00' ) { ChatDailyQuestionJob.perform_later }
+  every( 1.day , 'change_daily_question', :at => '04:00', :tz => 'UTC' ) { ChatDailyQuestionJob.perform_later }
 end
