@@ -1,8 +1,8 @@
 class ChatDailyQuestionsController < ApplicationController
-	before_action :authenticate_admin!
+	# before_action :authenticate_admin!
 
 	def index
-		@questions = ChatDailyQuestion.all
+		@questions = ChatDailyQuestion.all.order("created_at DESC")
 	end
 
 	def edit
