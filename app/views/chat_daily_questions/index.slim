@@ -1,0 +1,22 @@
+p
+	= link_to 'New Question', new_chat_daily_question_path
+blockquote 說明：以 schedule_at 的時間在當天的中午十二點發送訊息，如果 sent_at 有時間，代表已經發送過。
+table.table
+	thead
+		tr
+			td id
+			td question
+			td schedule_at
+			td sent_at
+			td
+	tbody
+		- @questions.each do |question|
+			tr
+				td =question.id
+				td =question.question
+				td =question.scheduled_at
+				td =question.try(:send_at)
+				td
+					p
+						=link_to 'Edit', edit_chat_daily_question_path(question)
+					=button_to 'Delete', chat_daily_question_path(question), method: 'delete'

@@ -1,5 +1,5 @@
 class UserManualValidationsController < ApplicationController
-	# before_action :authenticate_admin!, only: [:index, :update_user_org_code]
+	before_action :authenticate_admin!, only: [:index, :update_user_org_code]
 	before_action :authenticate_user!, only: [:new, :create]
 
 	def index

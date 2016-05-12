@@ -71,6 +71,9 @@ Rails.application.routes.draw do
   get '/sso_redirect_iframe' => 'sso#get_sso_redirect_iframe'
   get '/sso_new_session' => 'sso#get_sso_new_session'
 
+  # chat daily question route
+  resources :chat_daily_questions
+
   # user manual validation route
   resources :user_manual_validations, only: [:index, :new, :create, :destroy]
   get 'user_manual_validation/thank_you' => 'user_manual_validations#thank_you_page', as: :thank_you_page
