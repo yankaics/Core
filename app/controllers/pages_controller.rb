@@ -1,5 +1,6 @@
 class PagesController < ApplicationController
   layout '_base', only: [:mobile_index]
+  before_action :authenticate_admin!, only: [:chat_daily_question]
 
   def index
     render 'landing' if current_user.blank?
@@ -8,6 +9,10 @@ class PagesController < ApplicationController
   end
 
   def mobile_index
+
+  end
+
+  def chat_daily_question
 
   end
 
