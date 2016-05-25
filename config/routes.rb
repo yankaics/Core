@@ -87,10 +87,6 @@ Rails.application.routes.draw do
   get 'user_manual_validations/gender' => 'user_manual_validations#gender'
   post 'user_manual_validation/update_user_gender' => 'user_manual_validations#update_user_gender'
 
-  # change daily question
-
-  get '/send_daily_question' => 'pages#chat_daily_question'
-
   # Developers
   scope '/developers' do
     resources :applications, :controller => 'oauth/applications'

@@ -12,10 +12,6 @@ class PagesController < ApplicationController
 
   end
 
-  def chat_daily_question
-
-  end
-
   def eula
     @eula = Settings[:site_eula]
   end
