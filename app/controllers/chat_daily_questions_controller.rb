@@ -1,5 +1,5 @@
 class ChatDailyQuestionsController < ApplicationController
-	# before_action :authenticate_admin!
+	before_action :authenticate_admin!
 
 	def index
 		@questions = ChatDailyQuestion.all.order("created_at DESC")
@@ -21,6 +21,7 @@ class ChatDailyQuestionsController < ApplicationController
 
 	def create
 		@question = ChatDailyQuestion.create(questions_params)
+		ChatDailyQuestionJob.perform_later
 		redirect_to chat_daily_questions_path
 	end
 
